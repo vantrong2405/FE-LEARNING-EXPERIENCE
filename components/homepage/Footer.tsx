@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { Facebook, Twitter, Instagram, Linkedin } from 'lucide-react'
+import { Icons } from '../ui/icons'
 
 const partners = [
   {
@@ -25,10 +25,10 @@ const partners = [
 ]
 
 const socialLinks = [
-  { icon: Facebook, href: '#' },
-  { icon: Twitter, href: '#' },
-  { icon: Instagram, href: '#' },
-  { icon: Linkedin, href: '#' }
+  { icon: Icons.Facebook, href: '#' },
+  { icon: Icons.Twitter, href: '#' },
+  { icon: Icons.Instagram, href: '#' },
+  { icon: Icons.Linkedin, href: '#' }
 ]
 
 export default function Footer() {

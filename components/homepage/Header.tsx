@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { GraduationCap, Globe, ChevronDown, Menu, X } from 'lucide-react'
 import Link from 'next/link'
+import { Icons } from '../ui/icons'
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -14,7 +14,7 @@ export default function Header() {
       <div className='container mx-auto px-4 py-4'>
         <div className='flex items-center justify-between'>
           <div className='flex items-center space-x-2'>
-            <GraduationCap className='h-8 w-8 text-purple-500' />
+            <Icons.GraduationCap className='h-8 w-8 text-purple-500' />
             <span className='text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 text-transparent bg-clip-text'>
               EduMall
             </span>
@@ -23,7 +23,7 @@ export default function Header() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant='ghost' className='text-white hover:text-purple-400 transition-colors'>
-                  Courses <ChevronDown className='ml-1 h-4 w-4' />
+                  Courses <Icons.ChevronDown className='ml-1 h-4 w-4' />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className='bg-gray-800 border-gray-700'>
@@ -53,7 +53,7 @@ export default function Header() {
           </nav>
           <div className='hidden md:flex items-center space-x-4'>
             <Button variant='ghost' size='icon' className='text-white hover:text-purple-400 transition-colors'>
-              <Globe className='h-5 w-5' />
+              <Icons.Globe className='h-5 w-5' />
             </Button>
             <Button variant='ghost' className='text-white hover:text-purple-400 transition-colors'>
               Log in
@@ -68,7 +68,7 @@ export default function Header() {
             className='md:hidden text-white hover:text-purple-400 transition-colors'
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            {isMenuOpen ? <X className='h-6 w-6' /> : <Menu className='h-6 w-6' />}
+            {isMenuOpen ? <Icons.X className='h-6 w-6' /> : <Icons.Menu className='h-6 w-6' />}
           </Button>
         </div>
         {isMenuOpen && (

@@ -1,9 +1,9 @@
-import { Users, BookOpen, GraduationCap } from 'lucide-react'
+import { Icons } from '../ui/icons'
 
 const stats = [
-  { icon: Users, value: '2,000+', label: 'Expert Instructors' },
-  { icon: BookOpen, value: '5,500+', label: 'High-Quality Courses' },
-  { icon: GraduationCap, value: '4.5M+', label: 'Active Students' }
+  { icon: Icons.Users, value: '2,000+', label: 'Expert Instructors' },
+  { icon: Icons.BookOpen, value: '5,500+', label: 'High-Quality Courses' },
+  { icon: Icons.GraduationCap, value: '4.5M+', label: 'Active Students' }
 ]
 
 export default function Statistics() {
