@@ -24,7 +24,7 @@ export default function Hero() {
             >
               Get Started
             </Button>
-            <Button size='lg' variant='outline' className='text-white border-purple-500 hover:bg-purple-500/10'>
+            <Button size='lg' variant='secondary'>
               Explore Courses
             </Button>
           </div>
