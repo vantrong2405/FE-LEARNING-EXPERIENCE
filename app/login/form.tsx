@@ -5,8 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { GraduationCap, Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
+import { Icons } from '@/components/ui/icons'
 
 export default function FormLogin() {
   const [showPassword, setShowPassword] = useState(false)
@@ -19,7 +19,7 @@ export default function FormLogin() {
       <Card className='w-full max-w-md z-10 bg-gray-800 border-gray-700'>
         <CardHeader className='space-y-1'>
           <div className='flex items-center justify-center mb-4'>
-            <GraduationCap className='h-12 w-12 text-purple-500' />
+            <Icons.GraduationCap className='h-12 w-12 text-purple-500' />
           </div>
           <CardTitle className='text-2xl font-bold text-center bg-gradient-to-r from-purple-400 to-pink-500 text-transparent bg-clip-text'>
             Welcome back to EduMall
@@ -34,7 +34,7 @@ export default function FormLogin() {
               Email
             </Label>
             <div className='relative'>
-              <Mail className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' size={20} />
+              <Icons.Mail className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' size={20} />
               <Input
                 id='email'
                 placeholder='Enter your email'
@@ -48,7 +48,7 @@ export default function FormLogin() {
               Password
             </Label>
             <div className='relative'>
-              <Lock className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' size={20} />
+              <Icons.Lock className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' size={20} />
               <Input
                 id='password'
                 type={showPassword ? 'text' : 'password'}
@@ -60,7 +60,7 @@ export default function FormLogin() {
                 onClick={togglePasswordVisibility}
                 className='absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300'
               >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                {showPassword ? <Icons.EyeOff size={20} /> : <Icons.Eye size={20} />}
               </button>
             </div>
           </div>
