@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import Link from 'next/link'
 import { Icons } from '../ui/icons'
 
 const partners = [
@@ -48,6 +49,74 @@ export default function Footer() {
                 className='opacity-70 hover:opacity-100 transition-opacity grayscale hover:grayscale-0'
               />
             ))}
+          </div>
+        </div>
+        <div className='grid grid-cols-1 md:grid-cols-4 gap-8 mb-8'>
+          <div>
+            <h4 className='text-white font-semibold mb-4'>About EduMall</h4>
+            <ul className='space-y-2'>
+              <li>
+                <Link href='#' className='text-gray-400 hover:text-purple-400'>
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link href='#' className='text-gray-400 hover:text-purple-400'>
+                  Careers
+                </Link>
+              </li>
+              <li>
+                <Link href='#' className='text-gray-400 hover:text-purple-400'>
+                  Press
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 className='text-white font-semibold mb-4'>Resources</h4>
+            <ul className='space-y-2'>
+              <li>
+                <Link href='#' className='text-gray-400 hover:text-purple-400'>
+                  Blog
+                </Link>
+              </li>
+              <li>
+                <Link href='#' className='text-gray-400 hover:text-purple-400'>
+                  Help Center
+                </Link>
+              </li>
+              <li>
+                <Link href='#' className='text-gray-400 hover:text-purple-400'>
+                  Testimonials
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 className='text-white font-semibold mb-4'>Legal</h4>
+            <ul className='space-y-2'>
+              <li>
+                <Link href='#' className='text-gray-400 hover:text-purple-400'>
+                  Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link href='#' className='text-gray-400 hover:text-purple-400'>
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href='#' className='text-gray-400 hover:text-purple-400'>
+                  Cookie Policy
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 className='text-white font-semibold mb-4'>Contact Us</h4>
+            <p className='text-gray-400 mb-2'>1234 Learning Street</p>
+            <p className='text-gray-400 mb-2'>Education City, ED 12345</p>
+            <p className='text-gray-400'>support@edumall.com</p>
           </div>
         </div>
         <div className='border-t border-gray-800 pt-8 text-center'>

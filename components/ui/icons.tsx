@@ -9,7 +9,12 @@ import {
   Instagram,
   Linkedin,
   Users,
-  BookOpen
+  BookOpen,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  User
 } from 'lucide-react'
 
 export const Icons = {
@@ -23,5 +28,10 @@ export const Icons = {
   Instagram,
   Linkedin,
   Users,
-  BookOpen
+  BookOpen,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  User
 }
