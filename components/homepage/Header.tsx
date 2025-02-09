@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { GraduationCap, Globe, ChevronDown, Menu, X } from 'lucide-react'
 import Link from 'next/link'
-import logo from '@/public/assets/images/logo.png'
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -61,9 +60,11 @@ export default function Header() {
                 Log in
               </Button>
             </Link>
-            <Button className='bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white'>
-              Sign up
-            </Button>
+            <Link href='/register'>
+              <Button className='bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white'>
+                Sign up
+              </Button>
+            </Link>
           </div>
           <Button
             variant='ghost'
@@ -102,9 +103,11 @@ export default function Header() {
                 Log in
               </Button>
             </Link>
-            <Button className='w-full mt-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white'>
-              Sign up
-            </Button>
+            <Link href='/register' className='w-full'>
+              <Button className='w-full mt-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white'>
+                Sign up
+              </Button>
+            </Link>
           </div>
         )}
       </div>
