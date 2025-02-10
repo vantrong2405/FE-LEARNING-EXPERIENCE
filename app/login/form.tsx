@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
 import { Icons } from '@/components/ui/icons'
+import { pathURL } from '@/constants/path'
 
 export default function FormLogin() {
   const [showPassword, setShowPassword] = useState(false)
@@ -71,11 +72,11 @@ export default function FormLogin() {
           </Button>
           <div className='text-sm text-center text-gray-400'>
             Don't have an account?{' '}
-            <Link href='/register' className='text-purple-400 hover:text-purple-300'>
+            <Link href={pathURL.register} className='text-purple-400 hover:text-purple-300'>
               Sign up
             </Link>
           </div>
-          <Link href='/forgot-password' className='text-sm text-center text-purple-400 hover:text-purple-300'>
+          <Link href={pathURL.forgot_password} className='text-sm text-center text-purple-400 hover:text-purple-300'>
             Forgot your password?
           </Link>
         </CardFooter>
