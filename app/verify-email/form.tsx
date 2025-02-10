@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { pathURL } from '@/constants/path'
 import { GraduationCap, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 
@@ -28,12 +29,12 @@ export default function FormEmailVerificationSuccess() {
           </p>
         </CardContent>
         <CardFooter className='flex flex-col space-y-4'>
-          <Link href='/login' className='w-full'>
+          <Link href={pathURL.login} className='w-full'>
             <Button className='w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white'>
               Log In to Your Account
             </Button>
           </Link>
-          <Link href='/' className='w-full'>
+          <Link href={pathURL.home} className='w-full'>
             <Button variant='outline' className='w-full text-purple-400 border-purple-400 hover:bg-purple-400/10'>
               Return to Homepage
             </Button>
