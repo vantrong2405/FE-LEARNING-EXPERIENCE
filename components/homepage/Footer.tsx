@@ -53,7 +53,7 @@ export default function Footer() {
         </div>
         <div className='grid grid-cols-1 md:grid-cols-4 gap-8 mb-8'>
           <div>
-            <h4 className='text-white font-semibold mb-4'>About EduMall</h4>
+            <h4 className='text-white font-semibold mb-4'>About ELearn</h4>
             <ul className='space-y-2'>
               <li>
                 <Link href='#' className='text-gray-400 hover:text-purple-400'>
@@ -116,7 +116,7 @@ export default function Footer() {
             <h4 className='text-white font-semibold mb-4'>Contact Us</h4>
             <p className='text-gray-400 mb-2'>1234 Learning Street</p>
             <p className='text-gray-400 mb-2'>Education City, ED 12345</p>
-            <p className='text-gray-400'>support@edumall.com</p>
+            <p className='text-gray-400'>support@ELearn.com</p>
           </div>
         </div>
         <div className='border-t border-gray-800 pt-8 text-center'>
@@ -127,7 +127,7 @@ export default function Footer() {
               </a>
             ))}
           </div>
-          <p className='text-gray-400'>&copy; 2025 EduMall. All rights reserved.</p>
+          <p className='text-gray-400'>&copy; 2025 ELearn. All rights reserved.</p>
         </div>
       </div>
     </footer>

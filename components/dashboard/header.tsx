@@ -15,7 +15,7 @@ export function DashboardHeader() {
             <div className='bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg p-1.5'>
               <div className='text-white font-bold text-xl'>E</div>
             </div>
-            <span className='text-xl font-bold text-white'>Edumall</span>
+            <span className='text-xl font-bold text-white'>ELearn</span>
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

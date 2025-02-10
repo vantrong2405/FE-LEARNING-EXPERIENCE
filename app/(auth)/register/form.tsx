@@ -25,7 +25,7 @@ export default function FormRegister() {
             <Icons.GraduationCap className='h-12 w-12 text-purple-500' />
           </div>
           <CardTitle className='text-2xl font-bold text-center bg-gradient-to-r from-purple-400 to-pink-500 text-transparent bg-clip-text'>
-            Create your EduMall account
+            Create your ELearn account
           </CardTitle>
           <CardDescription className='text-gray-400 text-center'>Join our community of learners today</CardDescription>
         </CardHeader>

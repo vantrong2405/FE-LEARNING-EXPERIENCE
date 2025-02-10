@@ -17,7 +17,7 @@ export default function Header() {
           <Link href={pathURL.home} className='flex items-center space-x-2'>
             <Icons.GraduationCap className='h-8 w-8 text-purple-500' />
             <span className='text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 text-transparent bg-clip-text'>
-              EduMall
+              ELearn
             </span>
           </Link>
           <nav className='hidden md:flex space-x-6'>

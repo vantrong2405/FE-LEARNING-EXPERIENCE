@@ -24,7 +24,7 @@ export default function FormLogin() {
             <Icons.GraduationCap className='h-12 w-12 text-purple-500' />
           </div>
           <CardTitle className='text-2xl font-bold text-center bg-gradient-to-r from-purple-400 to-pink-500 text-transparent bg-clip-text'>
-            Welcome back to EduMall
+            Welcome back to ELearn
           </CardTitle>
           <CardDescription className='text-gray-400 text-center'>
             Enter your credentials to access your account
