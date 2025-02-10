@@ -7,7 +7,7 @@ const testimonials = [
     image:
       'https://static.vecteezy.com/system/resources/thumbnails/022/059/000/small/no-image-available-icon-vector.jpg',
     quote:
-      "EduMall's courses have been instrumental in advancing my career in data science. The quality of instruction is unparalleled."
+      "ELearn's courses have been instrumental in advancing my career in data science. The quality of instruction is unparalleled."
   },
   {
     name: 'Michael Chen',
@@ -15,7 +15,7 @@ const testimonials = [
     image:
       'https://static.vecteezy.com/system/resources/thumbnails/022/059/000/small/no-image-available-icon-vector.jpg',
     quote:
-      "I've taken multiple programming courses on EduMall, and each one has significantly improved my coding skills. Highly recommended!"
+      "I've taken multiple programming courses on ELearn, and each one has significantly improved my coding skills. Highly recommended!"
   },
   {
     name: 'Emily Rodriguez',
@@ -23,7 +23,7 @@ const testimonials = [
     image:
       'https://static.vecteezy.com/system/resources/thumbnails/022/059/000/small/no-image-available-icon-vector.jpg',
     quote:
-      'The digital marketing courses on EduMall have helped me stay ahead in this rapidly evolving field. Great investment in my professional growth.'
+      'The digital marketing courses on ELearn have helped me stay ahead in this rapidly evolving field. Great investment in my professional growth.'
   }
 ]
 
