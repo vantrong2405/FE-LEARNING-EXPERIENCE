@@ -1,6 +1,6 @@
 import React from 'react'
-import FormDashboardCourse from './form'
+import FormDashboardCourses from './form'
 
 export default function page() {
-  return <FormDashboardCourse />
+  return <FormDashboardCourses />
 }
