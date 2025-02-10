@@ -1,3 +1,4 @@
+import Contributors from '@/components/homepage/Contributors'
 import FeaturedCourses from '@/components/homepage/FeaturedCourses'
 import Footer from '@/components/homepage/Footer'
 import Header from '@/components/homepage/Header'
@@ -16,6 +17,7 @@ export default function HomePage() {
           <Statistics />
           <FeaturedCourses />
           <Testimonials />
+          <Contributors />
         </main>
         <Footer />
       </div>
