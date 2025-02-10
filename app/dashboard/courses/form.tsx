@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Slider } from '@/components/ui/slider'
 import { Book, Clock, Filter, Search, Star, TrendingUp, Users } from 'lucide-react'
 import Image from 'next/image'
 
@@ -99,31 +99,23 @@ const courses = [
 
 const categories = ['Tất cả', 'Ngoại Ngữ', 'Phát Triển Bản Thân', 'Thiết Kế', 'Lập Trình', 'Marketing', 'Tài Chính']
 
-const priceRanges = [
-  { label: 'Tất cả giá', value: 'all' },
-  { label: 'Dưới 200,000đ', value: '0-200000' },
-  { label: '200,000đ - 500,000đ', value: '200000-500000' },
-  { label: '500,000đ - 1,000,000đ', value: '500000-1000000' },
-  { label: 'Trên 1,000,000đ', value: '1000000-' }
-]
-
 export default function CoursesPage() {
   const [selectedCategory, setSelectedCategory] = useState('Tất cả')
-  const [priceRange, setPriceRange] = useState('all')
+  const [priceRange, setPriceRange] = useState([0, 1000000])
   const [searchQuery, setSearchQuery] = useState('')
+  const [filteredCourses, setFilteredCourses] = useState(courses)
 
-  const filteredCourses = courses.filter((course) => {
-    const categoryMatch = selectedCategory === 'Tất cả' || course.category === selectedCategory
-    const priceMatch = (() => {
-      if (priceRange === 'all') return true
-      const [min, max] = priceRange.split('-').map(Number)
-      return course.price >= min && (max ? course.price <= max : true)
-    })()
-    const searchMatch =
-      course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      course.instructor.toLowerCase().includes(searchQuery.toLowerCase())
-    return categoryMatch && priceMatch && searchMatch
-  })
+  useEffect(() => {
+    const filtered = courses.filter((course) => {
+      const categoryMatch = selectedCategory === 'Tất cả' || course.category === selectedCategory
+      const priceMatch = course.price >= priceRange[0] && course.price <= priceRange[1]
+      const searchMatch =
+        course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        course.instructor.toLowerCase().includes(searchQuery.toLowerCase())
+      return categoryMatch && priceMatch && searchMatch
+    })
+    setFilteredCourses(filtered)
+  }, [selectedCategory, priceRange, searchQuery])
 
   return (
     <div className='container mx-auto px-4 py-8 space-y-12'>
@@ -146,18 +138,20 @@ export default function CoursesPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Select value={priceRange} onValueChange={setPriceRange}>
-            <SelectTrigger className='w-full md:w-[200px] bg-gray-800 border-gray-700 text-white'>
-              <SelectValue placeholder='Chọn mức giá' />
-            </SelectTrigger>
-            <SelectContent>
-              {priceRanges.map((range) => (
-                <SelectItem key={range.value} value={range.value}>
-                  {range.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className='w-full md:w-auto flex flex-col items-start space-y-2'>
+            <label htmlFor='price-range' className='text-sm font-medium text-gray-300'>
+              Giá: {priceRange[0].toLocaleString()}đ - {priceRange[1].toLocaleString()}đ
+            </label>
+            <Slider
+              id='price-range'
+              min={0}
+              max={1000000}
+              step={50000}
+              value={priceRange}
+              onValueChange={setPriceRange}
+              className='w-full md:w-[300px]'
+            />
+          </div>
           <Button className='w-full md:w-auto bg-purple-600 hover:bg-purple-700 text-white'>
             <Filter className='mr-2 h-4 w-4' /> Lọc Khóa Học
           </Button>
