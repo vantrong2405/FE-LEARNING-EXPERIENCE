@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
 import { Icons } from '@/components/ui/icons'
+import { pathURL } from '@/constants/path'
 
 export default function FormRegister() {
   const [showPassword, setShowPassword] = useState(false)
@@ -105,7 +106,7 @@ export default function FormRegister() {
           </Button>
           <div className='text-sm text-center text-gray-400'>
             Already have an account?{' '}
-            <Link href='/login' className='text-purple-400 hover:text-purple-300'>
+            <Link href={pathURL.login} className='text-purple-400 hover:text-purple-300'>
               Sign in
             </Link>
           </div>

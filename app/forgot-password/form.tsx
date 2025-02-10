@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import Link from 'next/link'
 import { Icons } from '@/components/ui/icons'
+import { pathURL } from '@/constants/path'
 
 export default function FormForgotPassword() {
   return (
@@ -45,7 +46,7 @@ export default function FormForgotPassword() {
           </Button>
           <div className='text-sm text-center text-gray-400'>
             Remember your password?{' '}
-            <Link href='/login' className='text-purple-400 hover:text-purple-300'>
+            <Link href={pathURL.login} className='text-purple-400 hover:text-purple-300'>
               Back to login
             </Link>
           </div>
