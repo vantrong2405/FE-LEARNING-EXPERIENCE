@@ -8,35 +8,35 @@ const contributors = [
     role: 'Lead Developer',
     image:
       'https://static.vecteezy.com/system/resources/thumbnails/022/059/000/small/no-image-available-icon-vector.jpg',
-    github: 'https://github.com/alexjohnson'
+    github: 'https://github.com/vantrong2405'
   },
   {
     name: 'Nguyễn Đức Ninh',
     role: 'UX Designer',
     image:
       'https://static.vecteezy.com/system/resources/thumbnails/022/059/000/small/no-image-available-icon-vector.jpg',
-    github: 'https://github.com/sarahlee'
+    github: 'https://github.com/vantrong2405'
   },
   {
     name: 'Nguyễn Đức Thắng',
     role: 'Backend Engineer',
     image:
       'https://static.vecteezy.com/system/resources/thumbnails/022/059/000/small/no-image-available-icon-vector.jpg',
-    github: 'https://github.com/mikechen'
+    github: 'https://github.com/vantrong2405'
   },
   {
     name: 'Nguyễn Bá Thế Viễn',
     role: 'Content Strategist',
     image:
       'https://static.vecteezy.com/system/resources/thumbnails/022/059/000/small/no-image-available-icon-vector.jpg',
-    github: 'https://github.com/emilydavis'
+    github: 'https://github.com/vantrong2405'
   },
   {
     name: 'Nguyễn Hữu Trường',
     role: 'Mobile Developer',
     image:
       'https://static.vecteezy.com/system/resources/thumbnails/022/059/000/small/no-image-available-icon-vector.jpg',
-    github: 'https://github.com/carlosrodriguez'
+    github: 'https://github.com/vantrong2405'
   }
 ]
 
