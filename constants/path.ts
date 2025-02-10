@@ -2,5 +2,6 @@ export const pathURL = {
   home: '/',
   login: '/login',
   register: '/register',
-  forgot_password: '/forgot-password'
+  forgot_password: '/forgot-password',
+  dashboard_courses: '/dashboard/courses'
 }

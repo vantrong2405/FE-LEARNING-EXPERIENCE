@@ -25,7 +25,7 @@ export default function FormEmailVerificationSuccess() {
             <CheckCircle className='h-16 w-16 text-green-500 animate-bounce' />
           </div>
           <p className='text-center text-gray-300'>
-            You can now access all features of EduMall. Start exploring courses and begin your learning journey!
+            You can now access all features of ELearn. Start exploring courses and begin your learning journey!
           </p>
         </CardContent>
         <CardFooter className='flex flex-col space-y-4'>

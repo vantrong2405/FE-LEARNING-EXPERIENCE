@@ -1,5 +1,7 @@
 import { Button } from '@/components/ui/button'
+import { pathURL } from '@/constants/path'
 import Image from 'next/image'
+import Link from 'next/link'
 
 export default function Hero() {
   return (
@@ -24,9 +26,11 @@ export default function Hero() {
             >
               Get Started
             </Button>
-            <Button size='lg' variant='secondary'>
-              Explore Courses
-            </Button>
+            <Link href={pathURL.dashboard_courses}>
+              <Button size='lg' variant='secondary'>
+                Explore Courses
+              </Button>
+            </Link>
           </div>
         </div>
         <div className='md:w-1/2 relative animate-fade-in-up animation-delay-300'>
