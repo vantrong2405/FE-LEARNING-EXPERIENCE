@@ -57,7 +57,7 @@ const CourseDetail = () => {
               alt='Course Thumbnail'
               width={400}
               height={225}
-              className='rounded-lg mb-6'
+              className='rounded-lg mb-6 mx-auto'
             />
             <div className='text-4xl font-bold mb-6 text-purple-400'>$129.99</div>
             <Button className='w-full text-lg py-6 mb-6 bg-purple-600 hover:bg-purple-700 text-white'>
@@ -450,7 +450,7 @@ const CourseDetail = () => {
                 alt={course.title}
                 width={300}
                 height={169}
-                className='rounded-lg mb-4'
+                className='rounded-lg mb-4 mx-auto'
               />
               <h3 className='text-xl font-semibold mb-2 text-white'>{course.title}</h3>
               <p className='text-sm text-gray-300 mb-2'>{course.description}</p>
