@@ -29,16 +29,14 @@ const testimonials = [
 
 export default function Testimonials() {
   return (
-    <div className='bg-gray-800 py-16 md:py-24'>
+    <div className='dark:bg-gray-800 py-16 md:py-24 bg-gray-200'>
       <div className='container mx-auto px-4'>
-        <h2 className='text-3xl md:text-4xl font-bold mb-12 text-center text-white animate-fade-in-up'>
-          What Our Students Say
-        </h2>
+        <h2 className='text-3xl md:text-4xl font-bold mb-12 text-center  animate-fade-in-up'>What Our Students Say</h2>
         <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
           {testimonials.map((testimonial, index) => (
             <div
               key={index}
-              className='bg-gray-700 rounded-lg p-6 shadow-lg animate-fade-in-up'
+              className='dark:bg-gray-700 rounded-lg p-6 shadow-lg animate-fade-in-up'
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <div className='flex items-center mb-4'>
@@ -50,11 +48,11 @@ export default function Testimonials() {
                   className='rounded-full mr-4'
                 />
                 <div>
-                  <h3 className='text-lg font-semibold text-white'>{testimonial.name}</h3>
-                  <p className='text-purple-300'>{testimonial.role}</p>
+                  <h3 className='text-lg font-semibold '>{testimonial.name}</h3>
+                  <p className='dark:text-purple-300'>{testimonial.role}</p>
                 </div>
               </div>
-              <p className='text-gray-300 italic'>"{testimonial.quote}"</p>
+              <p className='dark:text-gray-300 italic'>"{testimonial.quote}"</p>
             </div>
           ))}
         </div>

@@ -8,7 +8,7 @@ import Testimonials from '@/components/homepage/Testimonials'
 
 export default function HomePage() {
   return (
-    <div className='min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white'>
+    <div className='min-h-screen dark:g-gradient-to-b dark:from-gray-900 dark:to-gray-800'>
       <div className="fixed inset-0 bg-[url('/bg-pattern.svg')] opacity-5 z-0"></div>
       <div className='relative z-10'>
         <Header />

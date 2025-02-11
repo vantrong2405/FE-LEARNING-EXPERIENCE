@@ -12,7 +12,7 @@ const placeholderImage =
 
 const CourseDetail = () => {
   return (
-    <div className='container mx-auto px-4 py-8 bg-[#0D0A25] text-white'>
+    <div className='container mx-auto px-4 py-8 bg-[#0D0A25] '>
       {/* Course Header */}
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12'>
         <div className='lg:col-span-2'>
@@ -29,10 +29,10 @@ const CourseDetail = () => {
               <span className='ml-2 text-gray-300'>(3,245 ratings)</span>
             </div>
             <span className='text-gray-300 text-lg'>23,456 students enrolled</span>
-            <Badge variant='secondary' className='text-lg px-3 py-1 bg-purple-600 text-white'>
+            <Badge variant='secondary' className='text-lg px-3 py-1 bg-purple-600 '>
               Bestseller
             </Badge>
-            <Badge variant='secondary' className='text-lg px-3 py-1 bg-gray-700 text-white'>
+            <Badge variant='secondary' className='text-lg px-3 py-1 bg-gray-700 '>
               Updated 1 week ago
             </Badge>
           </div>
@@ -60,9 +60,7 @@ const CourseDetail = () => {
               className='rounded-lg mb-6 mx-auto'
             />
             <div className='text-4xl font-bold mb-6 text-purple-400'>$129.99</div>
-            <Button className='w-full text-lg py-6 mb-6 bg-purple-600 hover:bg-purple-700 text-white'>
-              Enroll Now
-            </Button>
+            <Button className='w-full text-lg py-6 mb-6 bg-purple-600 hover:bg-purple-700 '>Enroll Now</Button>
             <div className='text-center text-gray-300 mb-6'>30-Day Money-Back Guarantee</div>
             <div className='space-y-4'>
               <div className='flex items-center'>
@@ -93,32 +91,32 @@ const CourseDetail = () => {
       {/* Course Content */}
       <Tabs defaultValue='overview' className='mb-12'>
         <TabsList className='grid w-full grid-cols-5 bg-gray-800'>
-          <TabsTrigger value='overview' className='text-white data-[state=active]:bg-purple-600'>
+          <TabsTrigger value='overview' className=' data-[state=active]:bg-purple-600'>
             Overview
           </TabsTrigger>
-          <TabsTrigger value='curriculum' className='text-white data-[state=active]:bg-purple-600'>
+          <TabsTrigger value='curriculum' className=' data-[state=active]:bg-purple-600'>
             Curriculum
           </TabsTrigger>
-          <TabsTrigger value='instructor' className='text-white data-[state=active]:bg-purple-600'>
+          <TabsTrigger value='instructor' className=' data-[state=active]:bg-purple-600'>
             Instructor
           </TabsTrigger>
-          <TabsTrigger value='reviews' className='text-white data-[state=active]:bg-purple-600'>
+          <TabsTrigger value='reviews' className=' data-[state=active]:bg-purple-600'>
             Reviews
           </TabsTrigger>
-          <TabsTrigger value='faq' className='text-white data-[state=active]:bg-purple-600'>
+          <TabsTrigger value='faq' className=' data-[state=active]:bg-purple-600'>
             FAQ
           </TabsTrigger>
         </TabsList>
         <TabsContent value='overview'>
           <Card className='bg-gray-800 border-gray-700'>
             <CardContent className='p-6'>
-              <h2 className='text-3xl font-semibold mb-6 text-white'>Course Overview</h2>
+              <h2 className='text-3xl font-semibold mb-6 '>Course Overview</h2>
               <p className='text-lg mb-6 text-gray-300'>
                 This comprehensive course is designed to take you from a beginner to an advanced level in full-stack web
                 development. You'll gain hands-on experience with the latest technologies and best practices in the
                 industry.
               </p>
-              <h3 className='text-2xl font-semibold mb-4 text-white'>What you'll learn</h3>
+              <h3 className='text-2xl font-semibold mb-4 '>What you'll learn</h3>
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-8'>
                 {[
                   'Master React for building dynamic user interfaces',
@@ -136,12 +134,12 @@ const CourseDetail = () => {
                   </div>
                 ))}
               </div>
-              <h3 className='text-2xl font-semibold mb-4 text-white'>Course Features</h3>
+              <h3 className='text-2xl font-semibold mb-4 '>Course Features</h3>
               <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-8'>
                 <Card className='bg-gray-700 border-gray-600'>
                   <CardContent className='p-4 flex flex-col items-center text-center'>
                     <PlayCircle className='w-12 h-12 text-purple-400 mb-2' />
-                    <h4 className='text-xl font-semibold mb-2 text-white'>40+ Hours of Video</h4>
+                    <h4 className='text-xl font-semibold mb-2 '>40+ Hours of Video</h4>
                     <p className='text-gray-300'>
                       Comprehensive video lessons covering all aspects of full-stack development
                     </p>
@@ -150,19 +148,19 @@ const CourseDetail = () => {
                 <Card className='bg-gray-700 border-gray-600'>
                   <CardContent className='p-4 flex flex-col items-center text-center'>
                     <FileText className='w-12 h-12 text-purple-400 mb-2' />
-                    <h4 className='text-xl font-semibold mb-2 text-white'>125+ Articles & Resources</h4>
+                    <h4 className='text-xl font-semibold mb-2 '>125+ Articles & Resources</h4>
                     <p className='text-gray-300'>In-depth written materials to supplement video content</p>
                   </CardContent>
                 </Card>
                 <Card className='bg-gray-700 border-gray-600'>
                   <CardContent className='p-4 flex flex-col items-center text-center'>
                     <Coffee className='w-12 h-12 text-purple-400 mb-2' />
-                    <h4 className='text-xl font-semibold mb-2 text-white'>20 Coding Challenges</h4>
+                    <h4 className='text-xl font-semibold mb-2 '>20 Coding Challenges</h4>
                     <p className='text-gray-300'>Practice your skills with real-world coding challenges</p>
                   </CardContent>
                 </Card>
               </div>
-              <h3 className='text-2xl font-semibold mb-4 text-white'>Requirements</h3>
+              <h3 className='text-2xl font-semibold mb-4 '>Requirements</h3>
               <ul className='list-disc list-inside space-y-2 mb-8 text-gray-300'>
                 <li className='text-lg'>Basic understanding of HTML, CSS, and JavaScript</li>
                 <li className='text-lg'>Familiarity with programming concepts</li>
@@ -175,7 +173,7 @@ const CourseDetail = () => {
         <TabsContent value='curriculum'>
           <Card className='bg-gray-800 border-gray-700'>
             <CardContent className='p-6'>
-              <h2 className='text-3xl font-semibold mb-6 text-white'>Course Curriculum</h2>
+              <h2 className='text-3xl font-semibold mb-6 '>Course Curriculum</h2>
               <Accordion type='single' collapsible className='w-full'>
                 {[
                   {
@@ -224,7 +222,7 @@ const CourseDetail = () => {
                   }
                 ].map((section, index) => (
                   <AccordionItem value={`section-${index + 1}`} key={index} className='border-gray-700'>
-                    <AccordionTrigger className='text-xl font-semibold text-white hover:text-purple-400'>
+                    <AccordionTrigger className='text-xl font-semibold  hover:text-purple-400'>
                       {section.title}
                     </AccordionTrigger>
                     <AccordionContent>
@@ -246,7 +244,7 @@ const CourseDetail = () => {
         <TabsContent value='instructor'>
           <Card className='bg-gray-800 border-gray-700'>
             <CardContent className='p-6'>
-              <h2 className='text-3xl font-semibold mb-6 text-white'>Meet Your Instructor</h2>
+              <h2 className='text-3xl font-semibold mb-6 '>Meet Your Instructor</h2>
               <div className='flex flex-col md:flex-row items-start gap-8'>
                 <Image
                   src={placeholderImage || '/placeholder.svg'}
@@ -256,12 +254,12 @@ const CourseDetail = () => {
                   className='rounded-lg'
                 />
                 <div>
-                  <h3 className='text-2xl font-semibold mb-2 text-white'>John Doe</h3>
+                  <h3 className='text-2xl font-semibold mb-2 '>John Doe</h3>
                   <p className='text-xl text-gray-300 mb-4'>Senior Full-Stack Developer and Educator</p>
                   <div className='flex items-center space-x-6 mb-4'>
                     <div className='flex items-center'>
                       <Star className='w-6 h-6 text-yellow-400' />
-                      <span className='ml-2 text-lg font-semibold text-white'>4.9 Instructor Rating</span>
+                      <span className='ml-2 text-lg font-semibold '>4.9 Instructor Rating</span>
                     </div>
                     <div className='flex items-center'>
                       <Users className='w-6 h-6 mr-2 text-purple-400' />
@@ -284,7 +282,7 @@ const CourseDetail = () => {
                     practical, hands-on exercises, ensuring that students not only understand concepts but can apply
                     them in real-world scenarios.
                   </p>
-                  <h4 className='text-xl font-semibold mb-2 text-white'>Areas of Expertise:</h4>
+                  <h4 className='text-xl font-semibold mb-2 '>Areas of Expertise:</h4>
                   <ul className='list-disc list-inside space-y-1 mb-6 text-gray-300'>
                     <li className='text-lg'>Front-end development with React and Redux</li>
                     <li className='text-lg'>Back-end systems with Node.js and Express</li>
@@ -301,10 +299,10 @@ const CourseDetail = () => {
         <TabsContent value='reviews'>
           <Card className='bg-gray-800 border-gray-700'>
             <CardContent className='p-6'>
-              <h2 className='text-3xl font-semibold mb-6 text-white'>Student Reviews</h2>
+              <h2 className='text-3xl font-semibold mb-6 '>Student Reviews</h2>
               <div className='flex flex-col md:flex-row items-center md:items-start gap-8 mb-8'>
                 <div className='text-center md:text-left'>
-                  <div className='text-5xl font-bold mb-2 text-white'>4.9</div>
+                  <div className='text-5xl font-bold mb-2 '>4.9</div>
                   <div className='flex items-center justify-center md:justify-start'>
                     <Star className='w-6 h-6 text-yellow-400' />
                     <Star className='w-6 h-6 text-yellow-400' />
@@ -361,7 +359,7 @@ const CourseDetail = () => {
                             className={`w-5 h-5 ${i < review.rating ? 'text-yellow-400' : 'text-gray-500'}`}
                           />
                         ))}
-                        <span className='ml-2 text-lg font-semibold text-white'>{review.name}</span>
+                        <span className='ml-2 text-lg font-semibold '>{review.name}</span>
                         <span className='ml-auto text-sm text-gray-400'>{review.date}</span>
                       </div>
                       <p className='text-lg text-gray-300'>{review.comment}</p>
@@ -375,7 +373,7 @@ const CourseDetail = () => {
         <TabsContent value='faq'>
           <Card className='bg-gray-800 border-gray-700'>
             <CardContent className='p-6'>
-              <h2 className='text-3xl font-semibold mb-6 text-white'>Frequently Asked Questions</h2>
+              <h2 className='text-3xl font-semibold mb-6 '>Frequently Asked Questions</h2>
               <Accordion type='single' collapsible className='w-full'>
                 {[
                   {
@@ -405,9 +403,7 @@ const CourseDetail = () => {
                   }
                 ].map((faq, index) => (
                   <AccordionItem value={`faq-${index + 1}`} key={index} className='border-gray-700'>
-                    <AccordionTrigger className='text-xl text-white hover:text-purple-400'>
-                      {faq.question}
-                    </AccordionTrigger>
+                    <AccordionTrigger className='text-xl  hover:text-purple-400'>{faq.question}</AccordionTrigger>
                     <AccordionContent className='text-lg text-gray-300'>{faq.answer}</AccordionContent>
                   </AccordionItem>
                 ))}
@@ -418,7 +414,7 @@ const CourseDetail = () => {
       </Tabs>
 
       {/* Related Courses */}
-      <h2 className='text-3xl font-semibold mb-6 text-white'>Related Courses</h2>
+      <h2 className='text-3xl font-semibold mb-6 '>Related Courses</h2>
       <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-12'>
         {[
           {
@@ -452,12 +448,12 @@ const CourseDetail = () => {
                 height={169}
                 className='rounded-lg mb-4 mx-auto'
               />
-              <h3 className='text-xl font-semibold mb-2 text-white'>{course.title}</h3>
+              <h3 className='text-xl font-semibold mb-2 '>{course.title}</h3>
               <p className='text-sm text-gray-300 mb-2'>{course.description}</p>
               <div className='flex items-center justify-between'>
                 <div className='flex items-center'>
                   <Star className='w-4 h-4 text-yellow-400' />
-                  <span className='ml-1 text-sm font-semibold text-white'>{course.rating}</span>
+                  <span className='ml-1 text-sm font-semibold '>{course.rating}</span>
                   <span className='ml-1 text-sm text-gray-400'>({course.students.toLocaleString()} students)</span>
                 </div>
                 <span className='text-lg font-bold text-purple-400'>${course.price}</span>

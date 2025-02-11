@@ -26,7 +26,7 @@ export default function FormForgotPassword() {
         </CardHeader>
         <CardContent className='space-y-4'>
           <div className='space-y-2'>
-            <Label htmlFor='email' className='text-gray-200'>
+            <Label htmlFor='email' className=''>
               Email
             </Label>
             <div className='relative'>
@@ -35,13 +35,13 @@ export default function FormForgotPassword() {
                 id='email'
                 placeholder='Enter your email'
                 type='email'
-                className='pl-10 bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                className='pl-10 bg-gray-700 border-gray-600  placeholder-gray-400'
               />
             </div>
           </div>
         </CardContent>
         <CardFooter className='flex flex-col space-y-4'>
-          <Button className='w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white'>
+          <Button className='w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 '>
             Send Reset Link
           </Button>
           <div className='text-sm text-center text-gray-400'>

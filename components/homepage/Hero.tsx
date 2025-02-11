@@ -13,7 +13,7 @@ export default function Hero() {
               Unlock Your Potential
             </span>
             <br />
-            <span className='text-white'>Learn Anything, Anytime</span>
+            <span className=''>Learn Anything, Anytime</span>
           </h1>
           <p className='text-gray-300 mb-8 text-lg md:text-xl leading-relaxed'>
             Discover a world of knowledge with our cutting-edge online learning platform. Enhance your skills and
@@ -22,7 +22,7 @@ export default function Hero() {
           <div className='flex flex-col sm:flex-row gap-4'>
             <Button
               size='lg'
-              className='bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold'
+              className='bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600  font-semibold'
             >
               Get Started
             </Button>
