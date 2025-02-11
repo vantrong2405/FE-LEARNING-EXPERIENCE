@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -13,19 +13,28 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isMusicOn, setIsMusicOn] = useState(false)
   const [showAlert, setShowAlert] = useState(true)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 100) {
-        setShowAlert(false)
-      } else {
-        setShowAlert(true)
-      }
+      setShowAlert(window.scrollY <= 100)
     }
 
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // Bật/tắt nhạc
+  const toggleMusic = () => {
+    if (!audioRef.current) return
+
+    if (isMusicOn) {
+      audioRef.current.pause()
+    } else {
+      audioRef.current.play()
+    }
+    setIsMusicOn(!isMusicOn)
+  }
 
   return (
     <div className='fixed top-0 left-0 right-0 z-50'>
@@ -143,7 +152,7 @@ export default function Header() {
                 variant='ghost'
                 size='icon'
                 className='text-white hover:text-yellow-300 transition-colors'
-                onClick={() => setIsMusicOn(!isMusicOn)}
+                onClick={toggleMusic}
               >
                 {isMusicOn ? <Volume2 className='h-5 w-5' /> : <VolumeX className='h-5 w-5' />}
               </Button>
@@ -151,6 +160,7 @@ export default function Header() {
           </AlertDescription>
         </Alert>
       )}
+      <audio ref={audioRef} src='/assets/audios/music.mp3' loop />
     </div>
   )
 }
