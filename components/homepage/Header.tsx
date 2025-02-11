@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Alert } from '@/components/ui/alert'
 import Link from 'next/link'
 import { Icons } from '../ui/icons'
 import { pathURL } from '@/constants/path'
@@ -17,7 +17,7 @@ export default function Header() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setShowAlert(window.scrollY <= 100)
+      setShowAlert(window.scrollY <= 70)
     }
 
     window.addEventListener('scroll', handleScroll)
@@ -140,26 +140,24 @@ export default function Header() {
           )}
         </div>
       </header>
+
       {showAlert && (
-        <Alert className='bg-gray-800 w-[100%] py-0 mx-auto border-none text-white text-xs shadow-lg transition-all duration-300 ease-in-out'>
-          <AlertDescription className='container mx-auto flex items-center justify-between py-2'>
-            <div className='flex items-center space-x-2'>
-              <Smile className='h-5 w-5 text-yellow-300' />
-              <span className='text-xs font-medium'>New courses available! Check them out now.</span>
-            </div>
-            <div className='flex items-center space-x-2'>
-              <Button
-                variant='ghost'
-                size='icon'
-                className='text-white hover:text-yellow-300 transition-colors'
-                onClick={toggleMusic}
-              >
-                {isMusicOn ? <Volume2 className='h-5 w-5' /> : <VolumeX className='h-5 w-5' />}
-              </Button>
-            </div>
-          </AlertDescription>
+        <Alert className='fixed top-16 left-1/2 transform -translate-x-1/2 bg-gray-800 w-[100%] py-2 px-4 border-none text-white text-xs shadow-lg rounded-lg transition-all duration-300 ease-in-out flex items-center justify-between'>
+          <div className='flex items-center space-x-2'>
+            <Smile className='h-4 w-4 text-yellow-300' />
+            <span className='text-xs font-medium'>New courses available! Check them out now.</span>
+          </div>
+          <Button
+            variant='ghost'
+            size='icon'
+            className='text-white hover:text-yellow-300 transition-colors'
+            onClick={toggleMusic}
+          >
+            {isMusicOn ? <Volume2 className='h-4 w-4' /> : <VolumeX className='h-4 w-4' />}
+          </Button>
         </Alert>
       )}
+
       <audio ref={audioRef} src='/assets/audios/music.mp3' loop />
     </div>
   )
