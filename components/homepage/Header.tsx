@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { Icons } from '../ui/icons'
 import { pathURL } from '@/constants/path'
 import { Volume2, VolumeX, Smile } from 'lucide-react'
+import { ModeToggle } from '../ui/toggle'
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -80,6 +81,7 @@ export default function Header() {
               </Button>
             </nav>
             <div className='hidden md:flex items-center space-x-4'>
+              <ModeToggle />
               <Button variant='ghost' size='icon' className='text-white hover:text-purple-400 transition-colors'>
                 <Icons.Globe className='h-5 w-5' />
               </Button>
