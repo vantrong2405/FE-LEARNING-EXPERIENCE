@@ -8,7 +8,7 @@ const stats = [
 
 export default function Statistics() {
   return (
-    <div className='bg-gradient-to-r from-purple-900 via-indigo-900 to-blue-900 py-16 md:py-24'>
+    <div className='dark:bg-gradient-to-r dark:from-purple-900 dark:via-indigo-900 dark:to-blue-900 bg-gray-300 py-16 md:py-24'>
       <div className='container mx-auto px-4'>
         <div className='grid grid-cols-1 sm:grid-cols-3 gap-12 text-center'>
           {stats.map((stat, index) => (
@@ -20,8 +20,8 @@ export default function Statistics() {
               <div className='bg-white/10 rounded-full p-4 mb-4'>
                 <stat.icon className='h-8 w-8 text-purple-400' />
               </div>
-              <h3 className='text-3xl md:text-4xl font-bold text-white mb-2'>{stat.value}</h3>
-              <p className='text-purple-200 text-lg'>{stat.label}</p>
+              <h3 className='text-3xl md:text-4xl font-bold  mb-2'>{stat.value}</h3>
+              <p className='dark:text-purple-200 text-lg'>{stat.label}</p>
             </div>
           ))}
         </div>
