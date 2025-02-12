@@ -18,7 +18,7 @@ export default function Header() {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 100) {
+      if (window.scrollY > 60) {
         setShowAlert(false)
       } else {
         setShowAlert(true)
@@ -148,7 +148,7 @@ export default function Header() {
       </header>
 
       {showAlert && (
-        <Alert className='fixed top-16 left-1/2 transform -translate-x-1/2 dark:bg-gray-800 bg-red-500 w-[100%] py-2 px-4 border-none text-xs shadow-lg rounded-lg transition-all duration-300 ease-in-out flex items-center justify-between'>
+        <Alert className='w-[80%] fixed top-16 left-1/2 transform -translate-x-1/2 dark:bg-gray-800 bg-red-500 py-2 px-4 border-none text-xs shadow-lg rounded-lg transition-all duration-300 ease-in-out flex items-center justify-between'>
           <div className='flex items-center space-x-2'>
             <Smile className='h-4 w-4 text-yellow-300' />
             <span className='text-xs font-medium'>New courses available! Check them out now.</span>
