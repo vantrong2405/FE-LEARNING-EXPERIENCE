@@ -26,15 +26,13 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <>
-      <html lang='en' suppressHydrationWarning>
-        <body className='transition-colors duration-300'>
-          <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
-            {children}
-          </ThemeProvider>
-          <AudioPlayer />
-        </body>
-      </html>
-    </>
+    <html lang='en' suppressHydrationWarning>
+      <body className='transition-colors duration-300'>
+        <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
+          {children}
+        </ThemeProvider>
+        <AudioPlayer />
+      </body>
+    </html>
   )
 }

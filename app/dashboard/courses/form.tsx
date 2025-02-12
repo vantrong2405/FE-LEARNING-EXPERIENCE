@@ -207,7 +207,7 @@ export default function CoursesPage() {
                 </div>
               </CardHeader>
               <CardContent className='p-4'>
-                <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2'>
+                <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-1'>
                   {course.title}
                 </h3>
                 <p className='text-sm text-gray-600 dark:text-gray-400 mb-2'>{course.category}</p>
@@ -269,7 +269,7 @@ export default function CoursesPage() {
                 </div>
               </CardHeader>
               <CardContent className='p-4'>
-                <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2'>
+                <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-1'>
                   {course.title}
                 </h3>
                 <p className='text-sm text-gray-600 dark:text-gray-400 mb-2'>{course.category}</p>

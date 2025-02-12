@@ -153,7 +153,7 @@ export default function Header() {
             <Smile className='h-4 w-4 text-yellow-300' />
             <span className='text-xs font-medium'>New courses available! Check them out now.</span>
           </div>
-          <Button variant='ghost' size='icon' className='hover:text-yellow-300 transition-colors' onClick={toggleMusic}>
+          <Button variant='ghost' size='icon' onClick={toggleMusic}>
             {isMusicOn ? <Volume2 className='h-4 w-4' /> : <VolumeX className='h-4 w-4' />}
           </Button>
         </Alert>
