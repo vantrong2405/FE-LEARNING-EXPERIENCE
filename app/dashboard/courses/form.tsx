@@ -233,7 +233,7 @@ export default function CoursesPage() {
               <CardFooter className='p-4 bg-gray-100 dark:bg-gray-750 border-t border-gray-300 dark:border-gray-700'>
                 <div className='flex items-center justify-between w-full'>
                   <div>
-                    <span className='text-lg font-bold text-gray-900 dark:text-white'>
+                    <span className='text-lg font-bold text-gray-900 dark:text-black'>
                       {course.price.toLocaleString()}đ
                     </span>
                     <span className='text-sm text-gray-600 dark:text-gray-400 line-through ml-2'>
@@ -295,7 +295,7 @@ export default function CoursesPage() {
               <CardFooter className='p-4 bg-gray-100 dark:bg-gray-750 border-t border-gray-300 dark:border-gray-700'>
                 <div className='flex items-center justify-between w-full'>
                   <div>
-                    <span className='text-lg font-bold text-gray-900 dark:text-white'>
+                    <span className='text-lg font-bold text-gray-900 dark:text-black'>
                       {course.price.toLocaleString()}đ
                     </span>
                     <span className='text-sm text-gray-600 dark:text-gray-400 line-through ml-2'>
@@ -360,7 +360,7 @@ export default function CoursesPage() {
                 </p>
               </div>
               <div className='flex-1 w-full'>
-                <div className='flex gap-2'>
+                <div className='flex w-full items-center space-x-2 '>
                   <Input
                     type='email'
                     placeholder='Nhập email của bạn'

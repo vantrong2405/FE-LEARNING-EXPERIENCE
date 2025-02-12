@@ -52,7 +52,7 @@ const CourseDetail = () => {
             </div>
           </div>
         </div>
-        <Card className='lg:col-span-1 dark:bg-gray-800 border-gray-300 dark:border-gray-700'>
+        <Card className='lg:col-span-1 dark:bg-gray-800 border-gray-300 dark:border-gray-700 mt-1'>
           <CardContent className='p-6'>
             <Image
               src={placeholderImage || '/placeholder.svg'}

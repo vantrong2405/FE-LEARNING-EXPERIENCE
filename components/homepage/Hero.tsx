@@ -40,7 +40,7 @@ export default function Hero() {
             alt='Online Learning'
             width={500}
             height={350}
-            className='rounded-2xl shadow-2xl relative z-10 w-full h-auto transform hover:scale-105 transition-transform duration-300'
+            className='mt-12 rounded-2xl shadow-2xl relative z-10 w-full h-auto transform hover:scale-105 transition-transform duration-300'
           />
         </div>
       </div>
