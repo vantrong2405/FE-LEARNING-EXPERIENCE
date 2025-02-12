@@ -118,10 +118,10 @@ export default function CoursesPage() {
   }, [selectedCategory, priceRange, searchQuery])
 
   return (
-    <div className='container mx-auto px-4 py-8 space-y-12'>
+    <div className='container mx-auto px-4 py-8 space-y-12 bg-white dark:bg-gray-900'>
       <section className='space-y-4'>
-        <h1 className='text-4xl font-bold text-white'>Khám Phá Khóa Học</h1>
-        <p className='text-xl text-gray-400'>
+        <h1 className='text-4xl font-bold text-gray-900 dark:text-white'>Khám Phá Khóa Học</h1>
+        <p className='text-xl text-gray-700 dark:text-gray-400'>
           Nâng cao kỹ năng của bạn với các khóa học chất lượng cao từ các chuyên gia hàng đầu
         </p>
       </section>
@@ -129,17 +129,17 @@ export default function CoursesPage() {
       <section className='space-y-4'>
         <div className='flex flex-col md:flex-row gap-4 items-center justify-between'>
           <div className='relative w-full md:w-96'>
-            <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' />
+            <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400' />
             <Input
               type='search'
               placeholder='Tìm kiếm khóa học...'
-              className='pl-10 bg-gray-800 border-gray-700 text-white placeholder-gray-400 focus:border-purple-500'
+              className='pl-10 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:border-purple-500'
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <div className='w-full md:w-auto flex flex-col items-start space-y-2'>
-            <label htmlFor='price-range' className='text-sm font-medium text-gray-300'>
+            <label htmlFor='price-range' className='text-sm font-medium text-gray-700 dark:text-gray-300'>
               Giá: {priceRange[0].toLocaleString()}đ - {priceRange[1].toLocaleString()}đ
             </label>
             <Slider
@@ -159,7 +159,7 @@ export default function CoursesPage() {
       </section>
 
       <section className='space-y-4'>
-        <h2 className='text-2xl font-semibold text-white'>Danh Mục Phổ Biến</h2>
+        <h2 className='text-2xl font-semibold text-gray-900 dark:text-white'>Danh Mục Phổ Biến</h2>
         <div className='flex flex-wrap gap-2'>
           {categories.map((category, index) => (
             <Button
@@ -168,7 +168,7 @@ export default function CoursesPage() {
               className={
                 category === selectedCategory
                   ? 'bg-purple-600 hover:bg-purple-700 text-white'
-                  : 'text-gray-300 border-gray-600 hover:bg-gray-700'
+                  : 'text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
               }
               onClick={() => setSelectedCategory(category)}
             >
@@ -180,8 +180,11 @@ export default function CoursesPage() {
 
       <section className='space-y-6'>
         <div className='flex justify-between items-center'>
-          <h2 className='text-2xl font-semibold text-white'>Khóa Học Nổi Bật</h2>
-          <Button variant='link' className='text-purple-400 hover:text-purple-300'>
+          <h2 className='text-2xl font-semibold text-gray-900 dark:text-white'>Khóa Học Nổi Bật</h2>
+          <Button
+            variant='link'
+            className='text-purple-600 hover:text-purple-500 dark:text-purple-400 dark:hover:text-purple-300'
+          >
             Xem tất cả
           </Button>
         </div>
@@ -189,7 +192,7 @@ export default function CoursesPage() {
           {filteredCourses.slice(0, 3).map((course, index) => (
             <Card
               key={index}
-              className='bg-gray-800 border-gray-700 overflow-hidden hover:shadow-lg transition-shadow duration-300'
+              className='bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow duration-300'
             >
               <CardHeader className='p-0'>
                 <div className='relative'>
@@ -204,13 +207,15 @@ export default function CoursesPage() {
                 </div>
               </CardHeader>
               <CardContent className='p-4'>
-                <h3 className='text-lg font-semibold text-white mb-2 line-clamp-2'>{course.title}</h3>
-                <p className='text-sm text-gray-400 mb-2'>{course.category}</p>
-                <div className='flex items-center gap-2 text-sm text-gray-400 mb-2'>
+                <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-1'>
+                  {course.title}
+                </h3>
+                <p className='text-sm text-gray-600 dark:text-gray-400 mb-2'>{course.category}</p>
+                <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2'>
                   <Users className='h-4 w-4' />
                   <span>{course.instructor}</span>
                 </div>
-                <div className='flex items-center gap-2 text-sm text-gray-400 mb-2'>
+                <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2'>
                   <Book className='h-4 w-4' />
                   <span>{course.lessons}</span>
                   <span>•</span>
@@ -220,14 +225,18 @@ export default function CoursesPage() {
                 <div className='flex items-center gap-2 text-sm text-yellow-500 mb-2'>
                   <Star className='h-4 w-4 fill-current' />
                   <span>{course.rating}</span>
-                  <span className='text-gray-400'>({course.students.toLocaleString()} học viên)</span>
+                  <span className='text-gray-600 dark:text-gray-400'>
+                    ({course.students.toLocaleString()} học viên)
+                  </span>
                 </div>
               </CardContent>
-              <CardFooter className='p-4 bg-gray-750 border-t border-gray-700'>
+              <CardFooter className='p-4 bg-gray-100 dark:bg-gray-750 border-t border-gray-300 dark:border-gray-700'>
                 <div className='flex items-center justify-between w-full'>
                   <div>
-                    <span className='text-lg font-bold text-white'>{course.price.toLocaleString()}đ</span>
-                    <span className='text-sm text-gray-400 line-through ml-2'>
+                    <span className='text-lg font-bold text-gray-900 dark:text-white'>
+                      {course.price.toLocaleString()}đ
+                    </span>
+                    <span className='text-sm text-gray-600 dark:text-gray-400 line-through ml-2'>
                       {course.originalPrice.toLocaleString()}đ
                     </span>
                   </div>
@@ -240,12 +249,12 @@ export default function CoursesPage() {
       </section>
 
       <section className='space-y-6'>
-        <h2 className='text-2xl font-semibold text-white'>Tất Cả Khóa Học</h2>
+        <h2 className='text-2xl font-semibold text-gray-900 dark:text-white'>Tất Cả Khóa Học</h2>
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
           {filteredCourses.map((course, index) => (
             <Card
               key={index}
-              className='bg-gray-800 border-gray-700 overflow-hidden hover:shadow-lg transition-shadow duration-300'
+              className='bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow duration-300'
             >
               <CardHeader className='p-0'>
                 <div className='relative'>
@@ -260,13 +269,15 @@ export default function CoursesPage() {
                 </div>
               </CardHeader>
               <CardContent className='p-4'>
-                <h3 className='text-lg font-semibold text-white mb-2 line-clamp-2'>{course.title}</h3>
-                <p className='text-sm text-gray-400 mb-2'>{course.category}</p>
-                <div className='flex items-center gap-2 text-sm text-gray-400 mb-2'>
+                <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-1'>
+                  {course.title}
+                </h3>
+                <p className='text-sm text-gray-600 dark:text-gray-400 mb-2'>{course.category}</p>
+                <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2'>
                   <Users className='h-4 w-4' />
                   <span>{course.instructor}</span>
                 </div>
-                <div className='flex items-center gap-2 text-sm text-gray-400 mb-2'>
+                <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2'>
                   <Book className='h-4 w-4' />
                   <span>{course.lessons}</span>
                   <span>•</span>
@@ -276,14 +287,18 @@ export default function CoursesPage() {
                 <div className='flex items-center gap-2 text-sm text-yellow-500 mb-2'>
                   <Star className='h-4 w-4 fill-current' />
                   <span>{course.rating}</span>
-                  <span className='text-gray-400'>({course.students.toLocaleString()} học viên)</span>
+                  <span className='text-gray-600 dark:text-gray-400'>
+                    ({course.students.toLocaleString()} học viên)
+                  </span>
                 </div>
               </CardContent>
-              <CardFooter className='p-4 bg-gray-750 border-t border-gray-700'>
+              <CardFooter className='p-4 bg-gray-100 dark:bg-gray-750 border-t border-gray-300 dark:border-gray-700'>
                 <div className='flex items-center justify-between w-full'>
                   <div>
-                    <span className='text-lg font-bold text-white'>{course.price.toLocaleString()}đ</span>
-                    <span className='text-sm text-gray-400 line-through ml-2'>
+                    <span className='text-lg font-bold text-gray-900 dark:text-white'>
+                      {course.price.toLocaleString()}đ
+                    </span>
+                    <span className='text-sm text-gray-600 dark:text-gray-400 line-through ml-2'>
                       {course.originalPrice.toLocaleString()}đ
                     </span>
                   </div>
@@ -296,15 +311,18 @@ export default function CoursesPage() {
       </section>
 
       <section className='space-y-6'>
-        <h2 className='text-2xl font-semibold text-white'>Xu Hướng Học Tập</h2>
-        <Card className='bg-gray-800 border-gray-700'>
+        <h2 className='text-2xl font-semibold text-gray-900 dark:text-white'>Xu Hướng Học Tập</h2>
+        <Card className='bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700'>
           <CardContent className='p-6'>
             <div className='flex items-center justify-between mb-4'>
               <div>
-                <h3 className='text-lg font-semibold text-white'>Top Danh Mục Được Quan Tâm</h3>
-                <p className='text-sm text-gray-400'>Dựa trên số lượng đăng ký trong 30 ngày qua</p>
+                <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>Top Danh Mục Được Quan Tâm</h3>
+                <p className='text-sm text-gray-600 dark:text-gray-400'>Dựa trên số lượng đăng ký trong 30 ngày qua</p>
               </div>
-              <Button variant='outline' className='text-purple-400 border-purple-400 hover:bg-purple-400/10'>
+              <Button
+                variant='outline'
+                className='text-purple-600 border-purple-600 hover:bg-purple-600/10 dark:text-purple-400 dark:border-purple-400 dark:hover:bg-purple-400/10'
+              >
                 <TrendingUp className='mr-2 h-4 w-4' />
                 Xem báo cáo chi tiết
               </Button>
@@ -314,11 +332,11 @@ export default function CoursesPage() {
                 <div key={index} className='flex items-center justify-between'>
                   <div className='flex items-center gap-2'>
                     <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center ${index === 0 ? 'bg-purple-500' : 'bg-gray-700'}`}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center ${index === 0 ? 'bg-purple-500' : 'bg-gray-300 dark:bg-gray-700'}`}
                     >
                       {index + 1}
                     </div>
-                    <span className='text-white'>{category}</span>
+                    <span className='text-gray-900 dark:text-white'>{category}</span>
                   </div>
                   <Progress value={100 - index * 15} className='w-1/3' />
                 </div>
@@ -329,13 +347,15 @@ export default function CoursesPage() {
       </section>
 
       <section className='space-y-6'>
-        <h2 className='text-2xl font-semibold text-white'>Đăng Ký Nhận Thông Tin</h2>
-        <Card className='bg-gray-800 border-gray-700'>
+        <h2 className='text-2xl font-semibold text-gray-900 dark:text-white'>Đăng Ký Nhận Thông Tin</h2>
+        <Card className='bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700'>
           <CardContent className='p-6'>
             <div className='flex flex-col md:flex-row items-center gap-4'>
               <div className='flex-1'>
-                <h3 className='text-lg font-semibold text-white mb-2'>Nhận Thông Tin Khóa Học Mới</h3>
-                <p className='text-sm text-gray-400'>
+                <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-2'>
+                  Nhận Thông Tin Khóa Học Mới
+                </h3>
+                <p className='text-sm text-gray-600 dark:text-gray-400'>
                   Đăng ký để nhận thông báo về các khóa học mới và ưu đãi đặc biệt.
                 </p>
               </div>
@@ -344,7 +364,7 @@ export default function CoursesPage() {
                   <Input
                     type='email'
                     placeholder='Nhập email của bạn'
-                    className='flex-1 bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-purple-500'
+                    className='flex-1 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 focus:border-purple-500'
                   />
                   <Button className='bg-purple-600 hover:bg-purple-700 text-white'>Đăng Ký</Button>
                 </div>
