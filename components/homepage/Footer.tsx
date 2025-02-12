@@ -42,7 +42,6 @@ export default function Footer() {
                   Blog
                 </Link>
               </li>
-              dark:
               <li>
                 <Link href='#' className='dark:text-gray-400 dark:hover:text-purple-400'>
                   Help Center

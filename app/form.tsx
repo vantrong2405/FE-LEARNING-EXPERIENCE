@@ -8,8 +8,6 @@ import Hero from '@/components/homepage/Hero'
 import Statistics from '@/components/homepage/Statistics'
 import Testimonials from '@/components/homepage/Testimonials'
 import { useState } from 'react'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 
 export default function HomePage() {
   const [inputValue, setInputValue] = useState('')
