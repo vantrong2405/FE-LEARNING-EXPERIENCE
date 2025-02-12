@@ -67,7 +67,6 @@ const QRPayment = () => {
 
   return (
     <div className='min-h-screen dark:bg-[#0D0A25] px-4 py-8'>
-      <h1 className='text-4xl font-bold mb-8 text-center text-gray-900 dark:text-white'>Complete Your Purchase</h1>
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-8xl mx-auto'>
         <Card className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 shadow-lg'>
           <CardHeader>
@@ -114,7 +113,7 @@ const QRPayment = () => {
                   <h3 className='text-xl font-semibold mb-4 text-gray-900 dark:text-white'>Payment Information</h3>
                   <div className='space-y-4 text-sm text-gray-700 dark:text-gray-300'>
                     <div className='flex items-center justify-between bg-white dark:bg-gray-800 p-3 rounded-md shadow'>
-                      <div className='flex items-center'>
+                      <div className='flex items-center font-semibold'>
                         <User className='w-5 h-5 mr-3 text-purple-600' />
                         <span>Doan Vo Van Trong</span>
                       </div>
@@ -129,7 +128,7 @@ const QRPayment = () => {
                       </Button>
                     </div>
                     <div className='flex items-center justify-between bg-white dark:bg-gray-800 p-3 rounded-md shadow'>
-                      <div className='flex items-center'>
+                      <div className='flex items-center font-semibold'>
                         <BanknoteIcon className='w-5 h-5 mr-3 text-purple-600' />
                         <span>MB-BANK</span>
                       </div>
@@ -144,7 +143,7 @@ const QRPayment = () => {
                       </Button>
                     </div>
                     <div className='flex items-center justify-between bg-white dark:bg-gray-800 p-3 rounded-md shadow'>
-                      <div className='flex items-center'>
+                      <div className='flex items-center font-semibold'>
                         <CreditCard className='w-5 h-5 mr-3 text-purple-600' />
                         <span>Number Account: 0357407264</span>
                       </div>
@@ -159,7 +158,7 @@ const QRPayment = () => {
                       </Button>
                     </div>
                     <div className='flex items-center justify-between bg-white dark:bg-gray-800 p-3 rounded-md shadow'>
-                      <div className='flex items-center'>
+                      <div className='flex items-center font-semibold'>
                         <Tag className='w-5 h-5 mr-3 text-purple-600' />
                         <span>Payment Code: {paymentCode}</span>
                       </div>
