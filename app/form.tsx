@@ -1,3 +1,5 @@
+'use client'
+
 import Contributors from '@/components/homepage/Contributors'
 import FeaturedCourses from '@/components/homepage/FeaturedCourses'
 import Footer from '@/components/homepage/Footer'
@@ -5,10 +7,15 @@ import Header from '@/components/homepage/Header'
 import Hero from '@/components/homepage/Hero'
 import Statistics from '@/components/homepage/Statistics'
 import Testimonials from '@/components/homepage/Testimonials'
+import { useState } from 'react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 
 export default function HomePage() {
+  const [inputValue, setInputValue] = useState('')
+
   return (
-    <div className='min-h-screen dark:g-gradient-to-b dark:from-gray-900 dark:to-gray-800'>
+    <div className='min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white'>
       <div className="fixed inset-0 bg-[url('/bg-pattern.svg')] opacity-5 z-0"></div>
       <div className='relative z-10'>
         <Header />
@@ -20,6 +27,26 @@ export default function HomePage() {
           <Contributors />
         </main>
         <Footer />
+      </div>
+      <div className='p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white'>
+        <h1 className='text-2xl font-bold mb-4'>Form Title</h1>
+        <form>
+          <div className='mb-4'>
+            <label htmlFor='input' className='block text-sm font-medium text-gray-700 dark:text-gray-300'>
+              Input Label
+            </label>
+            <Input
+              id='input'
+              type='text'
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              className='mt-1 block w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 focus:border-purple-500'
+            />
+          </div>
+          <Button type='submit' className='bg-purple-600 hover:bg-purple-700 text-white'>
+            Submit
+          </Button>
+        </form>
       </div>
     </div>
   )

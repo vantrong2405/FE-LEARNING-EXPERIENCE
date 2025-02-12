@@ -14,56 +14,11 @@ import useStoreLocal from '@/stores/useStoreLocal'
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [showAlert, setShowAlert] = useState(true)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
-  const { isMusicOn, toggleMusic, setMusicOn, currentTime, setCurrentTime } = useStoreLocal()
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowAlert(window.scrollY <= 70)
-    }
-
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  useEffect(() => {
-    const savedMusicState = localStorage.getItem('isMusicOn')
-    const savedCurrentTime = localStorage.getItem('currentTime')
-    if (savedMusicState === 'true') {
-      setMusicOn(true)
-      if (audioRef.current && savedCurrentTime) {
-        audioRef.current.currentTime = parseFloat(savedCurrentTime)
-        audioRef.current.play()
-      }
-    }
-  }, [setMusicOn, setCurrentTime])
-
-  useEffect(() => {
-    if (isMusicOn) {
-      audioRef.current?.play()
-    } else {
-      audioRef.current?.pause()
-    }
-  }, [isMusicOn])
-
-  useEffect(() => {
-    const handleTimeUpdate = () => {
-      if (audioRef.current) {
-        setCurrentTime(audioRef.current.currentTime)
-      }
-    }
-
-    const audioElement = audioRef.current
-    audioElement?.addEventListener('timeupdate', handleTimeUpdate)
-
-    return () => {
-      audioElement?.removeEventListener('timeupdate', handleTimeUpdate)
-    }
-  }, [setCurrentTime])
+  const { isMusicOn, toggleMusic } = useStoreLocal()
 
   return (
     <div className='fixed top-0 left-0 right-0 z-50'>
-      <header className='dark:bg-gray-900/80 backdrop-blur-md transition-all duration-300 ease-in-out'>
+      <header className='bg-white dark:bg-gray-900/80 backdrop-blur-md transition-all duration-300 ease-in-out'>
         <div className='container mx-auto px-4 py-4'>
           <div className='flex items-center justify-between'>
             <Link href={pathURL.home} className='flex items-center space-x-2'>
@@ -75,47 +30,57 @@ export default function Header() {
             <nav className='hidden md:flex space-x-6'>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant='ghost' className=' hover:text-purple-400 transition-colors'>
+                  <Button
+                    variant='ghost'
+                    className='text-gray-900 dark:text-white hover:text-purple-400 transition-colors'
+                  >
                     Courses <Icons.ChevronDown className='ml-1 h-4 w-4' />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className=''>
+                <DropdownMenuContent className='bg-white dark:bg-gray-800'>
                   <DropdownMenuItem>
-                    <Link href='#' className=' hover:text-purple-400'>
+                    <Link href='#' className='text-gray-900 dark:text-white hover:text-purple-400'>
                       All Courses
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <Link href='#' className=' hover:text-purple-400'>
+                    <Link href='#' className='text-gray-900 dark:text-white hover:text-purple-400'>
                       Featured
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem>
-                    <Link href='#' className=' hover:text-purple-400'>
+                    <Link href='#' className='text-gray-900 dark:text-white hover:text-purple-400'>
                       Categories
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <Button variant='ghost' className=' hover:text-purple-400 transition-colors'>
+              <Button variant='ghost' className='text-gray-900 dark:text-white hover:text-purple-400 transition-colors'>
                 Blog
               </Button>
-              <Button variant='ghost' className=' hover:text-purple-400 transition-colors'>
+              <Button variant='ghost' className='text-gray-900 dark:text-white hover:text-purple-400 transition-colors'>
                 Contact
               </Button>
             </nav>
             <div className='hidden md:flex items-center space-x-4'>
               <ModeToggle />
-              <Button variant='ghost' size='icon' className=' hover:text-purple-400 transition-colors'>
+              <Button
+                variant='ghost'
+                size='icon'
+                className='text-gray-900 dark:text-white hover:text-purple-400 transition-colors'
+              >
                 <Icons.Globe className='h-5 w-5' />
               </Button>
               <Link href={pathURL.login}>
-                <Button variant='ghost' className=' hover:text-purple-400 transition-colors'>
+                <Button
+                  variant='ghost'
+                  className='text-gray-900 dark:text-white hover:text-purple-400 transition-colors'
+                >
                   Log in
                 </Button>
               </Link>
               <Link href={pathURL.register}>
-                <Button className='bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 '>
+                <Button className='bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white'>
                   Sign up
                 </Button>
               </Link>
@@ -123,7 +88,7 @@ export default function Header() {
             <Button
               variant='ghost'
               size='icon'
-              className='md:hidden  hover:text-purple-400 transition-colors'
+              className='md:hidden text-gray-900 dark:text-white hover:text-purple-400 transition-colors'
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? <Icons.X className='h-6 w-6' /> : <Icons.Menu className='h-6 w-6' />}
@@ -131,22 +96,34 @@ export default function Header() {
           </div>
           {isMenuOpen && (
             <div className='mt-4 md:hidden transition-all duration-300 ease-in-out'>
-              <Button variant='ghost' className='w-full text-left  hover:text-purple-400 transition-colors py-2'>
+              <Button
+                variant='ghost'
+                className='w-full text-left text-gray-900 dark:text-white hover:text-purple-400 transition-colors py-2'
+              >
                 Courses
               </Button>
-              <Button variant='ghost' className='w-full text-left  hover:text-purple-400 transition-colors py-2'>
+              <Button
+                variant='ghost'
+                className='w-full text-left text-gray-900 dark:text-white hover:text-purple-400 transition-colors py-2'
+              >
                 Blog
               </Button>
-              <Button variant='ghost' className='w-full text-left  hover:text-purple-400 transition-colors py-2'>
+              <Button
+                variant='ghost'
+                className='w-full text-left text-gray-900 dark:text-white hover:text-purple-400 transition-colors py-2'
+              >
                 Contact
               </Button>
               <Link href={pathURL.login} className='w-full'>
-                <Button variant='ghost' className='w-full text-left  hover:text-purple-400 transition-colors py-2'>
+                <Button
+                  variant='ghost'
+                  className='w-full text-left text-gray-900 dark:text-white hover:text-purple-400 transition-colors py-2'
+                >
                   Log in
                 </Button>
               </Link>
               <Link href={pathURL.register} className='w-full'>
-                <Button className='w-full mt-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 '>
+                <Button className='w-full mt-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white'>
                   Sign up
                 </Button>
               </Link>
@@ -171,8 +148,6 @@ export default function Header() {
           </Button>
         </Alert>
       )}
-
-      <audio ref={audioRef} src='/assets/audios/music.mp3' loop />
     </div>
   )
 }

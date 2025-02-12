@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
 import NProgressHandler from '@/components/common/nro-progress'
-import { ThemeProvider } from '@/components/theme-provider'
+import { ThemeProvider } from '@/components/common/theme-provider'
+import AudioPlayer from '@/components/common/AudioPlayer'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -27,10 +28,11 @@ export default function RootLayout({
   return (
     <>
       <html lang='en' suppressHydrationWarning>
-        <body className='dark:text-white transition-colors duration-300'>
+        <body className='transition-colors duration-300'>
           <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
             {children}
           </ThemeProvider>
+          <AudioPlayer />
         </body>
       </html>
     </>
