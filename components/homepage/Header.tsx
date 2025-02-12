@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Alert } from '@/components/ui/alert'
@@ -15,6 +15,21 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [showAlert, setShowAlert] = useState(true)
   const { isMusicOn, toggleMusic } = useStoreLocal()
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 100) {
+        setShowAlert(false)
+      } else {
+        setShowAlert(true)
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
 
   return (
     <div className='fixed top-0 left-0 right-0 z-50'>
@@ -133,17 +148,12 @@ export default function Header() {
       </header>
 
       {showAlert && (
-        <Alert className='fixed top-16 left-1/2 transform -translate-x-1/2 dark:bg-gray-800 bg-red-500 w-[100%] py-2 px-4 border-none  text-xs shadow-lg rounded-lg transition-all duration-300 ease-in-out flex items-center justify-between'>
+        <Alert className='fixed top-16 left-1/2 transform -translate-x-1/2 dark:bg-gray-800 bg-red-500 w-[100%] py-2 px-4 border-none text-xs shadow-lg rounded-lg transition-all duration-300 ease-in-out flex items-center justify-between'>
           <div className='flex items-center space-x-2'>
             <Smile className='h-4 w-4 text-yellow-300' />
             <span className='text-xs font-medium'>New courses available! Check them out now.</span>
           </div>
-          <Button
-            variant='ghost'
-            size='icon'
-            className=' hover:text-yellow-300 transition-colors'
-            onClick={toggleMusic}
-          >
+          <Button variant='ghost' size='icon' className='hover:text-yellow-300 transition-colors' onClick={toggleMusic}>
             {isMusicOn ? <Volume2 className='h-4 w-4' /> : <VolumeX className='h-4 w-4' />}
           </Button>
         </Alert>
