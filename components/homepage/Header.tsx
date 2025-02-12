@@ -9,12 +9,13 @@ import { Icons } from '../ui/icons'
 import { pathURL } from '@/constants/path'
 import { Volume2, VolumeX, Smile } from 'lucide-react'
 import { ModeToggle } from '../ui/toggle'
+import useStoreLocal from '@/stores/useStoreLocal'
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isMusicOn, setIsMusicOn] = useState(false)
   const [showAlert, setShowAlert] = useState(true)
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  const { isMusicOn, toggleMusic, setMusicOn, currentTime, setCurrentTime } = useStoreLocal()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,17 +26,40 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Bật/tắt nhạc
-  const toggleMusic = () => {
-    if (!audioRef.current) return
-
-    if (isMusicOn) {
-      audioRef.current.pause()
-    } else {
-      audioRef.current.play()
+  useEffect(() => {
+    const savedMusicState = localStorage.getItem('isMusicOn')
+    const savedCurrentTime = localStorage.getItem('currentTime')
+    if (savedMusicState === 'true') {
+      setMusicOn(true)
+      if (audioRef.current && savedCurrentTime) {
+        audioRef.current.currentTime = parseFloat(savedCurrentTime)
+        audioRef.current.play()
+      }
     }
-    setIsMusicOn(!isMusicOn)
-  }
+  }, [setMusicOn, setCurrentTime])
+
+  useEffect(() => {
+    if (isMusicOn) {
+      audioRef.current?.play()
+    } else {
+      audioRef.current?.pause()
+    }
+  }, [isMusicOn])
+
+  useEffect(() => {
+    const handleTimeUpdate = () => {
+      if (audioRef.current) {
+        setCurrentTime(audioRef.current.currentTime)
+      }
+    }
+
+    const audioElement = audioRef.current
+    audioElement?.addEventListener('timeupdate', handleTimeUpdate)
+
+    return () => {
+      audioElement?.removeEventListener('timeupdate', handleTimeUpdate)
+    }
+  }, [setCurrentTime])
 
   return (
     <div className='fixed top-0 left-0 right-0 z-50'>

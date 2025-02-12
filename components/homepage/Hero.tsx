@@ -15,7 +15,7 @@ export default function Hero() {
             <br />
             <span className=''>Learn Anything, Anytime</span>
           </h1>
-          <p className='text-gray-300 mb-8 text-lg md:text-xl leading-relaxed'>
+          <p className='dark:text-gray-300 mb-8 text-lg md:text-xl leading-relaxed'>
             Discover a world of knowledge with our cutting-edge online learning platform. Enhance your skills and
             achieve your goals with expert-led courses.
           </p>
