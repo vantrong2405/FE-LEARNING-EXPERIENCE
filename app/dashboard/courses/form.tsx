@@ -9,6 +9,8 @@ import { Progress } from '@/components/ui/progress'
 import { Slider } from '@/components/ui/slider'
 import { Book, Clock, Filter, Search, Star, TrendingUp, Users } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
+import { pathURL } from '@/constants/path'
 
 const courses = [
   {
@@ -233,14 +235,16 @@ export default function CoursesPage() {
               <CardFooter className='p-4 bg-gray-100 dark:bg-gray-750 border-t border-gray-300 dark:border-gray-700'>
                 <div className='flex items-center justify-between w-full'>
                   <div>
-                    <span className='text-lg font-bold text-gray-900 dark:text-white'>
+                    <span className='text-lg font-bold text-gray-900 dark:text-black'>
                       {course.price.toLocaleString()}đ
                     </span>
                     <span className='text-sm text-gray-600 dark:text-gray-400 line-through ml-2'>
                       {course.originalPrice.toLocaleString()}đ
                     </span>
                   </div>
-                  <Button className='bg-purple-600 hover:bg-purple-700 text-white'>Xem Chi Tiết</Button>
+                  <Link href={pathURL.courses_detail(1)}>
+                    <Button className='bg-purple-600 hover:bg-purple-700 text-white'>Xem Chi Tiết</Button>
+                  </Link>
                 </div>
               </CardFooter>
             </Card>
@@ -295,14 +299,16 @@ export default function CoursesPage() {
               <CardFooter className='p-4 bg-gray-100 dark:bg-gray-750 border-t border-gray-300 dark:border-gray-700'>
                 <div className='flex items-center justify-between w-full'>
                   <div>
-                    <span className='text-lg font-bold text-gray-900 dark:text-white'>
+                    <span className='text-lg font-bold text-gray-900 dark:text-black'>
                       {course.price.toLocaleString()}đ
                     </span>
                     <span className='text-sm text-gray-600 dark:text-gray-400 line-through ml-2'>
                       {course.originalPrice.toLocaleString()}đ
                     </span>
                   </div>
-                  <Button className='bg-purple-600 hover:bg-purple-700 text-white'>Xem Chi Tiết</Button>
+                  <Link href={pathURL.courses_detail(1)}>
+                    <Button className='bg-purple-600 hover:bg-purple-700 text-white'>Xem Chi Tiết</Button>
+                  </Link>
                 </div>
               </CardFooter>
             </Card>
@@ -360,7 +366,7 @@ export default function CoursesPage() {
                 </p>
               </div>
               <div className='flex-1 w-full'>
-                <div className='flex gap-2'>
+                <div className='flex w-full items-center space-x-2 '>
                   <Input
                     type='email'
                     placeholder='Nhập email của bạn'

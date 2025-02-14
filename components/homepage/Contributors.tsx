@@ -46,11 +46,11 @@ export default function Contributors() {
   return (
     <section className='py-24 dark:bg-gray-900'>
       <div className='container mx-auto px-4'>
-        <h2 className='text-4xl font-bold text-center mb-16 '>Meet Our Team</h2>
+        <h2 className='text-4xl font-bold text-center mb-16'>Meet Our Team</h2>
 
         {/* Leader Card */}
-        <div className='flex justify-center mb-12'>
-          <Card className='dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-750 transition-colors w-full max-w-md'>
+        <div className='flex justify-center mb-16'>
+          <Card className='dark:bg-gray-800 dark:border-gray-700 hover:shadow-xl transition-shadow w-full max-w-md'>
             <CardContent className='p-6 flex flex-col items-center text-center'>
               <Image
                 src={leader.image || '/placeholder.svg'}
@@ -59,7 +59,7 @@ export default function Contributors() {
                 height={150}
                 className='rounded-full mb-4'
               />
-              <h3 className='text-2xl font-semibold  mb-1'>{leader.name}</h3>
+              <h3 className='text-2xl font-semibold mb-1'>{leader.name}</h3>
               <p className='text-lg dark:text-purple-300 mb-4'>{leader.role}</p>
               <div className='flex space-x-4'>
                 <a
@@ -94,7 +94,7 @@ export default function Contributors() {
         {/* Contributors Grid */}
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
           {contributors.map((contributor, index) => (
-            <Card key={index} className='dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-750 transition-colors'>
+            <Card key={index} className='dark:bg-gray-800 dark:border-gray-700 hover:shadow-xl transition-shadow'>
               <CardContent className='p-6 flex flex-col items-center text-center'>
                 <Image
                   src={contributor.image || '/placeholder.svg'}
@@ -103,7 +103,7 @@ export default function Contributors() {
                   height={120}
                   className='rounded-full mb-4'
                 />
-                <h3 className='text-xl font-semibold  mb-1'>{contributor.name}</h3>
+                <h3 className='text-xl font-semibold mb-1'>{contributor.name}</h3>
                 <p className='text-sm dark:text-purple-300 mb-4'>{contributor.role}</p>
                 <a
                   href={contributor.github}

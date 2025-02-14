@@ -16,7 +16,11 @@ import {
   EyeOff,
   User,
   Youtube,
-  Volume2
+  Volume2,
+  Quote,
+  Lightbulb,
+  Clock,
+  ShieldCheck
 } from 'lucide-react'
 
 export const Icons = {
@@ -37,5 +41,9 @@ export const Icons = {
   EyeOff,
   User,
   Youtube,
-  Volume2
+  Volume2,
+  Quote,
+  Lightbulb,
+  Clock,
+  ShieldCheck
 }

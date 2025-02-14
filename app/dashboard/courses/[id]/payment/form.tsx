@@ -244,18 +244,24 @@ const QRPayment = () => {
               <Label htmlFor='voucher' className='text-gray-700 dark:text-gray-300 mb-2 block'>
                 Have a voucher?
               </Label>
-              <div className='flex'>
+
+              <div className='flex w-full items-center space-x-2'>
                 <Input
                   id='voucher'
                   placeholder='Enter code'
                   value={voucher}
                   onChange={(e) => setVoucher(e.target.value)}
-                  className='rounded-r-none focus:ring-purple-500 focus:border-purple-500'
+                  className='  rounded-r-none focus:ring-purple-500 focus:border-purple-500'
                 />
-                <Button onClick={applyVoucher} className='rounded-l-none bg-purple-600 hover:bg-purple-700 text-white'>
-                  <Tag className='mr-2 h-4 w-4' />
-                  Apply
-                </Button>
+                <div className='flex justify-center '>
+                  <Button
+                    onClick={applyVoucher}
+                    className='  rounded-l-none bg-purple-600 hover:bg-purple-700 text-white'
+                  >
+                    <Tag className='mr-2 h-3 w-3' />
+                    Apply
+                  </Button>
+                </div>
               </div>
             </div>
           </CardContent>

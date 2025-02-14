@@ -18,10 +18,10 @@ export default function FormProfile() {
   return (
     <div className='min-h-screen w-full bg-[#0D0A25] text-white p-8'>
       <div className='max-w-4xl mx-auto'>
-        <h1 className='text-3xl font-bold mb-8 text-center'>Account Management</h1>
+        <h1 className='text-3xl font-bold mb-8 text-center mt-2'>Account Management</h1>
 
         <Tabs defaultValue='account' className='w-full'>
-          <TabsList className='grid w-full grid-cols-3 mb-8'>
+          <TabsList className='w-full bg-white rounded-lg shadow-sm flex justify-around '>
             <TabsTrigger value='account' className='text-lg'>
               <User className='w-5 h-5 mr-2' />
               Tài khoản
@@ -49,7 +49,7 @@ export default function FormProfile() {
                     id='name'
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className='bg-[#2C2859] border-purple-500'
+                    className='bg-[#7f76e0] border-purple-400'
                   />
                 </div>
 
@@ -60,10 +60,10 @@ export default function FormProfile() {
                       id='email'
                       value='trongdn2405@gmail.com'
                       disabled
-                      className='bg-[#2C2859] border-purple-500'
+                      className='bg-[#7f76e0] border-purple-400'
                     />
-                    <Button variant='outline' size='icon' className='bg-[#2C2859] border-purple-500'>
-                      <AlertCircle className='h-4 w-4' />
+                    <Button variant='outline' size='icon' className='bg-[#7f76e0] border-purple-400'>
+                      <AlertCircle className='h-4 w-4 ' />
                     </Button>
                   </div>
                   <p className='text-sm text-gray-400'>Liên hệ quản trị viên để thay đổi email.</p>
@@ -77,7 +77,7 @@ export default function FormProfile() {
                     value='0357407264'
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder='Số điện thoại'
-                    className='bg-[#2C2859] border-purple-500'
+                    className='bg-[#7f76e0] border-purple-400'
                   />
                 </div>
 
@@ -89,7 +89,7 @@ export default function FormProfile() {
                   <Switch checked={marketingEmails} onCheckedChange={setMarketingEmails} />
                 </div>
 
-                <Button className='w-full bg-purple-600 hover:bg-purple-700'>Lưu thay đổi</Button>
+                <Button className='w-full bg-purple-400 hover:bg-purple-700'>Lưu thay đổi</Button>
               </CardContent>
             </Card>
           </TabsContent>
@@ -107,7 +107,7 @@ export default function FormProfile() {
                     <Input
                       id='current-password'
                       type={showPassword ? 'text' : 'password'}
-                      className='bg-[#2C2859] border-purple-500 pr-10'
+                      className='bg-[#7f76e0] border-purple-400 pr-10'
                     />
                     <Button
                       variant='ghost'
@@ -126,15 +126,15 @@ export default function FormProfile() {
 
                 <div className='space-y-2'>
                   <Label htmlFor='new-password'>Mật khẩu mới</Label>
-                  <Input id='new-password' type='password' className='bg-[#2C2859] border-purple-500' />
+                  <Input id='new-password' type='password' className='bg-[#7f76e0] border-purple-400' />
                 </div>
 
                 <div className='space-y-2'>
                   <Label htmlFor='confirm-password'>Xác nhận mật khẩu mới</Label>
-                  <Input id='confirm-password' type='password' className='bg-[#2C2859] border-purple-500' />
+                  <Input id='confirm-password' type='password' className='bg-[#7f76e0] border-purple-400' />
                 </div>
 
-                <Button className='w-full bg-purple-600 hover:bg-purple-700'>Cập nhật mật khẩu</Button>
+                <Button className='w-full bg-purple-400 hover:bg-purple-700'>Cập nhật mật khẩu</Button>
               </CardContent>
             </Card>
           </TabsContent>
@@ -150,7 +150,7 @@ export default function FormProfile() {
                   <ShoppingCart className='w-16 h-16 mx-auto text-gray-400 mb-4' />
                   <p className='text-xl font-semibold mb-2'>Giỏ hàng trống</p>
                   <p className='text-gray-400 mb-4'>Bạn chưa thêm sản phẩm nào vào giỏ hàng.</p>
-                  <Button className='bg-purple-600 hover:bg-purple-700'>Tiếp tục mua sắm</Button>
+                  <Button className='bg-purple-400 hover:bg-purple-700'>Tiếp tục mua sắm</Button>
                 </div>
               </CardContent>
             </Card>

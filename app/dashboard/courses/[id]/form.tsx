@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Star, Clock, Users, PlayCircle, FileText, Download, Globe, CheckCircle, Coffee, Award } from 'lucide-react'
+import Carousel from '@/components/courses/related-courses'
 
 const placeholderImage =
   'https://static.vecteezy.com/system/resources/thumbnails/022/059/000/small/no-image-available-icon-vector.jpg'
@@ -31,7 +32,7 @@ const CourseDetail = () => {
               <span className='ml-2 text-gray-700 dark:text-gray-300'>(3,245 ratings)</span>
             </div>
             <span className='text-gray-700 dark:text-gray-300 text-lg'>23,456 students enrolled</span>
-            <Badge variant='secondary' className='text-lg px-3 py-1 bg-purple-600 text-white'>
+            <Badge variant='secondary' className='text-lg px-3 py-1 bg-purple-400 text-white'>
               Bestseller
             </Badge>
             <Badge variant='secondary' className='text-lg px-3 py-1 bg-gray-700 text-white'>
@@ -52,7 +53,7 @@ const CourseDetail = () => {
             </div>
           </div>
         </div>
-        <Card className='lg:col-span-1 dark:bg-gray-800 border-gray-300 dark:border-gray-700'>
+        <Card className='lg:col-span-1 dark:bg-gray-800 border-gray-300 dark:border-gray-700 mt-1'>
           <CardContent className='p-6'>
             <Image
               src={placeholderImage || '/placeholder.svg'}
@@ -61,30 +62,30 @@ const CourseDetail = () => {
               height={225}
               className='rounded-lg mb-6 mx-auto'
             />
-            <div className='text-4xl font-bold mb-6 text-purple-600'>$129.99</div>
-            <Button className='w-full text-lg py-6 mb-6 bg-purple-600 hover:bg-purple-700 text-white'>
+            <div className='text-4xl font-bold mb-6 text-purple-400'>$129.99</div>
+            <Button className='w-full text-lg py-6 mb-6 bg-purple-400 hover:bg-purple-700 text-white'>
               Enroll Now
             </Button>
             <div className='text-center text-gray-700 dark:text-gray-300 mb-6'>30-Day Money-Back Guarantee</div>
             <div className='space-y-4'>
               <div className='flex items-center'>
-                <Clock className='w-6 h-6 mr-3 text-purple-600' />
+                <Clock className='w-6 h-6 mr-3 text-purple-400' />
                 <span className='text-lg text-gray-900 dark:text-white'>40 hours of video content</span>
               </div>
               <div className='flex items-center'>
-                <FileText className='w-6 h-6 mr-3 text-purple-600' />
+                <FileText className='w-6 h-6 mr-3 text-purple-400' />
                 <span className='text-lg text-gray-900 dark:text-white'>125 articles and resources</span>
               </div>
               <div className='flex items-center'>
-                <Download className='w-6 h-6 mr-3 text-purple-600' />
+                <Download className='w-6 h-6 mr-3 text-purple-400' />
                 <span className='text-lg text-gray-900 dark:text-white'>Downloadable source code</span>
               </div>
               <div className='flex items-center'>
-                <Globe className='w-6 h-6 mr-3 text-purple-600' />
+                <Globe className='w-6 h-6 mr-3 text-purple-400' />
                 <span className='text-lg text-gray-900 dark:text-white'>Full lifetime access</span>
               </div>
               <div className='flex items-center'>
-                <Award className='w-6 h-6 mr-3 text-purple-600' />
+                <Award className='w-6 h-6 mr-3 text-purple-400' />
                 <span className='text-lg text-gray-900 dark:text-white'>Certificate of completion</span>
               </div>
             </div>
@@ -95,19 +96,19 @@ const CourseDetail = () => {
       {/* Course Content */}
       <Tabs defaultValue='overview' className='mb-12'>
         <TabsList className='grid w-full grid-cols-5 bg-gray-800 dark:bg-gray-900'>
-          <TabsTrigger value='overview' className='dark:text-white data-[state=active]:bg-purple-600'>
+          <TabsTrigger value='overview' className='dark:text-white data-[state=active]:bg-purple-400'>
             Overview
           </TabsTrigger>
-          <TabsTrigger value='curriculum' className='dark:text-white data-[state=active]:bg-purple-600'>
+          <TabsTrigger value='curriculum' className='dark:text-white data-[state=active]:bg-purple-400'>
             Curriculum
           </TabsTrigger>
-          <TabsTrigger value='instructor' className='dark:text-white data-[state=active]:bg-purple-600'>
+          <TabsTrigger value='instructor' className='dark:text-white data-[state=active]:bg-purple-400'>
             Instructor
           </TabsTrigger>
-          <TabsTrigger value='reviews' className='dark:text-white data-[state=active]:bg-purple-600'>
+          <TabsTrigger value='reviews' className='dark:text-white data-[state=active]:bg-purple-400'>
             Reviews
           </TabsTrigger>
-          <TabsTrigger value='faq' className='dark:text-white data-[state=active]:bg-purple-600'>
+          <TabsTrigger value='faq' className='dark:text-white data-[state=active]:bg-purple-400'>
             FAQ
           </TabsTrigger>
         </TabsList>
@@ -448,33 +449,42 @@ const CourseDetail = () => {
             description: 'Master advanced React concepts and learn to build high-performance applications',
             rating: 4.8,
             students: 12345,
-            price: 89.99
+            price: 89.99,
+            images: [
+              'https://images.unsplash.com/photo-1531746790731-6c087fecd65a',
+              'https://images.unsplash.com/photo-1522202176988-66273c2fd55f',
+              'https://images.unsplash.com/photo-1519125323398-675f0ddb6308'
+            ]
           },
           {
             title: 'Node.js Microservices: From Zero to Hero',
             description: 'Learn to build scalable microservices architectures with Node.js and Docker',
             rating: 4.7,
             students: 8901,
-            price: 99.99
+            price: 99.99,
+            images: [
+              'https://images.unsplash.com/photo-1531746790731-6c087fecd65a',
+              'https://images.unsplash.com/photo-1516321497487-e288fb19713f',
+              'https://images.unsplash.com/photo-1523275335684-37898b6baf30'
+            ]
           },
           {
             title: 'Full-Stack TypeScript: Next.js, NestJS, and PostgreSQL',
             description: 'Build modern, type-safe applications with TypeScript across the entire stack',
             rating: 4.9,
             students: 6789,
-            price: 109.99
+            price: 109.99,
+            images: [
+              'https://images.unsplash.com/photo-1517433456452-f9633a875f6f',
+              'https://images.unsplash.com/photo-1504384764586-bb4cdc1707b0',
+              'https://images.unsplash.com/photo-1517511620798-cec17d428bc0'
+            ]
           }
         ].map((course, index) => (
           <Card key={index} className='dark:bg-gray-800 border-gray-300 dark:border-gray-700'>
             <CardContent className='p-4'>
-              <Image
-                src={placeholderImage || '/placeholder.svg'}
-                alt={course.title}
-                width={300}
-                height={169}
-                className='rounded-lg mb-4 mx-auto'
-              />
-              <h3 className='text-xl font-semibold mb-2 text-gray-900 dark:text-white'>{course.title}</h3>
+              <Carousel images={course.images} />
+              <h3 className='text-xl font-semibold mt-4 mb-2 text-gray-900 dark:text-white'>{course.title}</h3>
               <p className='text-sm text-gray-700 dark:text-gray-300 mb-2'>{course.description}</p>
               <div className='flex items-center justify-between'>
                 <div className='flex items-center'>
