@@ -1,16 +1,25 @@
 'use client'
 
-import Contributors from '@/components/homepage/Contributors'
-import FeaturedCourses from '@/components/homepage/FeaturedCourses'
-import Footer from '@/components/homepage/Footer'
+import { useState, useEffect } from 'react'
 import Header from '@/components/homepage/Header'
 import Hero from '@/components/homepage/Hero'
-import Statistics from '@/components/homepage/Statistics'
+import Features from '@/components/homepage/Features'
+import FeaturedCourses from '@/components/homepage/FeaturedCourses'
 import Testimonials from '@/components/homepage/Testimonials'
-import { useState } from 'react'
+import Pricing from '@/components/homepage/Pricing'
+import FAQ from '@/components/homepage/FAQ'
+import Contributors from '@/components/homepage/Contributors'
+import Footer from '@/components/homepage/Footer'
+import Newsletter from '@/components/homepage/NewsLetter'
 
 export default function HomePage() {
-  const [inputValue, setInputValue] = useState('')
+  const [scrollY, setScrollY] = useState(0)
+
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   return (
     <div className='min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white'>
@@ -18,10 +27,25 @@ export default function HomePage() {
       <div className='relative z-10'>
         <Header />
         <main>
-          <Hero />
-          <Statistics />
-          <FeaturedCourses />
-          <Testimonials />
+          <section id='home'>
+            <Hero />
+          </section>
+          <section id='features'>
+            <Features />
+          </section>
+          <section id='courses'>
+            <FeaturedCourses />
+          </section>
+          <section id='testimonials'>
+            <Testimonials />
+          </section>
+          <section id='pricing'>
+            <Pricing />
+          </section>
+          <section id='faq'>
+            <FAQ />
+          </section>
+          <Newsletter />
           <Contributors />
         </main>
         <Footer />
