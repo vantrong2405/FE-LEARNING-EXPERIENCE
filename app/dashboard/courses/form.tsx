@@ -9,6 +9,8 @@ import { Progress } from '@/components/ui/progress'
 import { Slider } from '@/components/ui/slider'
 import { Book, Clock, Filter, Search, Star, TrendingUp, Users } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
+import { pathURL } from '@/constants/path'
 
 const courses = [
   {
@@ -240,7 +242,9 @@ export default function CoursesPage() {
                       {course.originalPrice.toLocaleString()}đ
                     </span>
                   </div>
-                  <Button className='bg-purple-600 hover:bg-purple-700 text-white'>Xem Chi Tiết</Button>
+                  <Link href={pathURL.courses_detail(1)}>
+                    <Button className='bg-purple-600 hover:bg-purple-700 text-white'>Xem Chi Tiết</Button>
+                  </Link>
                 </div>
               </CardFooter>
             </Card>
@@ -302,7 +306,9 @@ export default function CoursesPage() {
                       {course.originalPrice.toLocaleString()}đ
                     </span>
                   </div>
-                  <Button className='bg-purple-600 hover:bg-purple-700 text-white'>Xem Chi Tiết</Button>
+                  <Link href={pathURL.courses_detail(1)}>
+                    <Button className='bg-purple-600 hover:bg-purple-700 text-white'>Xem Chi Tiết</Button>
+                  </Link>
                 </div>
               </CardFooter>
             </Card>
