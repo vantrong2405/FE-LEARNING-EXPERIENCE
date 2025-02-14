@@ -7,7 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Input } from '@/components/ui/input'
-import { QrCode, CreditCard, RefreshCw, Tag, Clock, User, BanknoteIcon, CopyIcon } from 'lucide-react'
+import { QrCode, CreditCard, RefreshCw, Tag, Clock, User, BanknoteIcon, CopyIcon, AlertCircle } from 'lucide-react'
 import qr from '@/public/assets/images/qr.png'
 
 const QRPayment = () => {
@@ -261,6 +261,41 @@ const QRPayment = () => {
                     <Tag className='mr-2 h-3 w-3' />
                     Apply
                   </Button>
+                </div>
+              </div>
+            </div>
+            <div className='mt-4 p-4 bg-yellow-50 dark:bg-yellow-900 rounded-lg'>
+              <div className='flex'>
+                <div className='flex-shrink-0'>
+                  <AlertCircle className='h-5 w-5 text-yellow-400' aria-hidden='true' />
+                </div>
+                <div className='ml-3'>
+                  <h3 className='text-sm font-medium text-yellow-800 dark:text-yellow-100'>
+                    Important Payment Information
+                  </h3>
+                  <div className='mt-2 text-sm text-yellow-700 dark:text-yellow-200'>
+                    <p className='mb-2'>Please read the following instructions carefully:</p>
+                    <ul className='list-disc pl-5 space-y-1'>
+                      <li>Bank transfers may take up to 30 minutes to be reflected in our system.</li>
+                      <li>Ensure you use the provided payment code as the transfer reference.</li>
+                      <li>After making the payment, click the "Check Payment Status" button.</li>
+                      <li>
+                        If your payment is not updated after 30 minutes, please follow these steps:
+                        <ol className='list-decimal pl-5 mt-1'>
+                          <li>Double-check that you've entered the correct amount and reference code.</li>
+                          <li>Verify that the transfer has been completed from your bank's end.</li>
+                          <li>
+                            If everything is correct, please contact our support team via our Facebook page for
+                            immediate assistance.
+                          </li>
+                        </ol>
+                      </li>
+                    </ul>
+                    <p className='mt-2'>
+                      For any questions or concerns, don't hesitate to reach out to our customer support team. We're
+                      here to help ensure a smooth payment process for you.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>

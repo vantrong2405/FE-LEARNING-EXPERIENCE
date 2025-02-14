@@ -10,14 +10,14 @@ import { pathURL } from '@/constants/path'
 
 export default function FormForgotPassword() {
   return (
-    <div className='min-h-screen flex items-center justify-center bg-gray-900 py-12 px-4 sm:px-6 lg:px-8'>
-      <div className="fixed inset-0 bg-[url('/bg-pattern.svg')] opacity-5 z-0"></div>
-      <Card className='w-full max-w-md z-10 bg-gray-800 border-gray-700'>
+    <div className='min-h-screen flex items-center justify-center dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8'>
+      <div className="fixed inset-0 dark:bg-[url('/dark:bg-pattern.svg')] opacity-5 z-0"></div>
+      <Card className='w-full max-w-md z-10 dark:bg-gray-800 border-gray-700'>
         <CardHeader className='space-y-1'>
           <div className='flex items-center justify-center mb-4'>
             <Icons.GraduationCap className='h-12 w-12 text-purple-500' />
           </div>
-          <CardTitle className='text-2xl font-bold text-center bg-gradient-to-r from-purple-400 to-pink-500 text-transparent bg-clip-text'>
+          <CardTitle className='text-2xl font-bold text-center dark:bg-gradient-to-r from-purple-400 to-pink-500 dark:text-transparent dark:bg-clip-text'>
             Forgot Your Password?
           </CardTitle>
           <CardDescription className='text-gray-400 text-center'>
@@ -35,7 +35,7 @@ export default function FormForgotPassword() {
                 id='email'
                 placeholder='Enter your email'
                 type='email'
-                className='pl-10 bg-gray-700 border-gray-600  placeholder-gray-400'
+                className='pl-10 dark:bg-gray-700 border-gray-600  placeholder-gray-400'
               />
             </div>
           </div>

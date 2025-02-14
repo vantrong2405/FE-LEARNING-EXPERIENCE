@@ -1,16 +1,16 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Alert } from '@/components/ui/alert'
 import Link from 'next/link'
 import { Icons } from '../ui/icons'
 import { pathURL } from '@/constants/path'
-import { Volume2, VolumeX, Smile, ChevronUp, UserCircle, LogOut } from 'lucide-react'
+import { Volume2, VolumeX, ChevronUp } from 'lucide-react'
 import { ModeToggle } from '../ui/toggle'
 import useStoreLocal from '@/stores/useStoreLocal'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { UserCircle, LogOut } from 'lucide-react'
 
 const navItems = [
   { name: 'Home', href: '#home' },
@@ -27,23 +27,28 @@ export default function Header() {
   const [showScrollTop, setShowScrollTop] = useState(false)
   const { isMusicOn, toggleMusic } = useStoreLocal()
   const [scrollY, setScrollY] = useState(0)
-  const [isLoggedIn, setIsLoggedIn] = useState(true) // Giả lập trạng thái đăng nhập
-  const [userEmail, setUserEmail] = useState('user@example.com') // Giả lập email người dùng
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [userEmail, setUserEmail] = useState('user@example.com')
 
-  // 🎯 Sử dụng useCallback để tối ưu sự kiện cuộn
-  const handleScroll = useCallback(() => {
-    const y = window.scrollY
-    setScrollY(y)
-
-    // Chỉ cập nhật state khi giá trị thực sự thay đổi
-    setShowAlert((prev) => (y > 60 ? false : prev !== true ? true : prev))
-    setShowScrollTop((prev) => (y > 300 ? true : prev !== false ? false : prev))
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [handleScroll])
+    if (scrollY > 60) {
+      setShowAlert(false)
+    } else {
+      setShowAlert(true)
+    }
+
+    if (scrollY > 300) {
+      setShowScrollTop(true)
+    } else {
+      setShowScrollTop(false)
+    }
+  }, [scrollY])
 
   const scrollToSection = (sectionId: string) => {
     const section = document.getElementById(sectionId)
@@ -57,6 +62,7 @@ export default function Header() {
   }
 
   const handleSignOut = () => {
+    // Implement sign out logic here
     setIsLoggedIn(false)
   }
 
@@ -66,7 +72,7 @@ export default function Header() {
         className={`bg-white/80 dark:bg-gray-900/80 backdrop-blur-md transition-all duration-300 ease-in-out ${scrollY > 0 ? 'shadow-md' : ''}`}
       >
         <div className='container mx-auto px-4 py-4'>
-          <div className='flex items-center justify-around'>
+          <div className='flex items-center justify-between'>
             <Link href={pathURL.home} className='flex items-center space-x-2'>
               <Icons.GraduationCap className='h-8 w-8 text-purple-500' />
               <span className='text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 text-transparent bg-clip-text'>
@@ -128,7 +134,7 @@ export default function Header() {
                       <Avatar className='h-8 w-8'>
                         <AvatarImage src='/avatars/01.png' alt='@user' />
                         <AvatarFallback>
-                          <UserCircle className='h-6 w-6' />
+                          <UserCircle className='h-6 w-6' /> {/* UserCircle is now correctly rendered */}
                         </AvatarFallback>
                       </Avatar>
                     </Button>
@@ -224,28 +230,25 @@ export default function Header() {
         </div>
       </header>
 
-      {showAlert && (
-        <Alert className='w-[80%] fixed top-16 left-1/2 transform -translate-x-1/2 dark:bg-gray-800 bg-red-500 py-2 px-4 border-none text-xs shadow-lg rounded-lg transition-all duration-300 ease-in-out flex items-center justify-between'>
-          <div className='flex items-center space-x-2'>
-            <Smile className='h-4 w-4 text-yellow-300' />
-            <span className='text-xs font-medium'>New courses available! Check them out now.</span>
-          </div>
-          <Button variant='ghost' size='icon' onClick={toggleMusic}>
-            {isMusicOn ? <Volume2 className='h-4 w-4' /> : <VolumeX className='h-4 w-4' />}
-          </Button>
-        </Alert>
-      )}
-
       {showScrollTop && (
         <Button
           variant='secondary'
           size='icon'
-          className='fixed bottom-4 right-4 rounded-full shadow-lg'
+          className='fixed bottom-20 right-4 rounded-full shadow-lg'
           onClick={scrollToTop}
         >
           <ChevronUp className='h-6 w-6' />
         </Button>
       )}
+
+      <Button
+        variant='secondary'
+        size='icon'
+        className='fixed bottom-4 right-4 rounded-full shadow-lg'
+        onClick={toggleMusic}
+      >
+        {isMusicOn ? <Volume2 className='h-6 w-6' /> : <VolumeX className='h-6 w-6' />}
+      </Button>
     </div>
   )
 }

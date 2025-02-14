@@ -7,10 +7,14 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
 import { Slider } from '@/components/ui/slider'
-import { Book, Clock, Filter, Search, Star, TrendingUp, Users } from 'lucide-react'
+import { Book, Clock, Filter, Search, Star, TrendingUp, Users, X } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { pathURL } from '@/constants/path'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const courses = [
   {
@@ -100,6 +104,7 @@ const courses = [
 ]
 
 const categories = ['Tất cả', 'Ngoại Ngữ', 'Phát Triển Bản Thân', 'Thiết Kế', 'Lập Trình', 'Marketing', 'Tài Chính']
+const levels = ['Beginner', 'Intermediate', 'Advanced']
 
 export default function CoursesPage() {
   const [selectedCategory, setSelectedCategory] = useState('Tất cả')
@@ -119,6 +124,15 @@ export default function CoursesPage() {
     setFilteredCourses(filtered)
   }, [selectedCategory, priceRange, searchQuery])
 
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [category, setCategory] = useState('')
+  const [level, setLevel] = useState('')
+
+  const handleFilter = () => {
+    // Implement your filter logic here
+    console.log('Filtering with:', { searchQuery, priceRange, category, level })
+    setIsDialogOpen(false)
+  }
   return (
     <div className='container mx-auto px-4 py-8 space-y-12 bg-white dark:bg-gray-900'>
       <section className='space-y-4'>
@@ -127,23 +141,76 @@ export default function CoursesPage() {
           Nâng cao kỹ năng của bạn với các khóa học chất lượng cao từ các chuyên gia hàng đầu
         </p>
       </section>
-
-      <section className='space-y-4'>
-        <div className='flex flex-col md:flex-row gap-4 items-center justify-between'>
-          <div className='relative w-full md:w-96'>
-            <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400' />
-            <Input
-              type='search'
-              placeholder='Tìm kiếm khóa học...'
-              className='pl-10 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:border-purple-500'
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+      <section className='space-y-6 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md'>
+        <div className='flex flex-col md:flex-row gap-4 items-start md:items-center justify-between'>
+          <div className='w-full md:w-auto flex flex-col sm:flex-row gap-4 items-center'>
+            <div className='relative w-full sm:w-96'>
+              <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400' />
+              <Input
+                type='search'
+                placeholder='Tìm kiếm khóa học...'
+                className='pl-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 focus:border-purple-500'
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant='outline' className='w-full sm:w-auto'>
+                  <Filter className='mr-2 h-4 w-4' /> Bộ lọc nâng cao
+                </Button>
+              </DialogTrigger>
+              <DialogContent className='sm:max-w-[425px]'>
+                <DialogHeader>
+                  <DialogTitle>Lọc Khóa Học</DialogTitle>
+                </DialogHeader>
+                <div className='space-y-4 py-4'>
+                  <div className='space-y-2'>
+                    <Label htmlFor='category'>Danh mục</Label>
+                    <Select value={category} onValueChange={setCategory}>
+                      <SelectTrigger id='category'>
+                        <SelectValue placeholder='Chọn danh mục' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map((cat) => (
+                          <SelectItem key={cat} value={cat}>
+                            {cat}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className='space-y-2'>
+                    <Label htmlFor='level'>Cấp độ</Label>
+                    <Select value={level} onValueChange={setLevel}>
+                      <SelectTrigger id='level'>
+                        <SelectValue placeholder='Chọn cấp độ' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {levels.map((lvl) => (
+                          <SelectItem key={lvl} value={lvl}>
+                            {lvl}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className='flex justify-end space-x-2'>
+                  <Button variant='outline' onClick={() => setIsDialogOpen(false)}>
+                    Hủy
+                  </Button>
+                  <Button variant={'secondary'} onClick={handleFilter}>
+                    Áp dụng
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
-          <div className='w-full md:w-auto flex flex-col items-start space-y-2'>
-            <label htmlFor='price-range' className='text-sm font-medium text-gray-700 dark:text-gray-300'>
+          <div className='w-full md:w-64 space-y-2'>
+            <Label htmlFor='price-range' className='text-sm font-medium text-gray-700 dark:text-gray-300'>
               Giá: {priceRange[0].toLocaleString()}đ - {priceRange[1].toLocaleString()}đ
-            </label>
+            </Label>
             <Slider
               id='price-range'
               min={0}
@@ -151,13 +218,38 @@ export default function CoursesPage() {
               step={50000}
               value={priceRange}
               onValueChange={setPriceRange}
-              className='w-full md:w-[300px]'
+              className='w-full'
             />
           </div>
-          <Button className='w-full md:w-auto bg-purple-600 hover:bg-purple-700 text-white'>
-            <Filter className='mr-2 h-4 w-4' /> Lọc Khóa Học
-          </Button>
         </div>
+        <AnimatePresence>
+          {(searchQuery || priceRange[0] > 0 || priceRange[1] < 1000000 || category || level) && (
+            <div>
+              <span className='text-sm text-gray-600 dark:text-gray-400 mx-2'>Bộ lọc đang áp dụng:</span>
+              {searchQuery && (
+                <Button variant='secondary' size='sm' onClick={() => setSearchQuery('')}>
+                  Tìm kiếm: {searchQuery} <X className='ml-2 h-3 w-3 mx-2' />
+                </Button>
+              )}
+              {(priceRange[0] > 0 || priceRange[1] < 1000000) && (
+                <Button variant='secondary' size='sm' onClick={() => setPriceRange([0, 1000000])}>
+                  Giá: {priceRange[0].toLocaleString()}đ - {priceRange[1].toLocaleString()}đ{' '}
+                  <X className='ml-2 h-3 w-3' />
+                </Button>
+              )}
+              {category && (
+                <Button variant='secondary' size='sm' onClick={() => setCategory('')}>
+                  Danh mục: {category} <X className='ml-2 h-3 w-3' />
+                </Button>
+              )}
+              {level && (
+                <Button variant='secondary' size='sm' onClick={() => setLevel('')}>
+                  Cấp độ: {level} <X className='ml-2 h-3 w-3' />
+                </Button>
+              )}
+            </div>
+          )}
+        </AnimatePresence>
       </section>
 
       <section className='space-y-4'>
