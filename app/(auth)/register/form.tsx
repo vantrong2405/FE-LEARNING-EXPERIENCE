@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import Link from 'next/link'
 import { Icons } from '@/components/ui/icons'
 import { pathURL } from '@/constants/path'
+import Header from '@/components/homepage/Header'
 
 export default function FormRegister() {
   const [showPassword, setShowPassword] = useState(false)
@@ -17,14 +18,14 @@ export default function FormRegister() {
   const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword)
 
   return (
-    <div className='min-h-screen flex items-center justify-center bg-gray-900 py-12 px-4 sm:px-6 lg:px-8'>
-      <div className="fixed inset-0 bg-[url('/bg-pattern.svg')] opacity-5 z-0"></div>
-      <Card className='w-full max-w-md z-10 bg-gray-800 border-gray-700'>
+    <div className='min-h-screen flex items-center justify-center dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8'>
+      <div className="fixed inset-0 dark:bg-[url('/bg-pattern.svg')] opacity-5 z-0"></div>
+      <Card className='w-full max-w-md z-10 dark:bg-gray-800 border-gray-700'>
         <CardHeader className='space-y-1'>
           <div className='flex items-center justify-center mb-4'>
             <Icons.GraduationCap className='h-12 w-12 text-purple-500' />
           </div>
-          <CardTitle className='text-2xl font-bold text-center bg-gradient-to-r from-purple-400 to-pink-500 text-transparent bg-clip-text'>
+          <CardTitle className='text-2xl font-bold text-center dark:bg-gradient-to-r from-purple-400 to-pink-500 dark:text-transparent dark:bg-clip-text'>
             Create your ELearn account
           </CardTitle>
           <CardDescription className='text-gray-400 text-center'>Join our community of learners today</CardDescription>
@@ -39,7 +40,7 @@ export default function FormRegister() {
               <Input
                 id='name'
                 placeholder='Enter your full name'
-                className='pl-10 bg-gray-700 border-gray-600  placeholder-gray-400'
+                className='pl-10 dark:bg-gray-700 border-gray-600  placeholder-gray-400'
               />
             </div>
           </div>
@@ -53,7 +54,7 @@ export default function FormRegister() {
                 id='email'
                 placeholder='Enter your email'
                 type='email'
-                className='pl-10 bg-gray-700 border-gray-600  placeholder-gray-400'
+                className='pl-10 dark:bg-gray-700 border-gray-600  placeholder-gray-400'
               />
             </div>
           </div>
@@ -67,7 +68,7 @@ export default function FormRegister() {
                 id='password'
                 type={showPassword ? 'text' : 'password'}
                 placeholder='Create a password'
-                className='pl-10 pr-10 bg-gray-700 border-gray-600  placeholder-gray-400'
+                className='pl-10 pr-10 dark:bg-gray-700 border-gray-600  placeholder-gray-400'
               />
               <button
                 type='button'
@@ -88,7 +89,7 @@ export default function FormRegister() {
                 id='confirmPassword'
                 type={showConfirmPassword ? 'text' : 'password'}
                 placeholder='Confirm your password'
-                className='pl-10 pr-10 bg-gray-700 border-gray-600  placeholder-gray-400'
+                className='pl-10 pr-10 dark:bg-gray-700 border-gray-600  placeholder-gray-400'
               />
               <button
                 type='button'
