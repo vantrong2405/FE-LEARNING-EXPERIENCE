@@ -13,7 +13,7 @@ export default function Footer() {
   return (
     <footer className='dark:bg-gray-900 py-16 bg-gray-200'>
       <div className='container mx-auto px-4'>
-        <div className='grid grid-cols-1 md:grid-cols-4 gap-8 mb-8'>
+        <div className='ml-20 flex justify-between'>
           <div>
             <h4 className=' font-semibold mb-4'>About ELearn</h4>
             <ul className='space-y-2'>
@@ -81,7 +81,7 @@ export default function Footer() {
             <p className='dark:text-gray-400'>support@ELearn.com</p>
           </div>
         </div>
-        <div className='border-t border-gray-800 pt-8 text-center'>
+        <div className='border-t border-gray-800 pt-6 text-center mt-8'>
           <div className='flex justify-center space-x-6 mb-6'>
             {socialLinks.map((link, index) => (
               <a

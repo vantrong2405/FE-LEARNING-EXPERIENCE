@@ -2,6 +2,8 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
+import Link from 'next/link'
+import { pathURL } from '@/constants/path'
 
 const courses = [
   {
@@ -66,12 +68,14 @@ export default function FeaturedCourses() {
                   <p className='text-gray-400 text-sm mb-4'>{course.description}</p>
                 </CardContent>
                 <CardFooter className='dark:bg-gray-800 border-t dark:border-gray-700 p-4'>
-                  <Button
-                    variant='secondary'
-                    className='w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 '
-                  >
-                    Learn More
-                  </Button>
+                  <Link href={pathURL.dashboard_courses}>
+                    <Button
+                      variant='secondary'
+                      className='w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 '
+                    >
+                      Learn More
+                    </Button>
+                  </Link>
                 </CardFooter>
               </Card>
             </div>

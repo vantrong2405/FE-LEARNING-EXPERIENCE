@@ -3,5 +3,6 @@ export const pathURL = {
   login: '/login',
   register: '/register',
   forgot_password: '/forgot-password',
-  dashboard_courses: '/dashboard/courses'
+  dashboard_courses: '/dashboard/courses',
+  courses_detail: (id: number) => `/dashboard/courses/${id}`
 }
