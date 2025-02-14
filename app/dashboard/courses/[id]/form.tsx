@@ -52,6 +52,13 @@ const CourseDetail = () => {
               <p className='text-gray-700 dark:text-gray-300'>Senior Full-Stack Developer & Educator</p>
             </div>
           </div>
+          {/* create video ... demo */}
+          <div className='rounded-xl overflow-hidden h-full'>
+            <video className='w-full aspect-video' controls poster='/placeholder.svg?height=360&width=640'>
+              <source src='/assets/videos/video.mp4' type='video/mp4' />
+              Your browser does not support the video tag.
+            </video>
+          </div>
         </div>
         <Card className='lg:col-span-1 dark:bg-gray-800 border-gray-300 dark:border-gray-700 mt-1'>
           <CardContent className='p-6'>

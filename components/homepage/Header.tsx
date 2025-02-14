@@ -10,7 +10,7 @@ import { Volume2, VolumeX, ChevronUp } from 'lucide-react'
 import { ModeToggle } from '../ui/toggle'
 import useStoreLocal from '@/stores/useStoreLocal'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { UserCircle, LogOut } from 'lucide-react' // Import missing icons
+import { UserCircle, LogOut } from 'lucide-react'
 
 const navItems = [
   { name: 'Home', href: '#home' },
@@ -27,8 +27,8 @@ export default function Header() {
   const [showScrollTop, setShowScrollTop] = useState(false)
   const { isMusicOn, toggleMusic } = useStoreLocal()
   const [scrollY, setScrollY] = useState(0)
-  const [isLoggedIn, setIsLoggedIn] = useState(false) // Simulating login state
-  const [userEmail, setUserEmail] = useState('user@example.com') // Simulating user email
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [userEmail, setUserEmail] = useState('user@example.com')
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY)
