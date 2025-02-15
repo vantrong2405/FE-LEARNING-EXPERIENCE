@@ -232,7 +232,7 @@ export default function CoursesPage() {
                 </Button>
               )}
               {(priceRange[0] > 0 || priceRange[1] < 1000000) && (
-                <Button variant='secondary' size='sm' onClick={() => setPriceRange([0, 1000000])}>
+                <Button variant='secondary' className='mx-2' size='sm' onClick={() => setPriceRange([0, 1000000])}>
                   Giá: {priceRange[0].toLocaleString()}đ - {priceRange[1].toLocaleString()}đ{' '}
                   <X className='ml-2 h-3 w-3' />
                 </Button>
