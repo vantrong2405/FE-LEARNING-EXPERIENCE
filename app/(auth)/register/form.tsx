@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -8,7 +9,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import Link from 'next/link'
 import { Icons } from '@/components/ui/icons'
 import { pathURL } from '@/constants/path'
-import Header from '@/components/homepage/Header'
 
 export default function FormRegister() {
   const [showPassword, setShowPassword] = useState(false)
@@ -18,8 +18,31 @@ export default function FormRegister() {
   const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword)
 
   return (
-    <div className='min-h-screen flex items-center justify-center dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8'>
+    <div className='min-h-screen flex items-center justify-center dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden'>
+      <div className='absolute inset-0 pointer-events-none z-0'>
+        {Array.from({ length: 25 }).map((_, i) => (
+          <motion.div
+            key={i}
+            className='absolute h-2 w-2 rounded-full bg-pink-500 opacity-50'
+            animate={{
+              x: [Math.random() * window.innerWidth, Math.random() * window.innerWidth],
+              y: [Math.random() * window.innerHeight, Math.random() * window.innerHeight],
+              scale: [0, 1, 0],
+              opacity: [0, 1, 0]
+            }}
+            transition={{
+              duration: Math.random() * 5 + 5,
+              repeat: Infinity,
+              ease: 'linear'
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Background Pattern */}
       <div className="fixed inset-0 dark:bg-[url('/bg-pattern.svg')] opacity-5 z-0"></div>
+
+      {/* Form Register */}
       <Card className='w-full max-w-md z-10 dark:bg-gray-800 border-gray-700'>
         <CardHeader className='space-y-1'>
           <div className='flex items-center justify-center mb-4'>
@@ -32,43 +55,37 @@ export default function FormRegister() {
         </CardHeader>
         <CardContent className='space-y-4'>
           <div className='space-y-2'>
-            <Label htmlFor='name' className=''>
-              Full Name
-            </Label>
+            <Label htmlFor='name'>Full Name</Label>
             <div className='relative'>
               <Icons.User className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' size={20} />
               <Input
                 id='name'
                 placeholder='Enter your full name'
-                className='pl-10 dark:bg-gray-700 border-gray-600  placeholder-gray-400'
+                className='pl-10 dark:bg-gray-700 border-gray-600 placeholder-gray-400'
               />
             </div>
           </div>
           <div className='space-y-2'>
-            <Label htmlFor='email' className=''>
-              Email
-            </Label>
+            <Label htmlFor='email'>Email</Label>
             <div className='relative'>
               <Icons.Mail className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' size={20} />
               <Input
                 id='email'
                 placeholder='Enter your email'
                 type='email'
-                className='pl-10 dark:bg-gray-700 border-gray-600  placeholder-gray-400'
+                className='pl-10 dark:bg-gray-700 border-gray-600 placeholder-gray-400'
               />
             </div>
           </div>
           <div className='space-y-2'>
-            <Label htmlFor='password' className=''>
-              Password
-            </Label>
+            <Label htmlFor='password'>Password</Label>
             <div className='relative'>
               <Icons.Lock className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' size={20} />
               <Input
                 id='password'
                 type={showPassword ? 'text' : 'password'}
                 placeholder='Create a password'
-                className='pl-10 pr-10 dark:bg-gray-700 border-gray-600  placeholder-gray-400'
+                className='pl-10 pr-10 dark:bg-gray-700 border-gray-600 placeholder-gray-400'
               />
               <button
                 type='button'
@@ -80,16 +97,14 @@ export default function FormRegister() {
             </div>
           </div>
           <div className='space-y-2'>
-            <Label htmlFor='confirmPassword' className=''>
-              Confirm Password
-            </Label>
+            <Label htmlFor='confirmPassword'>Confirm Password</Label>
             <div className='relative'>
               <Icons.Lock className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' size={20} />
               <Input
                 id='confirmPassword'
                 type={showConfirmPassword ? 'text' : 'password'}
                 placeholder='Confirm your password'
-                className='pl-10 pr-10 dark:bg-gray-700 border-gray-600  placeholder-gray-400'
+                className='pl-10 pr-10 dark:bg-gray-700 border-gray-600 placeholder-gray-400'
               />
               <button
                 type='button'
