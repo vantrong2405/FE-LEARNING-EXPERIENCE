@@ -9,7 +9,7 @@ import { Star, Clock, Users, PlayCircle, FileText, Download, Globe, CheckCircle,
 import Carousel from '@/components/courses/related-courses'
 
 const placeholderImage =
-  'https://static.vecteezy.com/system/resources/thumbnails/022/059/000/small/no-image-available-icon-vector.jpg'
+  'https://img.freepik.com/free-vector/students-using-e-learning-platform-video-laptop-graduation-cap-online-education-platform-e-learning-platform-online-teaching-concept_335657-795.jpg'
 
 const CourseDetail = () => {
   return (
@@ -53,8 +53,12 @@ const CourseDetail = () => {
             </div>
           </div>
           {/* create video ... demo */}
-          <div className='rounded-xl overflow-hidden h-full'>
-            <video className='w-full aspect-video' controls poster='/placeholder.svg?height=360&width=640'>
+          <div className='rounded-xl overflow-hidden  border border-gray-400'>
+            <video
+              className='w-full aspect-video'
+              controls
+              poster='https://img.freepik.com/free-vector/students-using-e-learning-platform-video-laptop-graduation-cap-online-education-platform-e-learning-platform-online-teaching-concept_335657-795.jpg'
+            >
               <source src='/assets/videos/video.mp4' type='video/mp4' />
               Your browser does not support the video tag.
             </video>
