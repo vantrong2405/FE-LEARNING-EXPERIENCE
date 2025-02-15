@@ -6,8 +6,28 @@ import { motion } from 'framer-motion'
 
 export default function Hero() {
   return (
-    <div className='container mx-auto px-4 py-16 md:py-24 lg:py-32 xl:py-40'>
-      <div className='flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-20'>
+    <div className='relative container mx-auto px-4 py-16 md:py-24 lg:py-32 xl:py-40 overflow-hidden'>
+      {/* Hiệu ứng đóm bay bay */}
+      <div className='absolute inset-0 pointer-events-none'>
+        {Array.from({ length: 20 }).map((_, i) => (
+          <motion.div
+            key={i}
+            className='absolute h-2 w-2 rounded-full bg-pink-500 opacity-50'
+            animate={{
+              x: [Math.random() * window.innerWidth, Math.random() * window.innerWidth],
+              y: [Math.random() * window.innerHeight, Math.random() * window.innerHeight],
+              scale: [0, 1, 0]
+            }}
+            transition={{
+              duration: Math.random() * 5 + 5,
+              repeat: Infinity,
+              ease: 'linear'
+            }}
+          />
+        ))}
+      </div>
+
+      <div className='flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-20 relative z-10'>
         <motion.div
           className='lg:w-1/2'
           initial={{ opacity: 0, y: 20 }}

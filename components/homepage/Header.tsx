@@ -11,6 +11,7 @@ import { ModeToggle } from '../ui/toggle'
 import useStoreLocal from '@/stores/useStoreLocal'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { UserCircle, LogOut } from 'lucide-react'
+import Chatbox from '../chatbox/Chatbox'
 
 const navItems = [
   { name: 'Home', href: '#home' },
@@ -229,26 +230,25 @@ export default function Header() {
           )}
         </div>
       </header>
-
       {showScrollTop && (
         <Button
           variant='secondary'
           size='icon'
-          className='fixed bottom-20 right-4 rounded-full shadow-lg'
+          className='fixed bottom-28 right-4 rounded-full shadow-lg z-50'
           onClick={scrollToTop}
         >
           <ChevronUp className='h-6 w-6' />
         </Button>
       )}
-
       <Button
         variant='secondary'
         size='icon'
-        className='fixed bottom-4 right-4 rounded-full shadow-lg'
+        className='fixed bottom-16 right-4 rounded-full shadow-lg z-50'
         onClick={toggleMusic}
       >
         {isMusicOn ? <Volume2 className='h-6 w-6' /> : <VolumeX className='h-6 w-6' />}
       </Button>
+      <Chatbox /> {/* Chatbox luôn nằm dưới cùng */}
     </div>
   )
 }
