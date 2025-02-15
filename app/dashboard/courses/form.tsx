@@ -18,12 +18,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 const courses = [
   {
-    title: 'Nền tảng tiếng Anh cho người mới bắt đầu',
-    category: 'Ngoại Ngữ',
+    title: 'English Foundation for Beginners',
+    category: 'Language',
     badge: 'Bestseller',
     instructor: 'Hannah Pham',
-    lessons: '97 Bài học',
-    duration: '14 giờ 56 phút',
+    lessons: '97 Lessons',
+    duration: '14 hours 56 minutes',
     price: 399000,
     originalPrice: 749000,
     image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-EpJNu9CU0HsswhZUgf8c6eAiGOJNRn.png',
@@ -32,12 +32,12 @@ const courses = [
     students: 12500
   },
   {
-    title: 'Bí quyết trở thành người đứng đầu',
-    category: 'Phát Triển Bản Thân',
-    badge: 'Mới',
+    title: 'Secrets to Becoming a Top Performer',
+    category: 'Personal Development',
+    badge: 'New',
     instructor: 'Lê Thiên Dương',
-    lessons: '27 Bài học',
-    duration: '2 giờ 32 phút',
+    lessons: '27 Lessons',
+    duration: '2 hours 32 minutes',
     price: 399000,
     originalPrice: 799000,
     image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-EpJNu9CU0HsswhZUgf8c6eAiGOJNRn.png',
@@ -46,12 +46,12 @@ const courses = [
     students: 8300
   },
   {
-    title: 'Làm Mọi Thứ Với Photoshop - Thiết Kế Đồ Họa Thực Tiễn',
-    category: 'Thiết Kế',
+    title: 'Mastering Photoshop - Practical Graphic Design',
+    category: 'Design',
     badge: 'Hot',
     instructor: 'Lê Xuân Tiến',
-    lessons: '88 Bài học',
-    duration: '13 giờ 45 phút',
+    lessons: '88 Lessons',
+    duration: '13 hours 45 minutes',
     price: 199000,
     originalPrice: 749000,
     image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-EpJNu9CU0HsswhZUgf8c6eAiGOJNRn.png',
@@ -60,12 +60,12 @@ const courses = [
     students: 15700
   },
   {
-    title: 'Lập Trình Web Fullstack với React và Node.js',
-    category: 'Lập Trình',
+    title: 'Fullstack Web Development with React and Node.js',
+    category: 'Programming',
     badge: 'Trending',
     instructor: 'Nguyễn Văn Cường',
-    lessons: '120 Bài học',
-    duration: '25 giờ 30 phút',
+    lessons: '120 Lessons',
+    duration: '25 hours 30 minutes',
     price: 599000,
     originalPrice: 999000,
     image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-EpJNu9CU0HsswhZUgf8c6eAiGOJNRn.png',
@@ -74,12 +74,12 @@ const courses = [
     students: 10200
   },
   {
-    title: 'Marketing Số Cho Doanh Nghiệp Vừa và Nhỏ',
+    title: 'Digital Marketing for Small and Medium Businesses',
     category: 'Marketing',
-    badge: 'Phổ biến',
+    badge: 'Popular',
     instructor: 'Trần Thị Mai',
-    lessons: '45 Bài học',
-    duration: '8 giờ 15 phút',
+    lessons: '45 Lessons',
+    duration: '8 hours 15 minutes',
     price: 299000,
     originalPrice: 599000,
     image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-EpJNu9CU0HsswhZUgf8c6eAiGOJNRn.png',
@@ -88,12 +88,12 @@ const courses = [
     students: 9800
   },
   {
-    title: 'Khóa Học Đầu Tư Chứng Khoán Cơ Bản',
-    category: 'Tài Chính',
-    badge: 'Cập nhật',
+    title: 'Basic Stock Investment Course',
+    category: 'Finance',
+    badge: 'Updated',
     instructor: 'Phạm Minh Tuấn',
-    lessons: '60 Bài học',
-    duration: '10 giờ 45 phút',
+    lessons: '60 Lessons',
+    duration: '10 hours 45 minutes',
     price: 499000,
     originalPrice: 899000,
     image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-EpJNu9CU0HsswhZUgf8c6eAiGOJNRn.png',
@@ -103,18 +103,18 @@ const courses = [
   }
 ]
 
-const categories = ['Tất cả', 'Ngoại Ngữ', 'Phát Triển Bản Thân', 'Thiết Kế', 'Lập Trình', 'Marketing', 'Tài Chính']
+const categories = ['All', 'Language', 'Personal Development', 'Design', 'Programming', 'Marketing', 'Finance']
 const levels = ['Beginner', 'Intermediate', 'Advanced']
 
 export default function CoursesPage() {
-  const [selectedCategory, setSelectedCategory] = useState('Tất cả')
+  const [selectedCategory, setSelectedCategory] = useState('All')
   const [priceRange, setPriceRange] = useState([0, 1000000])
   const [searchQuery, setSearchQuery] = useState('')
   const [filteredCourses, setFilteredCourses] = useState(courses)
 
   useEffect(() => {
     const filtered = courses.filter((course) => {
-      const categoryMatch = selectedCategory === 'Tất cả' || course.category === selectedCategory
+      const categoryMatch = selectedCategory === 'All' || course.category === selectedCategory
       const priceMatch = course.price >= priceRange[0] && course.price <= priceRange[1]
       const searchMatch =
         course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -136,9 +136,9 @@ export default function CoursesPage() {
   return (
     <div className='container mx-auto px-4 py-8 space-y-12 bg-white dark:bg-gray-900'>
       <section className='space-y-4'>
-        <h1 className='text-4xl font-bold text-gray-900 dark:text-white'>Khám Phá Khóa Học</h1>
+        <h1 className='text-4xl font-bold text-gray-900 dark:text-white'>Explore Courses</h1>
         <p className='text-xl text-gray-700 dark:text-gray-400'>
-          Nâng cao kỹ năng của bạn với các khóa học chất lượng cao từ các chuyên gia hàng đầu
+          Enhance your skills with high-quality courses from top experts
         </p>
       </section>
       <section className='space-y-6 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md'>
@@ -148,7 +148,7 @@ export default function CoursesPage() {
               <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400' />
               <Input
                 type='search'
-                placeholder='Tìm kiếm khóa học...'
+                placeholder='Search for courses...'
                 className='pl-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 focus:border-purple-500'
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -157,19 +157,19 @@ export default function CoursesPage() {
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant='outline' className='w-full sm:w-auto'>
-                  <Filter className='mr-2 h-4 w-4' /> Bộ lọc nâng cao
+                  <Filter className='mr-2 h-4 w-4' /> Advanced Filters
                 </Button>
               </DialogTrigger>
               <DialogContent className='sm:max-w-[425px]'>
                 <DialogHeader>
-                  <DialogTitle>Lọc Khóa Học</DialogTitle>
+                  <DialogTitle>Filter Courses</DialogTitle>
                 </DialogHeader>
                 <div className='space-y-4 py-4'>
                   <div className='space-y-2'>
-                    <Label htmlFor='category'>Danh mục</Label>
+                    <Label htmlFor='category'>Category</Label>
                     <Select value={category} onValueChange={setCategory}>
                       <SelectTrigger id='category'>
-                        <SelectValue placeholder='Chọn danh mục' />
+                        <SelectValue placeholder='Select category' />
                       </SelectTrigger>
                       <SelectContent>
                         {categories.map((cat) => (
@@ -181,10 +181,10 @@ export default function CoursesPage() {
                     </Select>
                   </div>
                   <div className='space-y-2'>
-                    <Label htmlFor='level'>Cấp độ</Label>
+                    <Label htmlFor='level'>Level</Label>
                     <Select value={level} onValueChange={setLevel}>
                       <SelectTrigger id='level'>
-                        <SelectValue placeholder='Chọn cấp độ' />
+                        <SelectValue placeholder='Select level' />
                       </SelectTrigger>
                       <SelectContent>
                         {levels.map((lvl) => (
@@ -198,10 +198,10 @@ export default function CoursesPage() {
                 </div>
                 <div className='flex justify-end space-x-2'>
                   <Button variant='outline' onClick={() => setIsDialogOpen(false)}>
-                    Hủy
+                    Cancel
                   </Button>
                   <Button variant={'secondary'} onClick={handleFilter}>
-                    Áp dụng
+                    Apply
                   </Button>
                 </div>
               </DialogContent>
@@ -209,7 +209,7 @@ export default function CoursesPage() {
           </div>
           <div className='w-full md:w-64 space-y-2'>
             <Label htmlFor='price-range' className='text-sm font-medium text-gray-700 dark:text-gray-300'>
-              Giá: {priceRange[0].toLocaleString()}đ - {priceRange[1].toLocaleString()}đ
+              Price: {priceRange[0].toLocaleString()}đ - {priceRange[1].toLocaleString()}đ
             </Label>
             <Slider
               id='price-range'
@@ -225,26 +225,26 @@ export default function CoursesPage() {
         <AnimatePresence>
           {(searchQuery || priceRange[0] > 0 || priceRange[1] < 1000000 || category || level) && (
             <div>
-              <span className='text-sm text-gray-600 dark:text-gray-400 mx-2'>Bộ lọc đang áp dụng:</span>
+              <span className='text-sm text-gray-600 dark:text-gray-400 mx-2'>Active filters:</span>
               {searchQuery && (
                 <Button variant='secondary' size='sm' onClick={() => setSearchQuery('')}>
-                  Tìm kiếm: {searchQuery} <X className='ml-2 h-3 w-3 mx-2' />
+                  Search: {searchQuery} <X className='ml-2 h-3 w-3 mx-2' />
                 </Button>
               )}
               {(priceRange[0] > 0 || priceRange[1] < 1000000) && (
                 <Button variant='secondary' size='sm' onClick={() => setPriceRange([0, 1000000])}>
-                  Giá: {priceRange[0].toLocaleString()}đ - {priceRange[1].toLocaleString()}đ{' '}
+                  Price: {priceRange[0].toLocaleString()}đ - {priceRange[1].toLocaleString()}đ{' '}
                   <X className='ml-2 h-3 w-3' />
                 </Button>
               )}
               {category && (
                 <Button variant='secondary' size='sm' className='m-2' onClick={() => setCategory('')}>
-                  Danh mục: {category} <X className='ml-2 h-3 w-3' />
+                  Category: {category} <X className='ml-2 h-3 w-3' />
                 </Button>
               )}
               {level && (
                 <Button variant='secondary' size='sm' onClick={() => setLevel('')}>
-                  Cấp độ: {level} <X className='ml-2 h-3 w-3' />
+                  Level: {level} <X className='ml-2 h-3 w-3' />
                 </Button>
               )}
             </div>
@@ -253,7 +253,7 @@ export default function CoursesPage() {
       </section>
 
       <section className='space-y-4'>
-        <h2 className='text-2xl font-semibold text-gray-900 dark:text-white'>Danh Mục Phổ Biến</h2>
+        <h2 className='text-2xl font-semibold text-gray-900 dark:text-white'>Popular Categories</h2>
         <div className='flex flex-wrap gap-2'>
           {categories.map((category, index) => (
             <Button
@@ -274,12 +274,12 @@ export default function CoursesPage() {
 
       <section className='space-y-6'>
         <div className='flex justify-between items-center'>
-          <h2 className='text-2xl font-semibold text-gray-900 dark:text-white'>Khóa Học Nổi Bật</h2>
+          <h2 className='text-2xl font-semibold text-gray-900 dark:text-white'>Featured Courses</h2>
           <Button
             variant='link'
             className='text-purple-600 hover:text-purple-500 dark:text-purple-400 dark:hover:text-purple-300'
           >
-            Xem tất cả
+            View All
           </Button>
         </div>
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
@@ -320,7 +320,7 @@ export default function CoursesPage() {
                   <Star className='h-4 w-4 fill-current' />
                   <span>{course.rating}</span>
                   <span className='text-gray-600 dark:text-gray-400'>
-                    ({course.students.toLocaleString()} học viên)
+                    ({course.students.toLocaleString()} students)
                   </span>
                 </div>
               </CardContent>
@@ -335,7 +335,7 @@ export default function CoursesPage() {
                     </span>
                   </div>
                   <Link href={pathURL.courses_detail(1)}>
-                    <Button className='bg-purple-600 hover:bg-purple-700 text-white'>Xem Chi Tiết</Button>
+                    <Button className='bg-purple-600 hover:bg-purple-700 text-white'>View Details</Button>
                   </Link>
                 </div>
               </CardFooter>
@@ -345,7 +345,7 @@ export default function CoursesPage() {
       </section>
 
       <section className='space-y-6'>
-        <h2 className='text-2xl font-semibold text-gray-900 dark:text-white'>Tất Cả Khóa Học</h2>
+        <h2 className='text-2xl font-semibold text-gray-900 dark:text-white'>All Courses</h2>
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
           {filteredCourses.map((course, index) => (
             <Card
@@ -384,7 +384,7 @@ export default function CoursesPage() {
                   <Star className='h-4 w-4 fill-current' />
                   <span>{course.rating}</span>
                   <span className='text-gray-600 dark:text-gray-400'>
-                    ({course.students.toLocaleString()} học viên)
+                    ({course.students.toLocaleString()} students)
                   </span>
                 </div>
               </CardContent>
@@ -399,7 +399,7 @@ export default function CoursesPage() {
                     </span>
                   </div>
                   <Link href={pathURL.courses_detail(1)}>
-                    <Button className='bg-purple-600 hover:bg-purple-700 text-white'>Xem Chi Tiết</Button>
+                    <Button className='bg-purple-600 hover:bg-purple-700 text-white'>View Details</Button>
                   </Link>
                 </div>
               </CardFooter>
@@ -409,24 +409,88 @@ export default function CoursesPage() {
       </section>
 
       <section className='space-y-6'>
-        <h2 className='text-2xl font-semibold text-gray-900 dark:text-white'>Xu Hướng Học Tập</h2>
+        <h2 className='text-2xl font-semibold text-gray-900 dark:text-white'>All Courses</h2>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+          {filteredCourses.map((course, index) => (
+            <Card
+              key={index}
+              className='bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow duration-300'
+            >
+              <CardHeader className='p-0'>
+                <div className='relative'>
+                  <Image
+                    src={course.image || '/placeholder.svg'}
+                    alt={course.title}
+                    width={400}
+                    height={200}
+                    className='w-full h-48 object-cover'
+                  />
+                  <Badge className='absolute top-2 left-2 bg-purple-500 text-white'>{course.badge}</Badge>
+                </div>
+              </CardHeader>
+              <CardContent className='p-4'>
+                <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-1'>
+                  {course.title}
+                </h3>
+                <p className='text-sm text-gray-600 dark:text-gray-400 mb-2'>{course.category}</p>
+                <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2'>
+                  <Users className='h-4 w-4' />
+                  <span>{course.instructor}</span>
+                </div>
+                <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2'>
+                  <Book className='h-4 w-4' />
+                  <span>{course.lessons}</span>
+                  <span>•</span>
+                  <Clock className='h-4 w-4' />
+                  <span>{course.duration}</span>
+                </div>
+                <div className='flex items-center gap-2 text-sm text-yellow-500 mb-2'>
+                  <Star className='h-4 w-4 fill-current' />
+                  <span>{course.rating}</span>
+                  <span className='text-gray-600 dark:text-gray-400'>
+                    ({course.students.toLocaleString()} students)
+                  </span>
+                </div>
+              </CardContent>
+              <CardFooter className='p-4 bg-gray-100 dark:bg-gray-750 border-t border-gray-300 dark:border-gray-700'>
+                <div className='flex items-center justify-between w-full'>
+                  <div>
+                    <span className='text-lg font-bold text-gray-900 dark:text-black'>
+                      {course.price.toLocaleString()}đ
+                    </span>
+                    <span className='text-sm text-gray-600 dark:text-gray-400 line-through ml-2'>
+                      {course.originalPrice.toLocaleString()}đ
+                    </span>
+                  </div>
+                  <Link href={pathURL.courses_detail(1)}>
+                    <Button className='bg-purple-600 hover:bg-purple-700 text-white'>View Details</Button>
+                  </Link>
+                </div>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      <section className='space-y-6'>
+        <h2 className='text-2xl font-semibold text-gray-900 dark:text-white'>Learning Trends</h2>
         <Card className='bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700'>
           <CardContent className='p-6'>
             <div className='flex items-center justify-between mb-4'>
               <div>
-                <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>Top Danh Mục Được Quan Tâm</h3>
-                <p className='text-sm text-gray-600 dark:text-gray-400'>Dựa trên số lượng đăng ký trong 30 ngày qua</p>
+                <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>Top Categories of Interest</h3>
+                <p className='text-sm text-gray-600 dark:text-gray-400'>Based on enrollments in the last 30 days</p>
               </div>
               <Button
                 variant='outline'
                 className='text-purple-600 border-purple-600 hover:bg-purple-600/10 dark:text-purple-400 dark:border-purple-400 dark:hover:bg-purple-400/10'
               >
                 <TrendingUp className='mr-2 h-4 w-4' />
-                Xem báo cáo chi tiết
+                View Detailed Report
               </Button>
             </div>
             <div className='space-y-4'>
-              {['Lập Trình', 'Ngoại Ngữ', 'Marketing', 'Thiết Kế', 'Tài Chính'].map((category, index) => (
+              {['Programming', 'Language', 'Marketing', 'Design', 'Finance'].map((category, index) => (
                 <div key={index} className='flex items-center justify-between'>
                   <div className='flex items-center gap-2'>
                     <div
@@ -445,26 +509,26 @@ export default function CoursesPage() {
       </section>
 
       <section className='space-y-6'>
-        <h2 className='text-2xl font-semibold text-gray-900 dark:text-white'>Đăng Ký Nhận Thông Tin</h2>
+        <h2 className='text-2xl font-semibold text-gray-900 dark:text-white'>Subscribe for Updates</h2>
         <Card className='bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700'>
           <CardContent className='p-6'>
             <div className='flex flex-col md:flex-row items-center gap-4'>
               <div className='flex-1'>
                 <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-2'>
-                  Nhận Thông Tin Khóa Học Mới
+                  Get Notified About New Courses
                 </h3>
                 <p className='text-sm text-gray-600 dark:text-gray-400'>
-                  Đăng ký để nhận thông báo về các khóa học mới và ưu đãi đặc biệt.
+                  Subscribe to receive notifications about new courses and special offers.
                 </p>
               </div>
               <div className='flex-1 w-full'>
                 <div className='flex w-full items-center space-x-2 '>
                   <Input
                     type='email'
-                    placeholder='Nhập email của bạn'
+                    placeholder='Enter your email'
                     className='flex-1 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 focus:border-purple-500'
                   />
-                  <Button className='bg-purple-600 hover:bg-purple-700 text-white'>Đăng Ký</Button>
+                  <Button className='bg-purple-600 hover:bg-purple-700 text-white'>Subscribe</Button>
                 </div>
               </div>
             </div>
