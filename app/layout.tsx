@@ -4,6 +4,7 @@ import './globals.css'
 import NProgressHandler from '@/components/common/nro-progress'
 import { ThemeProvider } from '@/components/common/theme-provider'
 import AudioPlayer from '@/components/common/AudioPlayer'
+import LazyLoading from '@/components/common/lazy-loading'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -32,6 +33,8 @@ export default function RootLayout({
           {children}
         </ThemeProvider>
         <AudioPlayer />
+        <LazyLoading />
+        <NProgressHandler />
       </body>
     </html>
   )
