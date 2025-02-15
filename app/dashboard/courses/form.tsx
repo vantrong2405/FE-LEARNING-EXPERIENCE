@@ -238,7 +238,7 @@ export default function CoursesPage() {
                 </Button>
               )}
               {category && (
-                <Button variant='secondary' size='sm' className='mx-2' onClick={() => setCategory('')}>
+                <Button variant='secondary' size='sm' className='m-2' onClick={() => setCategory('')}>
                   Danh mục: {category} <X className='ml-2 h-3 w-3' />
                 </Button>
               )}
