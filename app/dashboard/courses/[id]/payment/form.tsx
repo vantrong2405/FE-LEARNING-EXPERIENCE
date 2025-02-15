@@ -105,8 +105,8 @@ const QRPayment = () => {
                 <Image
                   src={qr || '/placeholder.svg'}
                   alt='Payment QR Code'
-                  width={250}
-                  height={250}
+                  width={220}
+                  height={220}
                   className='mx-auto mb-6 rounded-lg shadow-md'
                 />
                 <div className='bg-gradient-to-r from-purple-50 to-blue-50 dark:from-gray-700 dark:to-gray-600 p-6 rounded-lg mb-6 shadow-md'>
