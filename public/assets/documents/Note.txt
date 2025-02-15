@@ -1,7 +1,0 @@
-User story là yêu cầu của dự án đối với từng chức năng
-
---Product Backlock (Quan trọng): từ userstory ra => cơ sở cho ...
-
-=> đến projectPlan
-
-=>
