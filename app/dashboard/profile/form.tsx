@@ -8,6 +8,8 @@ import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { User, Lock, ShoppingCart, AlertCircle, Eye, EyeOff } from 'lucide-react'
+import Link from 'next/link'
+import { pathURL } from '@/constants/path'
 
 export default function FormProfile() {
   const [marketingEmails, setMarketingEmails] = useState(false)
@@ -16,22 +18,22 @@ export default function FormProfile() {
   const [showPassword, setShowPassword] = useState(false)
 
   return (
-    <div className='min-h-screen w-full bg-[#0D0A25] text-white p-8'>
+    <div className='min-h-screen w-full dark:bg-[#0D0A25] dark:text-white p-8'>
       <div className='max-w-4xl mx-auto'>
         <h1 className='text-3xl font-bold mb-8 text-center mt-2'>Account Management</h1>
 
-        <Tabs defaultValue='account' className='w-full'>
-          <TabsList className='w-full bg-white rounded-lg shadow-sm flex justify-around '>
-            <TabsTrigger value='account' className='text-lg'>
-              <User className='w-5 h-5 mr-2' />
+        <Tabs defaultValue='account' className='w-full '>
+          <TabsList className='w-full bg-purple-400 rounded-lg shadow-sm flex justify-around '>
+            <TabsTrigger value='account' className='text-lg dark:text-black'>
+              <User className='w-5 h-5 mr-2 ' />
               Tài khoản
             </TabsTrigger>
-            <TabsTrigger value='password' className='text-lg'>
+            <TabsTrigger value='password' className='text-lg dark:text-black  '>
               <Lock className='w-5 h-5 mr-2' />
               Đổi mật khẩu
             </TabsTrigger>
-            <TabsTrigger value='cart' className='text-lg'>
-              <ShoppingCart className='w-5 h-5 mr-2' />
+            <TabsTrigger value='cart' className='text-lg dark:text-black '>
+              <ShoppingCart className='w-5 h-5 mr-2 ' />
               Giỏ hàng
             </TabsTrigger>
           </TabsList>
@@ -49,20 +51,15 @@ export default function FormProfile() {
                     id='name'
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className='bg-[#7f76e0] border-purple-400'
+                    className=' border-purple-400'
                   />
                 </div>
 
                 <div className='space-y-2'>
                   <Label htmlFor='email'>Email</Label>
                   <div className='flex items-center gap-2'>
-                    <Input
-                      id='email'
-                      value='trongdn2405@gmail.com'
-                      disabled
-                      className='bg-[#7f76e0] border-purple-400'
-                    />
-                    <Button variant='outline' size='icon' className='bg-[#7f76e0] border-purple-400'>
+                    <Input id='email' value='trongdn2405@gmail.com' disabled className=' border-purple-400' />
+                    <Button variant='outline' size='icon' className='bg-[#9d95f4] border-purple-400'>
                       <AlertCircle className='h-4 w-4 ' />
                     </Button>
                   </div>
@@ -77,7 +74,7 @@ export default function FormProfile() {
                     value='0357407264'
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder='Số điện thoại'
-                    className='bg-[#7f76e0] border-purple-400'
+                    className=' border-purple-400'
                   />
                 </div>
 
@@ -107,7 +104,7 @@ export default function FormProfile() {
                     <Input
                       id='current-password'
                       type={showPassword ? 'text' : 'password'}
-                      className='bg-[#7f76e0] border-purple-400 pr-10'
+                      className=' border-purple-400 pr-10'
                     />
                     <Button
                       variant='ghost'
@@ -126,12 +123,12 @@ export default function FormProfile() {
 
                 <div className='space-y-2'>
                   <Label htmlFor='new-password'>Mật khẩu mới</Label>
-                  <Input id='new-password' type='password' className='bg-[#7f76e0] border-purple-400' />
+                  <Input id='new-password' type='password' className=' border-purple-400' />
                 </div>
 
                 <div className='space-y-2'>
                   <Label htmlFor='confirm-password'>Xác nhận mật khẩu mới</Label>
-                  <Input id='confirm-password' type='password' className='bg-[#7f76e0] border-purple-400' />
+                  <Input id='confirm-password' type='password' className=' border-purple-400' />
                 </div>
 
                 <Button className='w-full bg-purple-400 hover:bg-purple-700'>Cập nhật mật khẩu</Button>
@@ -150,7 +147,9 @@ export default function FormProfile() {
                   <ShoppingCart className='w-16 h-16 mx-auto text-gray-400 mb-4' />
                   <p className='text-xl font-semibold mb-2'>Giỏ hàng trống</p>
                   <p className='text-gray-400 mb-4'>Bạn chưa thêm sản phẩm nào vào giỏ hàng.</p>
-                  <Button className='bg-purple-400 hover:bg-purple-700'>Tiếp tục mua sắm</Button>
+                  <Link href={pathURL.dashboard_courses}>
+                    <Button className='bg-purple-400 hover:bg-purple-700'>Tiếp tục mua sắm</Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>
