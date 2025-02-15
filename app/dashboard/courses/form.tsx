@@ -238,7 +238,7 @@ export default function CoursesPage() {
                 </Button>
               )}
               {category && (
-                <Button variant='secondary' size='sm' onClick={() => setCategory('')}>
+                <Button variant='secondary' size='sm' className='m-2' onClick={() => setCategory('')}>
                   Danh mục: {category} <X className='ml-2 h-3 w-3' />
                 </Button>
               )}
@@ -324,7 +324,7 @@ export default function CoursesPage() {
                   </span>
                 </div>
               </CardContent>
-              <CardFooter className='p-4 bg-gray-100 dark:bg-gray-750 border-t border-gray-300 dark:border-gray-700'>
+              <CardFooter className='p-4 bg-gray-100 border-t border-gray-300 dark:border-gray-700'>
                 <div className='flex items-center justify-between w-full'>
                   <div>
                     <span className='text-lg font-bold text-gray-900 dark:text-black'>

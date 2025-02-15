@@ -14,7 +14,7 @@ export default function LazyLoading() {
     const handlePageLoad = () => {
       setProgress(100)
       setTimeout(() => {
-        setLoading(false) // Hide loader after a short delay
+        setLoading(false)
       }, 500)
     }
 
@@ -37,11 +37,10 @@ export default function LazyLoading() {
     }
   }, [])
 
-  if (!isClient || !loading) return null // 🚀 Loader disappears completely after loading!
+  if (!isClient || !loading) return null
 
   const icons = [Book, Lightbulb, GraduationCap, Award, Rocket, Sparkles]
 
-  // 🎨 Define a consistent color array for icons
   const iconColors = [
     'text-blue-400',
     'text-indigo-400',
