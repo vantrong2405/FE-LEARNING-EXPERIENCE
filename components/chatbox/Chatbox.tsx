@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { MessageCircle, Send, X } from 'lucide-react'
+import { MessageCircle, Send, X, CircleStop } from 'lucide-react'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
 const apiKey = 'AIzaSyBbPOo7DvtYXLAklSZffneD4ktu9fEcKoI'
@@ -43,12 +43,27 @@ export default function Chatbox() {
     }
   ])
   const [isLoading, setIsLoading] = useState(false)
+  const [displayText, setDisplayText] = useState('')
   const scrollRef = useRef<HTMLDivElement | null>(null)
+  const lastMessageRef = useRef<HTMLDivElement>(null)
+  const [isRendering, setIsRendering] = useState(false)
+
+  // Typing animation effect
+  const typeMessage = async (text: string) => {
+    let currentText = ''
+    for (let i = 0; i < text.length; i++) {
+      currentText += text[i]
+      setDisplayText(currentText)
+      await new Promise((resolve) => setTimeout(resolve, 30)) // Adjust speed here
+    }
+    return currentText
+  }
 
   // Function to call the Gemini API and get a response
   const fetchAIResponse = async (userMessage: string) => {
     try {
       setIsLoading(true)
+      setIsRendering(true)
       setMessages((prev) => [
         ...prev,
         { id: Date.now(), sender: 'user', text: userMessage },
@@ -73,32 +88,44 @@ export default function Chatbox() {
       try {
         botReply = JSON.parse(responseText)
       } catch (e) {
-        // If not JSON, treat it as plain text
         botReply = { messages: responseText, data: [] }
       }
 
       setMessages((prev) => [
-        ...prev.slice(0, -1), // Remove the placeholder message
+        ...prev.slice(0, -1),
+        { id: Date.now() + 1, sender: 'bot', text: '', data: botReply.data }
+      ])
+
+      await typeMessage(botReply.messages)
+
+      setMessages((prev) => [
+        ...prev.slice(0, -1),
         { id: Date.now() + 1, sender: 'bot', text: botReply.messages, data: botReply.data }
       ])
     } catch (error) {
       console.error('Error calling Gemini API:', error)
     } finally {
       setIsLoading(false)
+      setDisplayText('')
+      setIsRendering(false)
     }
   }
 
   // Send message and get response from Gemini
   const handleSendMessage = () => {
     if (!input.trim()) return
+    if (isRendering) {
+      setIsRendering(false)
+      return
+    }
     fetchAIResponse(input)
     setInput('')
   }
 
   // Scroll to bottom when new message is added
   useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
-  }, [messages])
+    lastMessageRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages, displayText])
 
   return (
     <div className='fixed bottom-4 right-4 z-50'>
@@ -108,7 +135,7 @@ export default function Chatbox() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
             className='flex h-[500px] w-[380px] flex-col overflow-hidden rounded-md border bg-white shadow-lg dark:bg-gray-900'
           >
             {/* Chatbox Header */}
@@ -123,11 +150,15 @@ export default function Chatbox() {
             </div>
 
             {/* Display Messages */}
-            <ScrollArea className='h-[350px] flex-grow px-4 pt-4' ref={scrollRef}>
-              <div className='flex flex-col space-y-4'>
-                {messages.map((message) => (
+            <ScrollArea className='h-[350px] flex-grow px-4 pt-4'>
+              <div ref={scrollRef} className='flex flex-col space-y-4'>
+                {messages.map((message, index) => (
                   <motion.div
                     key={message.id}
+                    ref={index === messages.length - 1 ? lastMessageRef : null}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
                     className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     <div className='flex items-end gap-2 max-w-[75%]'>
@@ -153,12 +184,7 @@ export default function Chatbox() {
                         }`}
                       >
                         {message.text === 'Đợi tôi chút...' ? (
-                          <motion.div
-                            className='flex items-center'
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.5, repeat: Infinity, repeatType: 'reverse' }}
-                          >
+                          <div className='flex items-center'>
                             Đợi tôi chút
                             <motion.span
                               className='ml-1'
@@ -184,9 +210,13 @@ export default function Chatbox() {
                             >
                               .
                             </motion.span>
-                          </motion.div>
+                          </div>
                         ) : (
-                          message.text
+                          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+                            {index === messages.length - 1 && message.sender === 'bot' && displayText
+                              ? displayText
+                              : message.text}
+                          </motion.div>
                         )}
 
                         {/* Display Course Suggestions */}
@@ -222,8 +252,13 @@ export default function Chatbox() {
                   className='flex-grow bg-white text-sm placeholder:text-gray-400 dark:bg-gray-700 dark:text-white'
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                 />
-                <Button onClick={handleSendMessage} size='icon' variant='ghost' disabled={isLoading}>
-                  {isLoading ? '⏳' : <Send className='h-4 w-4' />}
+                <Button
+                  onClick={handleSendMessage}
+                  size='icon'
+                  variant={isRendering ? 'destructive' : 'ghost'}
+                  disabled={isLoading}
+                >
+                  {isRendering ? <CircleStop className='h-4 w-4' /> : isLoading ? '⏳' : <Send className='h-4 w-4' />}
                 </Button>
               </div>
             </motion.div>
