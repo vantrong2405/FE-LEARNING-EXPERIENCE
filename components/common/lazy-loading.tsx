@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Book, Lightbulb, GraduationCap, Award, Rocket, Sparkles } from 'lucide-react'
+import { Book, Lightbulb, GraduationCap, Award, Rocket, Brain } from 'lucide-react'
 
 export default function LazyLoading() {
   const [progress, setProgress] = useState(0)
@@ -39,66 +39,68 @@ export default function LazyLoading() {
 
   if (!isClient || !loading) return null
 
-  const icons = [Book, Lightbulb, GraduationCap, Award, Rocket, Sparkles]
+  const icons = [Book, Lightbulb, GraduationCap, Award, Rocket, Brain]
 
   const iconColors = [
     'text-blue-400',
-    'text-indigo-400',
+    'text-yellow-400',
+    'text-green-400',
     'text-purple-400',
-    'text-pink-400',
     'text-red-400',
-    'text-yellow-400'
+    'text-indigo-400'
   ]
 
   return (
-    <div className='fixed inset-0 bg-gray-900 flex flex-col items-center justify-center z-50'>
+    <div className='fixed inset-0 bg-gradient-to-br from-gray-900 to-gray-800 flex flex-col items-center justify-center z-50 p-4'>
       {/* Loader Container */}
-      <div className='relative'>
+      <div className='relative w-64 h-64 md:w-80 md:h-80'>
         {/* Outer decorative ring */}
-        <div className='absolute inset-0 rounded-full bg-blue-200 animate-pulse'></div>
+        <div className='absolute inset-0 rounded-full bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 opacity-20 animate-pulse'></div>
 
         {/* Main circle */}
-        <div className='relative w-96 h-96 rounded-full bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 flex items-center justify-center shadow-2xl'>
-          <div className='w-88 h-88 rounded-full bg-white flex items-center justify-center shadow-lg'>
-            <div className='w-80 h-80 rounded-full bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center relative shadow-inner'>
-              {/* Circular Progress Bar */}
-              <svg className='w-full h-full' viewBox='0 0 100 100'>
-                <circle
-                  className='text-blue-100 stroke-current'
-                  strokeWidth='4'
-                  cx='50'
-                  cy='50'
-                  r='44'
-                  fill='transparent'
-                ></circle>
-                <circle
-                  className='text-purple-500 stroke-current transition-all duration-300 ease-linear'
-                  strokeWidth='4'
-                  strokeLinecap='round'
-                  cx='50'
-                  cy='50'
-                  r='44'
-                  fill='transparent'
-                  strokeDasharray='276.46'
-                  strokeDashoffset={276.46 - (276.46 * progress) / 100}
-                ></circle>
-              </svg>
-              {/* Progress Number */}
-              <div className='absolute text-5xl font-extrabold text-blue-700'>{Math.round(progress)}%</div>
+        <div className='absolute inset-2 rounded-full bg-gray-800 flex items-center justify-center shadow-2xl'>
+          <div className='w-full h-full rounded-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center relative'>
+            {/* Circular Progress Bar */}
+            <svg className='w-full h-full -rotate-90' viewBox='0 0 100 100'>
+              <circle
+                className='text-gray-700 stroke-current'
+                strokeWidth='4'
+                cx='50'
+                cy='50'
+                r='45'
+                fill='transparent'
+              ></circle>
+              <circle
+                className='text-blue-500 stroke-current transition-all duration-300 ease-in-out'
+                strokeWidth='4'
+                strokeLinecap='round'
+                cx='50'
+                cy='50'
+                r='45'
+                fill='transparent'
+                strokeDasharray='282.74'
+                strokeDashoffset={282.74 - (282.74 * progress) / 100}
+              ></circle>
+            </svg>
+            {/* Progress Number */}
+            <div className='absolute inset-0 flex items-center justify-center'>
+              <div className='text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500'>
+                {Math.round(progress)}%
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Floating Icons with Fixed Colors */}
+        {/* Floating Icons */}
         {icons.map((Icon, index) => (
           <div
             key={index}
-            className={`absolute w-16 h-16 opacity-90 ${iconColors[index]} transition-all duration-300 ease-in-out`}
+            className={`absolute w-10 h-10 md:w-12 md:h-12 ${iconColors[index]} transition-all duration-300 ease-in-out`}
             style={{
-              top: `${50 - Math.round(54 * Math.cos((index * Math.PI) / 3))}%`,
-              left: `${50 + Math.round(54 * Math.sin((index * Math.PI) / 3))}%`,
+              top: `${50 - Math.round(46 * Math.cos((index * Math.PI) / 3))}%`,
+              left: `${50 + Math.round(46 * Math.sin((index * Math.PI) / 3))}%`,
               transform: 'translate(-50%, -50%)',
-              animation: `iconPulse 2s ease-in-out ${index * 0.3}s infinite`
+              animation: `iconFloat 3s ease-in-out ${index * 0.5}s infinite alternate`
             }}
           >
             <Icon strokeWidth={1.5} className='w-full h-full' />
@@ -106,19 +108,19 @@ export default function LazyLoading() {
         ))}
 
         {/* Decorative elements */}
-        <div className='absolute top-0 left-0 w-8 h-8 bg-blue-300 rounded-full opacity-50 animate-ping'></div>
+        <div className='absolute top-0 left-0 w-4 h-4 bg-blue-400 rounded-full opacity-50 animate-ping'></div>
         <div
-          className='absolute bottom-0 right-0 w-12 h-12 bg-blue-400 rounded-full opacity-50 animate-ping'
+          className='absolute bottom-0 right-0 w-6 h-6 bg-purple-400 rounded-full opacity-50 animate-ping'
           style={{ animationDelay: '0.5s' }}
         ></div>
         <div
-          className='absolute top-1/4 right-1/4 w-6 h-6 bg-blue-200 rounded-full opacity-50 animate-ping'
+          className='absolute top-1/4 right-1/4 w-3 h-3 bg-pink-400 rounded-full opacity-50 animate-ping'
           style={{ animationDelay: '0.7s' }}
         ></div>
       </div>
 
       {/* Loading Text */}
-      <div className='mt-10 text-3xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-transparent bg-clip-text'>
+      <div className='mt-8 text-xl md:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 text-center'>
         Preparing Your Learning Journey...
       </div>
     </div>
