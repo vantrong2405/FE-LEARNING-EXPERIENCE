@@ -9,9 +9,30 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import Link from 'next/link'
 import { Icons } from '@/components/ui/icons'
 import { pathURL } from '@/constants/path'
+import { useLoginMutation } from '@/queries/useAuth'
+import { useAppStore } from '@/components/ui/app-provider'
+import { useRouter } from 'next/navigation'
 
 export default function FormLogin() {
+  const setRole = useAppStore((state) => state.setRole)
   const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
+
+  const loginMutation = useLoginMutation()
+
+  const handleLogin = async () => {
+    setError(null)
+    loginMutation.mutate({ email, password })
+    router.push(pathURL.home)
+  }
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleLogin()
+    }
+  }
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword)
 
@@ -64,6 +85,9 @@ export default function FormLogin() {
                 placeholder='Enter your email'
                 type='email'
                 className='pl-10 dark:bg-gray-700 border-gray-600 placeholder-gray-400'
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={handleKeyDown}
               />
             </div>
           </div>
@@ -75,6 +99,9 @@ export default function FormLogin() {
                 id='password'
                 type={showPassword ? 'text' : 'password'}
                 placeholder='Enter your password'
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={handleKeyDown}
                 className='pl-10 pr-10 dark:bg-gray-700 border-gray-600 placeholder-gray-400'
               />
               <button
@@ -88,7 +115,10 @@ export default function FormLogin() {
           </div>
         </CardContent>
         <CardFooter className='flex flex-col space-y-4'>
-          <Button className='w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 '>
+          <Button
+            onClick={handleLogin}
+            className='w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 '
+          >
             Sign In
           </Button>
           <Button variant='secondary' className='w-full flex items-center'>
