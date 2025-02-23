@@ -1,5 +1,6 @@
 'use client'
 
+import { User } from '@/app/types/user.i'
 import { create } from 'zustand'
 
 interface StoreState {
