@@ -17,3 +17,8 @@ export const useVerifyMutation = () => {
     mutationFn: authApiRequest.verifyEmail
   })
 }
+export const useLogoutMutation = () => {
+  return useMutation({
+    mutationFn: authApiRequest.logout
+  })
+}

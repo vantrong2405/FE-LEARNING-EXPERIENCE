@@ -12,6 +12,9 @@ import useStoreLocal from '@/stores/useStoreLocal'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { UserCircle, LogOut } from 'lucide-react'
 import Chatbox from '../chatbox/Chatbox'
+import { useLogoutMutation } from '@/queries/useAuth'
+import { getRefreshTokenFromLocalStorage } from '@/lib/utils'
+import { useRouter } from 'next/navigation'
 
 const navItems = [
   { name: 'Home', href: '#home' },
@@ -30,6 +33,8 @@ export default function Header() {
   const [scrollY, setScrollY] = useState(0)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userEmail, setUserEmail] = useState('user@example.com')
+  const logoutMutation = useLogoutMutation()
+  const router = useRouter()
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY)
@@ -62,9 +67,24 @@ export default function Header() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  useEffect(() => {
+    const token = localStorage.getItem('access_token')
+    setIsLoggedIn(!!token)
+  }, [])
+
   const handleSignOut = () => {
-    // Implement sign out logic here
-    setIsLoggedIn(false)
+    const refreshToken = getRefreshTokenFromLocalStorage() as string
+    logoutMutation.mutate(
+      { refreshToken },
+      {
+        onSuccess: () => {
+          localStorage.removeItem('access_token')
+          localStorage.removeItem('refresh_token')
+          setIsLoggedIn(false)
+          router.push('/login')
+        }
+      }
+    )
   }
 
   return (
