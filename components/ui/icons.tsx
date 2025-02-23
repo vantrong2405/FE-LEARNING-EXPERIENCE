@@ -21,7 +21,8 @@ import {
   Lightbulb,
   Clock,
   ShieldCheck,
-  AlertTriangle
+  AlertTriangle,
+  Key
 } from 'lucide-react'
 
 export const Icons = {
@@ -47,5 +48,6 @@ export const Icons = {
   Lightbulb,
   Clock,
   ShieldCheck,
-  AlertTriangle
+  AlertTriangle,
+  Key
 }
