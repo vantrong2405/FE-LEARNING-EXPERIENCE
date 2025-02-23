@@ -1,5 +1,13 @@
 import http from '@/lib/http'
-import { LoginBodyType, LoginResType, RefreshTokenResType } from '@/schemaValidator/auth.schema'
+import {
+  LoginBodyType,
+  LoginResType,
+  RefreshTokenResType,
+  RegisterBodyType,
+  RegisterRes,
+  VerifyBodyType,
+  VerifyResType
+} from '@/schemaValidator/auth.schema'
 
 const authApiRequest = {
   refreshTokenRequest: null as Promise<{
@@ -7,9 +15,8 @@ const authApiRequest = {
     payload: RefreshTokenResType
   }> | null,
   sLogin: (body: LoginBodyType) => http.post<LoginResType>('auth/login', body),
-  login: (body: LoginBodyType) =>
-    http.post<LoginResType>('api/auth/login', body, {
-      baseUrl: ''
-    })
+
+  register: (body: RegisterBodyType) => http.post<RegisterRes>('auth/register', body),
+  verifyEmail: (body: VerifyBodyType) => http.post<VerifyResType>('auth/verify-email', body)
 }
 export default authApiRequest

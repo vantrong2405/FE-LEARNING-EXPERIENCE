@@ -10,24 +10,38 @@ import Link from 'next/link'
 import { Icons } from '@/components/ui/icons'
 import { pathURL } from '@/constants/path'
 import { useLoginMutation } from '@/queries/useAuth'
-import { useAppStore } from '@/components/ui/app-provider'
 import { useRouter } from 'next/navigation'
 
 export default function FormLogin() {
-  const setRole = useAppStore((state) => state.setRole)
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const router = useRouter()
 
   const loginMutation = useLoginMutation()
+  const router = useRouter()
 
-  const handleLogin = async () => {
-    setError(null)
-    loginMutation.mutate({ email, password })
-    router.push(pathURL.home)
+  const handleLogin = () => {
+    loginMutation.mutate(
+      { email, password },
+      {
+        onSuccess: (data) => {
+          const access_token = data.payload.data.accessToken
+          const refresh_token = data.payload.data.refreshToken
+
+          if (access_token && refresh_token) {
+            localStorage.setItem('access_token', access_token)
+            localStorage.setItem('refresh_token', refresh_token)
+          }
+
+          router.push(pathURL.home)
+        },
+        onError: (error) => {
+          console.error('Login failed:', error)
+        }
+      }
+    )
   }
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleLogin()

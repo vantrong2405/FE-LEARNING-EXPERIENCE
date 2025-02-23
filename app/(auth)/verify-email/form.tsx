@@ -6,8 +6,34 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { pathURL } from '@/constants/path'
 import { GraduationCap, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
+import { useVerifyMutation } from '@/queries/useAuth'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 export default function FormEmailVerificationSuccess() {
+  const verifyMutation = useVerifyMutation()
+  const router = useRouter()
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const email_verify_token = params.get('token')
+
+    if (email_verify_token) {
+      verifyMutation.mutate(
+        { email_verify_token },
+        {
+          onSuccess: () => {
+            setTimeout(() => {
+              router.push('/login')
+            }, 5000)
+          },
+          onError: (error) => {
+            console.error('Error verifying email:', error)
+          }
+        }
+      )
+    }
+  }, [verifyMutation, router])
   return (
     <div className='min-h-screen flex items-center justify-center dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden'>
       <div className='absolute inset-0 pointer-events-none z-0'>

@@ -106,51 +106,13 @@ const request = async <Response>(
         }
       )
     } else if (res.status === AUTHENTICATION_ERROR_STATUS) {
-      if (isClient) {
-        // if (!clientLogoutRequest) {
-        //   clientLogoutRequest = fetch('/api/auth/logout', {
-        //     method: 'POST',
-        //     body: null,
-        //     headers: {
-        //       ...baseHeaders
-        //     } as any
-        //   })
-        //   try {
-        //     await clientLogoutRequest
-        //   } catch (error) {
-        //   } finally {
-        //     removeTokensFromLocalStorage()
-        //     clientLogoutRequest = null
-        //     location.href = '/login'
-        //   }
-        // }
-      } else {
-        const access_token = (options?.headers as any)?.Authorization.split('Bearer ')[1]
-        redirect(`/logout?accessToken=${access_token}`)
-      }
+      const access_token = (options?.headers as any)?.Authorization.split('Bearer ')[1]
+      redirect(`/logout?accessToken=${access_token}`)
     } else {
       throw new HttpError(data)
     }
   }
-  // Đảm bảo logic dưới đây chỉ chạy ở phía client (browser)
-  if (isClient) {
-    const normalizeUrl = normalizePath(url)
-    if (['api/auth/login'].includes(normalizeUrl)) {
-      const { accessToken, refreshToken } = (payload as LoginResType).data
-      setRefreshTokenToLocalStorage(accessToken)
-      setAccessTokenToLocalStorage(refreshToken)
-    } else if ('api/auth/token' === normalizeUrl) {
-      const { access_token, refresh_token } = payload as {
-        access_token: string
-        refresh_token: string
-      }
-      setAccessTokenToLocalStorage(access_token)
-      setRefreshTokenToLocalStorage(refresh_token)
-    }
-    if (['api/auth/logout'].includes(normalizeUrl)) {
-      removeTokensFromLocalStorage()
-    }
-  }
+
   return data
 }
 
