@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,13 +9,54 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import Link from 'next/link'
 import { Icons } from '@/components/ui/icons'
 import { pathURL } from '@/constants/path'
+import { useResetMutation } from '@/queries/useAuth'
+import { useRouter } from 'next/navigation'
 
 export default function FormResetPassword() {
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [isPasswordValid, setIsPasswordValid] = useState(true)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [token, setToken] = useState<string | null>(null)
+  const router = useRouter()
 
   const toggleNewPasswordVisibility = () => setShowNewPassword(!showNewPassword)
   const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword)
+  const resetPaswordMutation = useResetMutation()
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlToken = new URLSearchParams(window.location.search).get('token')
+      setToken(urlToken)
+    }
+  }, [])
+
+  const handleSubmit = () => {
+    if (!token) {
+      console.error('Token không tồn tại!')
+      return
+    }
+
+    if (password === confirmPassword) {
+      resetPaswordMutation.mutate(
+        {
+          new_password: password,
+          confirm_password: confirmPassword,
+          forgot_password_token: token
+        },
+        {
+          onSuccess: () => {
+            router.push('/login')
+          },
+          onError: (error) => {
+            console.error('Reset failed:', error)
+          }
+        }
+      )
+    } else {
+      setIsPasswordValid(false)
+    }
+  }
 
   return (
     <div className='min-h-screen flex items-center justify-center dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden'>
@@ -61,6 +102,8 @@ export default function FormResetPassword() {
               <Input
                 id='newPassword'
                 type={showNewPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder='Enter your new password'
                 className='pl-10 pr-10 dark:bg-gray-700 border-gray-600 placeholder-gray-400'
               />
@@ -80,9 +123,12 @@ export default function FormResetPassword() {
               <Input
                 id='confirmPassword'
                 type={showConfirmPassword ? 'text' : 'password'}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder='Confirm your new password'
                 className='pl-10 pr-10 dark:bg-gray-700 border-gray-600 placeholder-gray-400'
               />
+
               <button
                 type='button'
                 onClick={toggleConfirmPasswordVisibility}
@@ -91,10 +137,14 @@ export default function FormResetPassword() {
                 {showConfirmPassword ? <Icons.EyeOff size={20} /> : <Icons.Eye size={20} />}
               </button>
             </div>
+            {!isPasswordValid && <p className='text-red-500 text-sm'>Mật khẩu không khớp!</p>}
           </div>
         </CardContent>
         <CardFooter className='flex flex-col space-y-4'>
-          <Button className='w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'>
+          <Button
+            onClick={handleSubmit}
+            className='w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
+          >
             Reset Password
           </Button>
           <div className='text-sm text-center text-gray-400'>

@@ -22,3 +22,20 @@ export const useLogoutMutation = () => {
     mutationFn: authApiRequest.logout
   })
 }
+
+export const useVerifyPasswordMutation = () => {
+  return useMutation({
+    mutationFn: authApiRequest.verifyEmailPassword
+  })
+}
+export const useForgotPasswordMutation = () => {
+  return useMutation({
+    mutationFn: authApiRequest.forgotPassword
+  })
+}
+
+export const useResetMutation = () => {
+  return useMutation({
+    mutationFn: authApiRequest.resetPassword
+  })
+}

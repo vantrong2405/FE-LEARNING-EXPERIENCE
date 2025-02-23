@@ -86,3 +86,29 @@ export const LogoutBody = z
   .strict()
 
 export type LogoutBodyType = z.TypeOf<typeof LogoutBody>
+
+export const ForgotPasswordBody = z
+  .object({
+    email: z.string().email()
+  })
+  .strict()
+
+export type ForgotPasswordBodyType = z.TypeOf<typeof ForgotPasswordBody>
+
+export const VerifyEmailPasswordBody = z
+  .object({
+    forgot_password_token: z.string()
+  })
+  .strict()
+
+export type VerifyEmailPasswordBodyType = z.TypeOf<typeof VerifyEmailPasswordBody>
+
+export const ResetPasswordBody = z
+  .object({
+    forgot_password_token: z.string(),
+    new_password: z.string(),
+    confirm_password: z.string()
+  })
+  .strict()
+
+export type ResetPasswordBodyType = z.TypeOf<typeof ResetPasswordBody>
