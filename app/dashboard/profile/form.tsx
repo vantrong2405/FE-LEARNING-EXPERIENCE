@@ -8,17 +8,20 @@ import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { User, Lock, ShoppingCart, AlertCircle, Eye, EyeOff } from 'lucide-react'
-import { useGetMeQuery, useUpdateMeMutation } from '@/queries/useAuth'
-import { toast } from 'sonner'
+import { useChangePasswordMutation, useGetMeQuery, useUpdateMeMutation } from '@/queries/useAuth'
 
 export default function FormProfile() {
   const [marketingEmails, setMarketingEmails] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const getMeQuery = useGetMeQuery()
   const updateMeMutation = useUpdateMeMutation()
+  const changePasswordMutation = useChangePasswordMutation()
   const [email, setEmail] = useState('')
   const [gender, setGender] = useState('')
   const [name, setName] = useState('')
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   useEffect(() => {
     if (getMeQuery.data?.payload?.data) {
       const { name, email, gender } = getMeQuery.data.payload.data
@@ -30,6 +33,14 @@ export default function FormProfile() {
 
   function handleSubmit() {
     updateMeMutation.mutate({ name, gender })
+  }
+
+  function handleChangePassword() {
+    changePasswordMutation.mutate({
+      current_password: currentPassword,
+      new_password: newPassword,
+      confirm_password: confirmPassword
+    })
   }
 
   return (
@@ -160,6 +171,8 @@ export default function FormProfile() {
                   <div className='relative'>
                     <Input
                       id='current-password'
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
                       type={showPassword ? 'text' : 'password'}
                       className='dark:bg-gray-800 border-purple-500 focus:border-purple-400 focus:ring-purple-400 pr-10'
                     />
@@ -185,6 +198,8 @@ export default function FormProfile() {
                   <Input
                     id='new-password'
                     type='password'
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
                     className='dark:bg-gray-800 border-purple-500 focus:border-purple-400 focus:ring-purple-400'
                   />
                 </div>
@@ -196,11 +211,15 @@ export default function FormProfile() {
                   <Input
                     id='confirm-password'
                     type='password'
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     className='dark:bg-gray-800 border-purple-500 focus:border-purple-400 focus:ring-purple-400'
                   />
                 </div>
 
                 <Button
+                  onClick={handleChangePassword}
+                  type='submit'
                   variant={'secondary'}
                   className='w-full dark:bg-purple-600 hover:dark:bg-purple-700 transition-colors duration-200'
                 >

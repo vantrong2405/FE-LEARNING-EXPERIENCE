@@ -148,3 +148,13 @@ export const MeBody = z
   .strict()
 
 export type MeBodyType = z.TypeOf<typeof MeBody>
+
+export const ChangePasswordBody = z
+  .object({
+    current_password: z.string(),
+    new_password: z.string(),
+    confirm_password: z.string()
+  })
+  .strict()
+
+export type ChangePasswordBodyType = z.TypeOf<typeof ChangePasswordBody>
