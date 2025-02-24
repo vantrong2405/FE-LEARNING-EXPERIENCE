@@ -1,9 +1,11 @@
 import http from '@/lib/http'
 import {
   ForgotPasswordBodyType,
+  GetMeResType,
   LoginBodyType,
   LoginResType,
   LogoutBodyType,
+  MeBodyType,
   RefreshTokenResType,
   RegisterBodyType,
   RegisterRes,
@@ -25,6 +27,8 @@ const authApiRequest = {
   logout: (body: LogoutBodyType) => http.post('auth/logout', body),
   forgotPassword: (body: ForgotPasswordBodyType) => http.post('auth/forgot-password', body),
   verifyEmailPassword: (body: VerifyEmailPasswordBodyType) => http.post('auth/verify-forgot-password', body),
-  resetPassword: (body: ResetPasswordBodyType) => http.post('auth/reset-password', body)
+  resetPassword: (body: ResetPasswordBodyType) => http.post('auth/reset-password', body),
+  getMe: () => http.get<GetMeResType>('auth/get-me'),
+  updateMe: (body: MeBodyType) => http.post<GetMeResType>('auth/update-me', body)
 }
 export default authApiRequest

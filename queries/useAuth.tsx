@@ -1,5 +1,6 @@
 import authApiRequest from '@/apiRequest/auth'
-import { useMutation } from '@tanstack/react-query'
+import { GetMeResType } from '@/schemaValidator/auth.schema'
+import { useMutation, useQuery } from '@tanstack/react-query'
 
 export const useLoginMutation = () => {
   return useMutation({
@@ -37,5 +38,16 @@ export const useForgotPasswordMutation = () => {
 export const useResetMutation = () => {
   return useMutation({
     mutationFn: authApiRequest.resetPassword
+  })
+}
+export const useGetMeQuery = () => {
+  return useQuery({
+    queryKey: ['account-profile'],
+    queryFn: authApiRequest.getMe
+  })
+}
+export const useUpdateMeMutation = () => {
+  return useMutation({
+    mutationFn: authApiRequest.updateMe
   })
 }

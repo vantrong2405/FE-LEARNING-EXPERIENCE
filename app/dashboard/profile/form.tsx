@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -8,12 +8,29 @@ import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { User, Lock, ShoppingCart, AlertCircle, Eye, EyeOff } from 'lucide-react'
+import { useGetMeQuery, useUpdateMeMutation } from '@/queries/useAuth'
+import { toast } from 'sonner'
 
 export default function FormProfile() {
   const [marketingEmails, setMarketingEmails] = useState(false)
-  const [name, setName] = useState('Văn Trọng')
-  const [phone, setPhone] = useState('0357407264')
   const [showPassword, setShowPassword] = useState(false)
+  const getMeQuery = useGetMeQuery()
+  const updateMeMutation = useUpdateMeMutation()
+  const [email, setEmail] = useState('')
+  const [gender, setGender] = useState('')
+  const [name, setName] = useState('')
+  useEffect(() => {
+    if (getMeQuery.data?.payload?.data) {
+      const { name, email, gender } = getMeQuery.data.payload.data
+      setName(name || '')
+      setEmail(email || '')
+      setGender(gender || '')
+    }
+  }, [getMeQuery.data])
+
+  function handleSubmit() {
+    updateMeMutation.mutate({ name, gender })
+  }
 
   return (
     <div className='min-h-screen w-full dark:bg-gray-90 p-8'>
@@ -75,7 +92,7 @@ export default function FormProfile() {
                   <div className='flex items-center gap-2'>
                     <Input
                       id='email'
-                      value='trongdn2405@gmail.com'
+                      value={email}
                       disabled
                       className='dark:bg-gray-800 border-purple-500 text-gray-400'
                     />
@@ -91,15 +108,14 @@ export default function FormProfile() {
                 </div>
 
                 <div className='space-y-2'>
-                  <Label htmlFor='phone' className='dark:text-purple-300'>
-                    Number Phone
+                  <Label htmlFor='gender' className='dark:text-purple-300'>
+                    Gender
                   </Label>
                   <Input
-                    id='phone'
-                    type='tel'
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder='Số điện thoại'
+                    id='gender'
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value)}
+                    placeholder='Giới tính'
                     className='dark:bg-gray-800 border-purple-500 focus:border-purple-400 focus:ring-purple-400'
                   />
                 </div>
@@ -118,7 +134,9 @@ export default function FormProfile() {
 
                 <Button
                   variant={'secondary'}
+                  type='submit'
                   className='w-full dark:bg-purple-600 hover:dark:bg-purple-700 transition-colors duration-200'
+                  onClick={handleSubmit}
                 >
                   Lưu thay đổi
                 </Button>

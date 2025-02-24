@@ -112,3 +112,39 @@ export const ResetPasswordBody = z
   .strict()
 
 export type ResetPasswordBodyType = z.TypeOf<typeof ResetPasswordBody>
+
+export const GetMeRes = z.object({
+  statusCode: z.number(),
+  data: z.object({
+    id: z.number(),
+    name: z.string(),
+    email: z.string(),
+    username: z.string(),
+    gender: z.string().nullable(),
+    dateOfBirth: z.string(),
+    bio: z.string().nullable(),
+    avatarUrl: z.string().nullable(),
+    courses: z.array(z.unknown()),
+    reviews: z.array(z.unknown()),
+    roleId: z.number(),
+    verify: z.number(),
+    createdAt: z.string(),
+    updatedAt: z.string()
+  })
+})
+
+export type GetMeResType = z.infer<typeof GetMeRes>
+
+export const MeBody = z
+  .object({
+    name: z.string(),
+    //email: z.string()
+    // username: z.string(),
+    gender: z.string()
+    // dateOfBirth: z.string(),
+    // bio: z.string().nullable(),
+    // avatarUrl: z.string().nullable()
+  })
+  .strict()
+
+export type MeBodyType = z.TypeOf<typeof MeBody>
