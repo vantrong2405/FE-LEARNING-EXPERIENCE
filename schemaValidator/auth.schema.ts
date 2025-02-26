@@ -26,8 +26,7 @@ export const RegisterBody = z
     name: z
       .string()
       .min(2, 'Name must be at least 2 characters long')
-      .max(100, 'Name must be at most 100 characters long')
-      .regex(/^[a-zA-Z\s]+$/, 'Name can only contain letters and spaces'),
+      .max(100, 'Name must be at most 100 characters long'),
 
     email: z
       .string()
