@@ -9,14 +9,30 @@ import Link from 'next/link'
 import { Icons } from '@/components/ui/icons'
 import { pathURL } from '@/constants/path'
 import { useForgotPasswordMutation } from '@/queries/useAuth'
-import { ForgotPasswordBodyType } from '@/schemaValidator/auth.schema'
-import { useState } from 'react'
+import { ForgotPasswordBody, ForgotPasswordBodyType } from '@/schemaValidator/auth.schema'
+
+import { handleErrorApi } from '@/lib/utils'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 export default function FormForgotPassword() {
-  const [email, setEmail] = useState('')
+  const form = useForm<ForgotPasswordBodyType>({
+    resolver: zodResolver(ForgotPasswordBody),
+    defaultValues: {
+      email: ''
+    }
+  })
   const forgotPasswordMutation = useForgotPasswordMutation()
   const handleSubmit = async (body: ForgotPasswordBodyType) => {
-    const data = await forgotPasswordMutation.mutateAsync(body)
+    await forgotPasswordMutation.mutateAsync(body, {
+      onSuccess: () => {},
+      onError: (error) => {
+        handleErrorApi({
+          error,
+          setError: form.setError
+        })
+      }
+    })
   }
   return (
     <div className='min-h-screen flex items-center justify-center dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden'>
@@ -65,15 +81,20 @@ export default function FormForgotPassword() {
                 id='email'
                 placeholder='Enter your email'
                 type='email'
-                className='pl-10 dark:bg-gray-700 border-gray-600 placeholder-gray-400'
-                onChange={(e) => setEmail(e.target.value)}
+                className={`pl-10 dark:bg-gray-700 border-gray-600 placeholder-gray-400 ${
+                  form.formState.errors.email && 'border-red-500'
+                }`}
+                {...form.register('email')}
               />
             </div>
+            {form.formState.errors.email && (
+              <p className='text-red-500 text-sm'>{form.formState.errors.email.message}</p>
+            )}
           </div>
         </CardContent>
         <CardFooter className='flex flex-col space-y-4'>
           <Button
-            onClick={() => handleSubmit({ email })}
+            onClick={() => form.handleSubmit(handleSubmit)()}
             className='w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 '
           >
             Send Reset Link

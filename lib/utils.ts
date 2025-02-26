@@ -2,12 +2,44 @@ import { TokenPayload } from '@/lib/jwt.types'
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import jwt from 'jsonwebtoken'
+import { EntityError, HttpError } from '@/lib/http'
+import { toast } from 'sonner'
+import { UseFormSetError } from 'react-hook-form'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 export const normalizePath = (path: string) => {
   return path.startsWith('/') ? path.slice(1) : path
+}
+
+export const handleErrorApi = ({
+  error,
+  setError,
+  duration
+}: {
+  error: any
+  setError?: UseFormSetError<any>
+  duration?: number
+}) => {
+  console.log('Lỗi nhận được:', error)
+
+  if (error instanceof EntityError && Array.isArray(error.payload.error)) {
+    error.payload.error.forEach((item: { field: string; message: string }) => {
+      setError?.(item.field, {
+        type: 'server',
+        message: item.message
+      })
+    })
+  } else if (error instanceof HttpError && error.payload?.message) {
+    toast.error(error.payload.message, {
+      duration: duration ?? 5000
+    })
+  } else {
+    toast.error('Đã xảy ra lỗi, vui lòng thử lại!', {
+      duration: duration ?? 5000
+    })
+  }
 }
 
 const isBrowser = typeof window !== 'undefined'

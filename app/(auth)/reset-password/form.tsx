@@ -11,16 +11,26 @@ import { Icons } from '@/components/ui/icons'
 import { pathURL } from '@/constants/path'
 import { useResetMutation } from '@/queries/useAuth'
 import { useRouter } from 'next/navigation'
+import { ResetPasswordBody, ResetPasswordBodyType } from '@/schemaValidator/auth.schema'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
+import { handleErrorApi } from '@/lib/utils'
 
 export default function FormResetPassword() {
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [isPasswordValid, setIsPasswordValid] = useState(true)
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [token, setToken] = useState<string | null>(null)
   const router = useRouter()
 
+  const form = useForm<ResetPasswordBodyType>({
+    resolver: zodResolver(ResetPasswordBody),
+    defaultValues: {
+      forgot_password_token: '',
+      new_password: '',
+      confirm_password: ''
+    }
+  })
   const toggleNewPasswordVisibility = () => setShowNewPassword(!showNewPassword)
   const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword)
   const resetPaswordMutation = useResetMutation()
@@ -31,31 +41,34 @@ export default function FormResetPassword() {
     }
   }, [])
 
-  const handleSubmit = () => {
+  const handleSubmit = async (body: ResetPasswordBodyType) => {
     if (!token) {
-      console.error('Token không tồn tại!')
+      toast.error('Invalid or missing reset token.')
       return
     }
 
-    if (password === confirmPassword) {
-      resetPaswordMutation.mutate(
-        {
-          new_password: password,
-          confirm_password: confirmPassword,
-          forgot_password_token: token
-        },
-        {
-          onSuccess: () => {
-            router.push('/login')
-          },
-          onError: (error) => {
-            console.error('Reset failed:', error)
-          }
-        }
-      )
-    } else {
-      setIsPasswordValid(false)
+    if (body.new_password !== body.confirm_password) {
+      toast.error('Passwords do not match.')
+      return
     }
+
+    if (resetPaswordMutation.isPending) return
+
+    resetPaswordMutation.mutate(
+      { ...body, forgot_password_token: token },
+      {
+        onSuccess: () => {
+          toast.success('Password reset successfully.')
+          router.push(pathURL.login)
+        },
+        onError: (error) => {
+          handleErrorApi({
+            error,
+            setError: form.setError
+          })
+        }
+      }
+    )
   }
 
   return (
@@ -102,10 +115,9 @@ export default function FormResetPassword() {
               <Input
                 id='newPassword'
                 type={showNewPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                {...form.register('new_password')}
                 placeholder='Enter your new password'
-                className='pl-10 pr-10 dark:bg-gray-700 border-gray-600 placeholder-gray-400'
+                className={`pl-10 pr-10 dark:bg-gray-700 border-gray-600 placeholder-gray-400 ${form.formState.errors.new_password ? 'border-red-500' : ''}`}
               />
               <button
                 type='button'
@@ -115,6 +127,9 @@ export default function FormResetPassword() {
                 {showNewPassword ? <Icons.EyeOff size={20} /> : <Icons.Eye size={20} />}
               </button>
             </div>
+            {form.formState.errors.new_password && (
+              <p className='text-red-500 text-sm'>{form.formState.errors.new_password.message}</p>
+            )}
           </div>
           <div className='space-y-2'>
             <Label htmlFor='confirmPassword'>Confirm New Password</Label>
@@ -123,10 +138,9 @@ export default function FormResetPassword() {
               <Input
                 id='confirmPassword'
                 type={showConfirmPassword ? 'text' : 'password'}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                {...form.register('confirm_password')}
                 placeholder='Confirm your new password'
-                className='pl-10 pr-10 dark:bg-gray-700 border-gray-600 placeholder-gray-400'
+                className={`pl-10 pr-10 dark:bg-gray-700 border-gray-600 placeholder-gray-400 ${form.formState.errors.confirm_password ? 'border-red-500' : ''}`}
               />
 
               <button
@@ -137,12 +151,14 @@ export default function FormResetPassword() {
                 {showConfirmPassword ? <Icons.EyeOff size={20} /> : <Icons.Eye size={20} />}
               </button>
             </div>
-            {!isPasswordValid && <p className='text-red-500 text-sm'>Mật khẩu không khớp!</p>}
+            {form.formState.errors.confirm_password && (
+              <p className='text-red-500 text-sm'>{form.formState.errors.confirm_password.message}</p>
+            )}
           </div>
         </CardContent>
         <CardFooter className='flex flex-col space-y-4'>
           <Button
-            onClick={handleSubmit}
+            onClick={form.handleSubmit(handleSubmit)}
             className='w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
           >
             Reset Password

@@ -9,6 +9,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { User, Lock, ShoppingCart, AlertCircle, Eye, EyeOff } from 'lucide-react'
 import { useChangePasswordMutation, useGetMeQuery, useUpdateMeMutation } from '@/queries/useAuth'
+import { toast } from 'sonner'
+import { ChangePasswordBody, ChangePasswordBodyType, MeBody, MeBodyType } from '@/schemaValidator/auth.schema'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { handleErrorApi } from '@/lib/utils'
 
 export default function FormProfile() {
   const [marketingEmails, setMarketingEmails] = useState(false)
@@ -17,29 +22,59 @@ export default function FormProfile() {
   const updateMeMutation = useUpdateMeMutation()
   const changePasswordMutation = useChangePasswordMutation()
   const [email, setEmail] = useState('')
-  const [gender, setGender] = useState('')
-  const [name, setName] = useState('')
-  const [currentPassword, setCurrentPassword] = useState('')
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
+
+  const formU = useForm<MeBodyType>({
+    resolver: zodResolver(MeBody),
+    defaultValues: {
+      name: '',
+      gender: ''
+    }
+  })
+
   useEffect(() => {
     if (getMeQuery.data?.payload?.data) {
       const { name, email, gender } = getMeQuery.data.payload.data
-      setName(name || '')
+      formU.setValue('name', name || '')
+      formU.setValue('gender', gender || '')
       setEmail(email || '')
-      setGender(gender || '')
     }
   }, [getMeQuery.data])
 
-  function handleSubmit() {
-    updateMeMutation.mutate({ name, gender })
+  const form = useForm<ChangePasswordBodyType>({
+    resolver: zodResolver(ChangePasswordBody),
+    defaultValues: {
+      current_password: '',
+      new_password: '',
+      confirm_password: ''
+    }
+  })
+
+  const handleUpdate = (body: MeBodyType) => {
+    updateMeMutation.mutate(body, {
+      onSuccess: () => {
+        toast('Update Account Success!')
+      },
+      onError: (error) => {
+        handleErrorApi({
+          error,
+          setError: formU.setError
+        })
+      }
+    })
   }
 
-  function handleChangePassword() {
-    changePasswordMutation.mutate({
-      current_password: currentPassword,
-      new_password: newPassword,
-      confirm_password: confirmPassword
+  const handleChangePassword = (body: ChangePasswordBodyType) => {
+    changePasswordMutation.mutate(body, {
+      onSuccess: () => {
+        toast('Change Password Success!')
+        form.reset()
+      },
+      onError: (error) => {
+        handleErrorApi({
+          error,
+          setError: form.setError
+        })
+      }
     })
   }
 
@@ -90,10 +125,12 @@ export default function FormProfile() {
                   </Label>
                   <Input
                     id='name'
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className='dark:bg-gray-800 border-purple-500 focus:border-purple-400 focus:ring-purple-400'
+                    {...formU.register('name')}
+                    className={` dark:bg-gray-800 border-purple-500 focus:border-purple-400 focus:ring-purple-400 ${formU.formState.errors.name ? 'border-red-500' : ''}`}
                   />
+                  {formU.formState.errors.name && (
+                    <p className='text-red-500 text-sm'>{formU.formState.errors.name.message}</p>
+                  )}
                 </div>
 
                 <div className='space-y-2'>
@@ -124,11 +161,13 @@ export default function FormProfile() {
                   </Label>
                   <Input
                     id='gender'
-                    value={gender}
-                    onChange={(e) => setGender(e.target.value)}
+                    {...formU.register('gender')}
                     placeholder='Giới tính'
-                    className='dark:bg-gray-800 border-purple-500 focus:border-purple-400 focus:ring-purple-400'
+                    className={` dark:bg-gray-800 border-purple-500 focus:border-purple-400 focus:ring-purple-400 ${formU.formState.errors.name ? 'border-red-500' : ''}`}
                   />
+                  {formU.formState.errors.gender && (
+                    <p className='text-red-500 text-sm'>{formU.formState.errors.gender.message}</p>
+                  )}
                 </div>
 
                 <div className='flex items-center justify-between'>
@@ -147,7 +186,7 @@ export default function FormProfile() {
                   variant={'secondary'}
                   type='submit'
                   className='w-full dark:bg-purple-600 hover:dark:bg-purple-700 transition-colors duration-200'
-                  onClick={handleSubmit}
+                  onClick={formU.handleSubmit(handleUpdate)}
                 >
                   Lưu thay đổi
                 </Button>
@@ -171,10 +210,9 @@ export default function FormProfile() {
                   <div className='relative'>
                     <Input
                       id='current-password'
-                      value={currentPassword}
-                      onChange={(e) => setCurrentPassword(e.target.value)}
                       type={showPassword ? 'text' : 'password'}
-                      className='dark:bg-gray-800 border-purple-500 focus:border-purple-400 focus:ring-purple-400 pr-10'
+                      {...form.register('current_password')}
+                      className={` dark:bg-gray-800 border-purple-500 focus:border-purple-400 focus:ring-purple-400 pr-10 ${form.formState.errors.current_password ? 'border-red-500' : ''}`}
                     />
                     <Button
                       variant='ghost'
@@ -189,6 +227,9 @@ export default function FormProfile() {
                       )}
                     </Button>
                   </div>
+                  {form.formState.errors.current_password && (
+                    <p className='text-red-500 text-sm'>{form.formState.errors.current_password.message}</p>
+                  )}
                 </div>
 
                 <div className='space-y-2'>
@@ -198,10 +239,12 @@ export default function FormProfile() {
                   <Input
                     id='new-password'
                     type='password'
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    className='dark:bg-gray-800 border-purple-500 focus:border-purple-400 focus:ring-purple-400'
+                    {...form.register('new_password')}
+                    className={` dark:bg-gray-800 border-purple-500 focus:border-purple-400 focus:ring-purple-400 pr-10 ${form.formState.errors.new_password ? 'border-red-500' : ''}`}
                   />
+                  {form.formState.errors.new_password && (
+                    <p className='text-red-500 text-sm'>{form.formState.errors.new_password.message}</p>
+                  )}
                 </div>
 
                 <div className='space-y-2'>
@@ -211,14 +254,16 @@ export default function FormProfile() {
                   <Input
                     id='confirm-password'
                     type='password'
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className='dark:bg-gray-800 border-purple-500 focus:border-purple-400 focus:ring-purple-400'
+                    {...form.register('confirm_password')}
+                    className={` dark:bg-gray-800 border-purple-500 focus:border-purple-400 focus:ring-purple-400 pr-10 ${form.formState.errors.confirm_password ? 'border-red-500' : ''}`}
                   />
+                  {form.formState.errors.confirm_password && (
+                    <p className='text-red-500 text-sm'>{form.formState.errors.confirm_password.message}</p>
+                  )}
                 </div>
 
                 <Button
-                  onClick={handleChangePassword}
+                  onClick={form.handleSubmit(handleChangePassword)}
                   type='submit'
                   variant={'secondary'}
                   className='w-full dark:bg-purple-600 hover:dark:bg-purple-700 transition-colors duration-200'

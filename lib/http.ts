@@ -1,12 +1,5 @@
 import envConfig from '@/config'
-import {
-  getAccessTokenFromLocalStorage,
-  normalizePath,
-  removeTokensFromLocalStorage,
-  setAccessTokenToLocalStorage,
-  setRefreshTokenToLocalStorage
-} from '@/lib/utils'
-import { LoginResType } from '@/schemaValidator/auth.schema'
+import { getAccessTokenFromLocalStorage, normalizePath } from '@/lib/utils'
 import { redirect } from 'next/navigation'
 
 type CustomOptions = Omit<RequestInit, 'method'> & {
@@ -14,14 +7,14 @@ type CustomOptions = Omit<RequestInit, 'method'> & {
 }
 
 const ENTITY_ERROR_STATUS = 422
-const AUTHENTICATION_ERROR_STATUS = 401
+const AUTHENTICATION_ERROR_STATUS = 400
 
 type EntityErrorPayload = {
   message: string
-  errors: {
-    field: string
-    message: string
-  }[]
+  error: string
+  statusCode: number
+  timestamp?: string
+  path?: string
 }
 
 export class HttpError extends Error {
@@ -41,13 +34,12 @@ export class EntityError extends HttpError {
   status: typeof ENTITY_ERROR_STATUS
   payload: EntityErrorPayload
   constructor({ status, payload }: { status: typeof ENTITY_ERROR_STATUS; payload: EntityErrorPayload }) {
-    super({ status, payload, message: 'Lỗi Thực Thể' })
+    super({ status, payload, message: payload.message || 'Lỗi Thực Thể' })
     this.status = status
     this.payload = payload
   }
 }
 
-let clientLogoutRequest: null | Promise<any> = null
 export const isClient = typeof window !== 'undefined'
 const request = async <Response>(
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
@@ -74,11 +66,8 @@ const request = async <Response>(
       baseHeaders.Authorization = `Bearer ${accessToken}`
     }
   }
-  // Nếu không truyền baseUrl (hoặc baseUrl = undefined) thì lấy từ envConfig.NEXT_PUBLIC_API_ENDPOINT
-  // Nếu truyền baseUrl thì lấy giá trị truyền vào, truyền vào '' thì đồng nghĩa với việc chúng ta gọi API đến Next.js Server
 
   const baseUrl = options?.baseUrl === undefined ? envConfig.NEXT_PUBLIC_BACKEND_END_POINT : options.baseUrl
-
   const fullUrl = `${baseUrl}/${normalizePath(url)}`
 
   const res = await fetch(fullUrl, {
@@ -91,12 +80,12 @@ const request = async <Response>(
     method
   })
 
-  const payload: Response = await res.json()
+  const payload: Response = await res.json().catch(() => ({ message: 'Lỗi không xác định' }))
   const data = {
     status: res.status,
     payload
   }
-  // Interceptor là nời chúng ta xử lý request và response trước khi trả về cho phía component
+
   if (!res.ok) {
     if (res.status === ENTITY_ERROR_STATUS) {
       throw new EntityError(
@@ -106,7 +95,7 @@ const request = async <Response>(
         }
       )
     } else if (res.status === AUTHENTICATION_ERROR_STATUS) {
-      const access_token = (options?.headers as any)?.Authorization.split('Bearer ')[1]
+      const access_token = (options?.headers as any)?.Authorization?.split('Bearer ')[1]
       redirect(`/logout?accessToken=${access_token}`)
     } else {
       throw new HttpError(data)

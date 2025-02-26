@@ -164,7 +164,9 @@ export default function Header() {
                   <DropdownMenuContent className='w-56' align='end' forceMount>
                     <DropdownMenuItem className='flex items-center'>
                       <UserCircle className='mr-2 h-4 w-4' />
-                      <span>{name}</span>
+                      <Link href={pathURL.profile}>
+                        <span>{name}</span>
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem className='flex items-center' onClick={handleSignOut}>
                       <LogOut className='mr-2 h-4 w-4' />
@@ -216,12 +218,14 @@ export default function Header() {
               ))}
               {isLoggedIn ? (
                 <>
-                  <Button
-                    variant='ghost'
-                    className='w-full text-left text-gray-900 dark:text-white hover:text-purple-400 transition-colors py-2'
-                  >
-                    {name}
-                  </Button>
+                  <Link href={pathURL.profile}>
+                    <Button
+                      variant='ghost'
+                      className='w-full text-left text-gray-900 dark:text-white hover:text-purple-400 transition-colors py-2'
+                    >
+                      {name}
+                    </Button>
+                  </Link>
                   <Button
                     variant='ghost'
                     className='w-full text-left text-gray-900 dark:text-white hover:text-purple-400 transition-colors py-2'

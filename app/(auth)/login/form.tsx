@@ -11,40 +11,48 @@ import { pathURL } from '@/constants/path'
 import { useLoginMutation } from '@/queries/useAuth'
 import { useRouter } from 'next/navigation'
 import { getOauthGoogleUrl } from '@/app/hooks/auth/useLoginOathGoogle'
+import { handleErrorApi, setAccessTokenToLocalStorage, setRefreshTokenToLocalStorage } from '@/lib/utils'
+import { useForm } from 'react-hook-form'
+import { LoginBody, LoginBodyType } from '@/schemaValidator/auth.schema'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 export default function FormLogin() {
   const [showPassword, setShowPassword] = useState(false)
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const form = useForm<LoginBodyType>({
+    resolver: zodResolver(LoginBody),
+    defaultValues: {
+      email: '',
+      password: ''
+    }
+  })
 
   const loginMutation = useLoginMutation()
   const router = useRouter()
 
-  const handleLogin = () => {
-    loginMutation.mutate(
-      { email, password },
-      {
-        onSuccess: (data) => {
-          const access_token = data.payload.data.accessToken
-          const refresh_token = data.payload.data.refreshToken
+  const handleLogin = (body: LoginBodyType) => {
+    loginMutation.mutate(body, {
+      onSuccess: (data) => {
+        const access_token = data.payload.data.accessToken
+        const refresh_token = data.payload.data.refreshToken
 
-          if (access_token && refresh_token) {
-            localStorage.setItem('access_token', access_token)
-            localStorage.setItem('refresh_token', refresh_token)
-          }
-
-          router.push(pathURL.home)
-        },
-        onError: (error) => {
-          console.error('Login failed:', error)
+        if (access_token && refresh_token) {
+          setAccessTokenToLocalStorage(access_token)
+          setRefreshTokenToLocalStorage(refresh_token)
         }
+        router.push(pathURL.home)
+      },
+      onError: (error) => {
+        handleErrorApi({
+          error,
+          setError: form.setError
+        })
       }
-    )
+    })
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      handleLogin()
+      form.handleSubmit(handleLogin)()
     }
   }
 
@@ -75,11 +83,13 @@ export default function FormLogin() {
               id='email'
               placeholder='Enter your email'
               type='email'
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              {...form.register('email')}
+              className={`dark:bg-gray-700 border-gray-600 placeholder-gray-400 ${form.formState.errors.email ? 'border-red-500' : ''}`}
               onKeyDown={handleKeyDown}
-              className='dark:bg-gray-700 border-gray-600 placeholder-gray-400'
             />
+            {form.formState.errors.email && (
+              <p className='text-red-500 text-sm'>{form.formState.errors.email.message}</p>
+            )}
           </div>
           <div className='space-y-2'>
             <Label htmlFor='password'>Password</Label>
@@ -88,11 +98,11 @@ export default function FormLogin() {
                 id='password'
                 type={showPassword ? 'text' : 'password'}
                 placeholder='Enter your password'
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                {...form.register('password')}
+                className={`dark:bg-gray-700 border-gray-600 placeholder-gray-400 ${form.formState.errors.password ? 'border-red-500' : ''}`}
                 onKeyDown={handleKeyDown}
-                className='dark:bg-gray-700 border-gray-600 placeholder-gray-400'
               />
+
               <button
                 type='button'
                 onClick={togglePasswordVisibility}
@@ -101,10 +111,16 @@ export default function FormLogin() {
                 {showPassword ? <Icons.EyeOff size={20} /> : <Icons.Eye size={20} />}
               </button>
             </div>
+            {form.formState.errors.password && (
+              <p className='text-red-500 text-sm'>{form.formState.errors.password.message}</p>
+            )}
           </div>
         </CardContent>
         <CardFooter className='flex flex-col space-y-4'>
-          <Button onClick={handleLogin} className='w-full bg-gradient-to-r from-purple-500 to-pink-500'>
+          <Button
+            onClick={() => form.handleSubmit(handleLogin)()}
+            className='w-full bg-gradient-to-r from-purple-500 to-pink-500'
+          >
             Sign In
           </Button>
           <Link href={oauthURL}>

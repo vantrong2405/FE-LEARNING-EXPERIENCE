@@ -6,5 +6,6 @@ export const pathURL = {
   register: '/register',
   forgot_password: '/forgot-password',
   dashboard_courses: '/dashboard/courses',
+  profile: '/dashboard/profile',
   courses_detail: (id: number) => `/dashboard/courses/${id}`
 }

@@ -21,40 +21,45 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { cn } from '@/lib/utils'
+import { cn, handleErrorApi } from '@/lib/utils'
 import { CalendarIcon } from 'lucide-react'
 import { format } from 'date-fns'
 import { useRegisterMutation } from '@/queries/useAuth'
-import { useRouter } from 'next/navigation'
+import { useForm } from 'react-hook-form'
+import { RegisterBody, RegisterBodyType } from '@/schemaValidator/auth.schema'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 export default function FormRegister() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>()
   const togglePasswordVisibility = () => setShowPassword(!showPassword)
   const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword)
   const registerMutation = useRegisterMutation()
-  const message = registerMutation.data?.payload.data.message
-  const [error, setError] = useState<string | null>(null)
-  const router = useRouter()
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    dateOfBirth: new Date(),
-    name: '',
-    roleId: 0
+
+  const form = useForm<RegisterBodyType>({
+    resolver: zodResolver(RegisterBody),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      dateOfBirth: undefined,
+      roleId: 1
+    }
   })
 
-  const handleChange = (field: keyof typeof formData, value: string | number | Date | undefined) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
-
-  const handleRegister = async () => {
-    setError(null)
-    registerMutation.mutate(formData)
-    toast(message)
-    router.push(pathURL.verify)
+  const handleSubmit = (body: RegisterBodyType) => {
+    registerMutation.mutate(body, {
+      onSuccess: (data) => {
+        toast(data.payload.data.message)
+      },
+      onError: (error) => {
+        handleErrorApi({
+          error,
+          setError: form.setError
+        })
+      }
+    })
   }
 
   return (
@@ -100,12 +105,12 @@ export default function FormRegister() {
               <Icons.User className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' size={20} />
               <Input
                 id='name'
-                value={formData.name}
-                onChange={(e) => handleChange('name', e.target.value)}
+                {...form.register('name')}
+                className={`pl-10 dark:bg-gray-700 border-gray-600 placeholder-gray-400 ${form.formState.errors.name ? 'border-red-500' : ''}`}
                 placeholder='Enter your full name'
-                className='pl-10 dark:bg-gray-700 border-gray-600 placeholder-gray-400'
               />
             </div>
+            {form.formState.errors.name && <p className='text-red-500 text-sm'>{form.formState.errors.name.message}</p>}
           </div>
           <div className='space-y-2'>
             <Label htmlFor='email'>Email</Label>
@@ -113,35 +118,41 @@ export default function FormRegister() {
               <Icons.Mail className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' size={20} />
               <Input
                 id='email'
-                value={formData.email}
-                onChange={(e) => handleChange('email', e.target.value)}
+                {...form.register('email')}
+                className={`pl-10 dark:bg-gray-700 border-gray-600 placeholder-gray-400 ${form.formState.errors.email ? 'border-red-500' : ''}`}
                 placeholder='Enter your email'
                 type='email'
-                className='pl-10 dark:bg-gray-700 border-gray-600 placeholder-gray-400'
               />
             </div>
+            {form.formState.errors.email && (
+              <p className='text-red-500 text-sm'>{form.formState.errors.email.message}</p>
+            )}
           </div>
           <div className='space-y-2'>
-            <Label>Date Of Birth:</Label>
+            <Label>Date Of Birth</Label>
             <div className='relative'>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant='outline'
                     className={cn(
-                      ' dark:bg-gray-700 border-gray-600 placeholder-gray-400 w-full pl-3 text-left font-normal',
-                      !selectedDate && 'text-muted-foreground '
+                      'dark:bg-gray-700 border-gray-600 placeholder-gray-400 w-full pl-3 text-left font-normal',
+                      !form.watch('dateOfBirth') && 'text-muted-foreground'
                     )}
                   >
-                    {selectedDate ? format(selectedDate, 'PPP') : <span>Pick a date</span>}
+                    {form.watch('dateOfBirth') ? (
+                      format(new Date(form.watch('dateOfBirth')), 'PPP')
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
                     <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className='w-auto p-0' align='start'>
                   <Calendar
                     mode='single'
-                    selected={selectedDate}
-                    onSelect={setSelectedDate}
+                    selected={form.watch('dateOfBirth') || new Date()}
+                    onSelect={(date) => form.setValue('dateOfBirth', date || new Date())}
                     disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
                     initialFocus
                   />
@@ -149,17 +160,17 @@ export default function FormRegister() {
               </Popover>
             </div>
           </div>
+
           <div className='space-y-2'>
             <Label htmlFor='password'>Password</Label>
             <div className='relative'>
               <Icons.Lock className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' size={20} />
               <Input
                 id='password'
-                value={formData.password}
-                onChange={(e) => handleChange('password', e.target.value)}
+                {...form.register('password')}
+                className={`pl-10 dark:bg-gray-700 border-gray-600 placeholder-gray-400 ${form.formState.errors.password ? 'border-red-500' : ''}`}
                 type={showPassword ? 'text' : 'password'}
                 placeholder='Create a password'
-                className='pl-10 pr-10 dark:bg-gray-700 border-gray-600 placeholder-gray-400'
               />
               <button
                 type='button'
@@ -169,6 +180,9 @@ export default function FormRegister() {
                 {showPassword ? <Icons.EyeOff size={20} /> : <Icons.Eye size={20} />}
               </button>
             </div>
+            {form.formState.errors.password && (
+              <p className='text-red-500 text-sm'>{form.formState.errors.password.message}</p>
+            )}
           </div>
           <div className='space-y-2'>
             <Label htmlFor='confirmPassword'>Confirm Password</Label>
@@ -176,11 +190,10 @@ export default function FormRegister() {
               <Icons.Lock className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' size={20} />
               <Input
                 id='confirmPassword'
-                value={formData.confirmPassword}
-                onChange={(e) => handleChange('confirmPassword', e.target.value)}
+                {...form.register('confirmPassword')}
+                className={`pl-10 dark:bg-gray-700 border-gray-600 placeholder-gray-400 ${form.formState.errors.confirmPassword ? 'border-red-500' : ''}`}
                 type={showConfirmPassword ? 'text' : 'password'}
                 placeholder='Confirm your password'
-                className='pl-10 pr-10 dark:bg-gray-700 border-gray-600 placeholder-gray-400'
               />
               <button
                 type='button'
@@ -190,10 +203,13 @@ export default function FormRegister() {
                 {showConfirmPassword ? <Icons.EyeOff size={20} /> : <Icons.Eye size={20} />}
               </button>
             </div>
+            {form.formState.errors.confirmPassword && (
+              <p className='text-red-500 text-sm'>{form.formState.errors.confirmPassword.message}</p>
+            )}
           </div>
           <div className='space-y-2'>
-            <Label htmlFor='confirmPassword'>Select Role</Label>
-            <Select onValueChange={(value) => handleChange('roleId', Number(value))}>
+            <Label htmlFor='roleId'>Select Role</Label>
+            <Select onValueChange={(value) => form.setValue('roleId', Number(value))}>
               <SelectTrigger className='w-full dark:bg-gray-700 border-gray-600 placeholder-gray-400'>
                 <SelectValue placeholder='Select Role ' />
               </SelectTrigger>
@@ -209,7 +225,7 @@ export default function FormRegister() {
         </CardContent>
         <CardFooter className='flex flex-col space-y-4'>
           <Button
-            onClick={handleRegister}
+            onClick={() => form.handleSubmit(handleSubmit)()}
             className='w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 '
           >
             Create Account
