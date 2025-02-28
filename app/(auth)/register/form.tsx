@@ -44,14 +44,23 @@ export default function FormRegister() {
       password: '',
       confirmPassword: '',
       dateOfBirth: undefined,
-      roleId: 1
+      roleId: undefined
     }
   })
 
   const handleSubmit = (body: RegisterBodyType) => {
+    if (body.password !== body.confirmPassword) {
+      form.setError('confirmPassword', {
+        type: 'manual',
+        message: 'Passwords do not match'
+      })
+      return
+    }
+
     registerMutation.mutate(body, {
       onSuccess: (data) => {
-        toast(data.payload.data.message)
+        form.reset()
+        toast.success(data.payload.data.message)
       },
       onError: (error) => {
         handleErrorApi({
@@ -137,6 +146,7 @@ export default function FormRegister() {
                     variant='outline'
                     className={cn(
                       'dark:bg-gray-700 border-gray-600 placeholder-gray-400 w-full pl-3 text-left font-normal',
+                      form.formState.errors.dateOfBirth && 'border-red-500',
                       !form.watch('dateOfBirth') && 'text-muted-foreground'
                     )}
                   >
@@ -159,6 +169,9 @@ export default function FormRegister() {
                 </PopoverContent>
               </Popover>
             </div>
+            {form.formState.errors.dateOfBirth && (
+              <p className='text-red-500 text-sm'>{form.formState.errors.dateOfBirth.message}</p>
+            )}
           </div>
 
           <div className='space-y-2'>
@@ -210,7 +223,9 @@ export default function FormRegister() {
           <div className='space-y-2'>
             <Label htmlFor='roleId'>Select Role</Label>
             <Select onValueChange={(value) => form.setValue('roleId', Number(value))}>
-              <SelectTrigger className='w-full dark:bg-gray-700 border-gray-600 placeholder-gray-400'>
+              <SelectTrigger
+                className={`w-full dark:bg-gray-700 border-gray-600 placeholder-gray-400 ${form.formState.errors.confirmPassword ? 'border-red-500' : ''}`}
+              >
                 <SelectValue placeholder='Select Role ' />
               </SelectTrigger>
               <SelectContent>
@@ -221,6 +236,9 @@ export default function FormRegister() {
                 </SelectGroup>
               </SelectContent>
             </Select>
+            {form.formState.errors.roleId && (
+              <p className='text-red-500 text-sm'>{form.formState.errors.roleId.message}</p>
+            )}
           </div>
         </CardContent>
         <CardFooter className='flex flex-col space-y-4'>

@@ -15,114 +15,37 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { motion, AnimatePresence } from 'framer-motion'
-
-const courses = [
-  {
-    title: 'English Foundation for Beginners',
-    category: 'Language',
-    badge: 'Bestseller',
-    instructor: 'Hannah Pham',
-    lessons: '97 Lessons',
-    duration: '14 hours 56 minutes',
-    price: 399000,
-    originalPrice: 749000,
-    image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-EpJNu9CU0HsswhZUgf8c6eAiGOJNRn.png',
-    progress: 65,
-    rating: 4.8,
-    students: 12500
-  },
-  {
-    title: 'Secrets to Becoming a Top Performer',
-    category: 'Personal Development',
-    badge: 'New',
-    instructor: 'Lê Thiên Dương',
-    lessons: '27 Lessons',
-    duration: '2 hours 32 minutes',
-    price: 399000,
-    originalPrice: 799000,
-    image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-EpJNu9CU0HsswhZUgf8c6eAiGOJNRn.png',
-    progress: 40,
-    rating: 4.6,
-    students: 8300
-  },
-  {
-    title: 'Mastering Photoshop - Practical Graphic Design',
-    category: 'Design',
-    badge: 'Hot',
-    instructor: 'Lê Xuân Tiến',
-    lessons: '88 Lessons',
-    duration: '13 hours 45 minutes',
-    price: 199000,
-    originalPrice: 749000,
-    image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-EpJNu9CU0HsswhZUgf8c6eAiGOJNRn.png',
-    progress: 80,
-    rating: 4.9,
-    students: 15700
-  },
-  {
-    title: 'Fullstack Web Development with React and Node.js',
-    category: 'Programming',
-    badge: 'Trending',
-    instructor: 'Nguyễn Văn Cường',
-    lessons: '120 Lessons',
-    duration: '25 hours 30 minutes',
-    price: 599000,
-    originalPrice: 999000,
-    image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-EpJNu9CU0HsswhZUgf8c6eAiGOJNRn.png',
-    progress: 55,
-    rating: 4.7,
-    students: 10200
-  },
-  {
-    title: 'Digital Marketing for Small and Medium Businesses',
-    category: 'Marketing',
-    badge: 'Popular',
-    instructor: 'Trần Thị Mai',
-    lessons: '45 Lessons',
-    duration: '8 hours 15 minutes',
-    price: 299000,
-    originalPrice: 599000,
-    image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-EpJNu9CU0HsswhZUgf8c6eAiGOJNRn.png',
-    progress: 70,
-    rating: 4.5,
-    students: 9800
-  },
-  {
-    title: 'Basic Stock Investment Course',
-    category: 'Finance',
-    badge: 'Updated',
-    instructor: 'Phạm Minh Tuấn',
-    lessons: '60 Lessons',
-    duration: '10 hours 45 minutes',
-    price: 499000,
-    originalPrice: 899000,
-    image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-EpJNu9CU0HsswhZUgf8c6eAiGOJNRn.png',
-    progress: 30,
-    rating: 4.6,
-    students: 7500
-  }
-]
-
-const categories = ['All', 'Language', 'Personal Development', 'Design', 'Programming', 'Marketing', 'Finance']
-const levels = ['Beginner', 'Intermediate', 'Advanced']
+import { useCourseQuery } from '@/queries/useCourse'
+import { useCategoryListQuery } from '@/queries/useCategory'
+import { useLevelListQuery } from '@/queries/useLevel'
+import { pagination } from '@/constants/pagination-config'
 
 export default function CoursesPage() {
+  const courseQuery = useCourseQuery(pagination.LIMIT, pagination.PAGE)
+  const categoryQuery = useCategoryListQuery(pagination.LIMIT, pagination.PAGE)
+  const levelQuery = useLevelListQuery(pagination.LIMIT, pagination.PAGE)
+
+  const courses = courseQuery.data?.payload.data.data ?? []
+  const categories = categoryQuery.data?.payload.data.data ?? []
+  const levels = levelQuery.data?.payload.data.data ?? []
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [priceRange, setPriceRange] = useState([0, 1000000])
   const [searchQuery, setSearchQuery] = useState('')
   const [filteredCourses, setFilteredCourses] = useState(courses)
 
   useEffect(() => {
+    if (!courses.length) return
     const filtered = courses.filter((course) => {
-      const categoryMatch = selectedCategory === 'All' || course.category === selectedCategory
+      const categoryMatch = selectedCategory === 'All' || course.category.name === selectedCategory
       const priceMatch = course.price >= priceRange[0] && course.price <= priceRange[1]
       const searchMatch =
         course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        course.instructor.toLowerCase().includes(searchQuery.toLowerCase())
+        course.instructor.name.toLowerCase().includes(searchQuery.toLowerCase())
       return categoryMatch && priceMatch && searchMatch
     })
+
     setFilteredCourses(filtered)
-  }, [selectedCategory, priceRange, searchQuery])
+  }, [selectedCategory, priceRange, searchQuery, courses])
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [category, setCategory] = useState('')
@@ -173,8 +96,8 @@ export default function CoursesPage() {
                       </SelectTrigger>
                       <SelectContent>
                         {categories.map((cat) => (
-                          <SelectItem key={cat} value={cat}>
-                            {cat}
+                          <SelectItem key={cat.id} value={cat.name}>
+                            {cat.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -188,8 +111,8 @@ export default function CoursesPage() {
                       </SelectTrigger>
                       <SelectContent>
                         {levels.map((lvl) => (
-                          <SelectItem key={lvl} value={lvl}>
-                            {lvl}
+                          <SelectItem key={lvl.id} value={lvl.name}>
+                            {lvl.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -255,18 +178,18 @@ export default function CoursesPage() {
       <section className='space-y-4'>
         <h2 className='text-2xl font-semibold text-gray-900 dark:text-white'>Popular Categories</h2>
         <div className='flex flex-wrap gap-2'>
-          {categories.map((category, index) => (
+          {categories.map((category) => (
             <Button
-              key={index}
-              variant={category === selectedCategory ? 'default' : 'outline'}
+              key={category.id}
+              variant={category.name === selectedCategory ? 'default' : 'outline'}
               className={
-                category === selectedCategory
+                category.name === selectedCategory
                   ? 'bg-purple-600 hover:bg-purple-700 text-white'
                   : 'text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
               }
-              onClick={() => setSelectedCategory(category)}
+              onClick={() => setSelectedCategory(category.name)}
             >
-              {category}
+              {category.name}
             </Button>
           ))}
         </div>
@@ -285,42 +208,46 @@ export default function CoursesPage() {
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
           {filteredCourses.slice(0, 3).map((course, index) => (
             <Card
-              key={index}
+              key={course.id} // Dùng course.id nếu có, tránh lỗi key
               className='bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow duration-300'
             >
               <CardHeader className='p-0'>
-                <div className='relative'>
+                <div className='relative w-full h-48'>
                   <Image
-                    src={course.image || '/placeholder.svg'}
+                    src={course.thumbnailUrl && course.thumbnailUrl.trim() !== '' ? course.thumbnailUrl : ''}
                     alt={course.title}
-                    width={400}
-                    height={200}
-                    className='w-full h-48 object-cover'
+                    fill
+                    className='object-cover'
                   />
-                  <Badge className='absolute top-2 left-2 bg-purple-500 text-white'>{course.badge}</Badge>
+
+                  {course.description && (
+                    <Badge className='absolute top-2 left-2 bg-purple-500 text-white'>{course.title}</Badge>
+                  )}
                 </div>
               </CardHeader>
               <CardContent className='p-4'>
                 <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-1'>
-                  {course.title}
+                  {course.title ?? 'Untitled Course'}
                 </h3>
-                <p className='text-sm text-gray-600 dark:text-gray-400 mb-2'>{course.category}</p>
+                <p className='text-sm text-gray-600 dark:text-gray-400 mb-2'>
+                  {course.category?.name ?? 'No Category'}
+                </p>
                 <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2'>
                   <Users className='h-4 w-4' />
-                  <span>{course.instructor}</span>
+                  <span>{course.instructor?.name ?? 'Unknown Instructor'}</span>
                 </div>
                 <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2'>
                   <Book className='h-4 w-4' />
-                  <span>{course.lessons}</span>
+                  <span>{course.articlesCount ?? 0} lessons</span>
                   <span>•</span>
                   <Clock className='h-4 w-4' />
-                  <span>{course.duration}</span>
+                  <span>{course.videoHours ?? 'Unknown duration'}</span>
                 </div>
                 <div className='flex items-center gap-2 text-sm text-yellow-500 mb-2'>
                   <Star className='h-4 w-4 fill-current' />
-                  <span>{course.rating}</span>
+                  <span>{course.rating ?? 'N/A'}</span>
                   <span className='text-gray-600 dark:text-gray-400'>
-                    ({course.students.toLocaleString()} students)
+                    ({course.totalReviews?.toLocaleString() ?? 0} students)
                   </span>
                 </div>
               </CardContent>
@@ -328,13 +255,17 @@ export default function CoursesPage() {
                 <div className='flex items-center justify-between w-full'>
                   <div>
                     <span className='text-lg font-bold text-gray-900 dark:text-black'>
-                      {course.price.toLocaleString()}đ
+                      {course.price?.toLocaleString() ?? 0}đ
                     </span>
-                    <span className='text-sm text-gray-600 dark:text-gray-400 line-through ml-2'>
-                      {course.originalPrice.toLocaleString()}đ
-                    </span>
+                    {course.price && (
+                      <span className='text-sm text-gray-600 dark:text-gray-400 line-through ml-2'>
+                        {course.price.toLocaleString()}đ
+                      </span>
+                    )}
                   </div>
-                  <Link href={pathURL.courses_detail(1)}>
+                  <Link href={pathURL.courses_detail(course.id ?? 1)}>
+                    {' '}
+                    {/* Tránh truyền giá trị cố định */}
                     <Button className='bg-purple-600 hover:bg-purple-700 text-white'>View Details</Button>
                   </Link>
                 </div>
@@ -353,102 +284,38 @@ export default function CoursesPage() {
               className='bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow duration-300'
             >
               <CardHeader className='p-0'>
-                <div className='relative'>
+                <div className='relative w-full h-48'>
                   <Image
-                    src={course.image || '/placeholder.svg'}
+                    src={course.thumbnailUrl && course.thumbnailUrl.trim() !== '' ? course.thumbnailUrl : ''}
                     alt={course.title}
-                    width={400}
-                    height={200}
-                    className='w-full h-48 object-cover'
+                    fill
+                    className='object-cover'
                   />
-                  <Badge className='absolute top-2 left-2 bg-purple-500 text-white'>{course.badge}</Badge>
-                </div>
-              </CardHeader>
-              <CardContent className='p-4'>
-                <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-1'>
-                  {course.title}
-                </h3>
-                <p className='text-sm text-gray-600 dark:text-gray-400 mb-2'>{course.category}</p>
-                <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2'>
-                  <Users className='h-4 w-4' />
-                  <span>{course.instructor}</span>
-                </div>
-                <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2'>
-                  <Book className='h-4 w-4' />
-                  <span>{course.lessons}</span>
-                  <span>•</span>
-                  <Clock className='h-4 w-4' />
-                  <span>{course.duration}</span>
-                </div>
-                <div className='flex items-center gap-2 text-sm text-yellow-500 mb-2'>
-                  <Star className='h-4 w-4 fill-current' />
-                  <span>{course.rating}</span>
-                  <span className='text-gray-600 dark:text-gray-400'>
-                    ({course.students.toLocaleString()} students)
-                  </span>
-                </div>
-              </CardContent>
-              <CardFooter className='p-4 bg-gray-100 dark:bg-gray-750 border-t border-gray-300 dark:border-gray-700'>
-                <div className='flex items-center justify-between w-full'>
-                  <div>
-                    <span className='text-lg font-bold text-gray-900 dark:text-black'>
-                      {course.price.toLocaleString()}đ
-                    </span>
-                    <span className='text-sm text-gray-600 dark:text-gray-400 line-through ml-2'>
-                      {course.originalPrice.toLocaleString()}đ
-                    </span>
-                  </div>
-                  <Link href={pathURL.courses_detail(1)}>
-                    <Button className='bg-purple-600 hover:bg-purple-700 text-white'>View Details</Button>
-                  </Link>
-                </div>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      </section>
 
-      <section className='space-y-6'>
-        <h2 className='text-2xl font-semibold text-gray-900 dark:text-white'>All Courses</h2>
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-          {filteredCourses.map((course, index) => (
-            <Card
-              key={index}
-              className='bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow duration-300'
-            >
-              <CardHeader className='p-0'>
-                <div className='relative'>
-                  <Image
-                    src={course.image || '/placeholder.svg'}
-                    alt={course.title}
-                    width={400}
-                    height={200}
-                    className='w-full h-48 object-cover'
-                  />
-                  <Badge className='absolute top-2 left-2 bg-purple-500 text-white'>{course.badge}</Badge>
+                  <Badge className='absolute top-2 left-2 bg-purple-500 text-white'>{course.title}</Badge>
                 </div>
               </CardHeader>
               <CardContent className='p-4'>
                 <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-1'>
                   {course.title}
                 </h3>
-                <p className='text-sm text-gray-600 dark:text-gray-400 mb-2'>{course.category}</p>
+                <p className='text-sm text-gray-600 dark:text-gray-400 mb-2'>{course.category.name}</p>
                 <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2'>
                   <Users className='h-4 w-4' />
-                  <span>{course.instructor}</span>
+                  <span>{course.instructor.name}</span>
                 </div>
                 <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2'>
                   <Book className='h-4 w-4' />
-                  <span>{course.lessons}</span>
+                  <span>{course.articlesCount}</span>
                   <span>•</span>
                   <Clock className='h-4 w-4' />
-                  <span>{course.duration}</span>
+                  <span>{course.videoHours}</span>
                 </div>
                 <div className='flex items-center gap-2 text-sm text-yellow-500 mb-2'>
                   <Star className='h-4 w-4 fill-current' />
                   <span>{course.rating}</span>
                   <span className='text-gray-600 dark:text-gray-400'>
-                    ({course.students.toLocaleString()} students)
+                    ({course.totalReviews.toLocaleString()} students)
                   </span>
                 </div>
               </CardContent>
@@ -459,7 +326,7 @@ export default function CoursesPage() {
                       {course.price.toLocaleString()}đ
                     </span>
                     <span className='text-sm text-gray-600 dark:text-gray-400 line-through ml-2'>
-                      {course.originalPrice.toLocaleString()}đ
+                      {course.price.toLocaleString()}đ
                     </span>
                   </div>
                   <Link href={pathURL.courses_detail(1)}>
@@ -490,7 +357,7 @@ export default function CoursesPage() {
               </Button>
             </div>
             <div className='space-y-4'>
-              {['Programming', 'Language', 'Marketing', 'Design', 'Finance'].map((category, index) => (
+              {categories.map((category, index) => (
                 <div key={index} className='flex items-center justify-between'>
                   <div className='flex items-center gap-2'>
                     <div
@@ -498,7 +365,7 @@ export default function CoursesPage() {
                     >
                       {index + 1}
                     </div>
-                    <span className='text-gray-900 dark:text-white'>{category}</span>
+                    <span className='text-gray-900 dark:text-white'>{category.name}</span>
                   </div>
                   <Progress value={100 - index * 15} className='w-1/3' />
                 </div>
