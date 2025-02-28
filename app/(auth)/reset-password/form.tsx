@@ -47,12 +47,15 @@ export default function FormResetPassword() {
       return
     }
 
+    if (resetPaswordMutation.isPending) return
+
     if (body.new_password !== body.confirm_password) {
-      toast.error('Passwords do not match.')
+      form.setError('confirm_password', {
+        type: 'manual',
+        message: 'Passwords do not match'
+      })
       return
     }
-
-    if (resetPaswordMutation.isPending) return
 
     resetPaswordMutation.mutate(
       { ...body, forgot_password_token: token },

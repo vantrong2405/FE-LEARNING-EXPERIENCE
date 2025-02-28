@@ -48,10 +48,15 @@ export const RegisterBody = z
       .min(8, 'Confirm Password must be at least 8 characters long')
       .max(100, 'Confirm Password must be at most 100 characters long'),
 
-    dateOfBirth: z.date(),
+    dateOfBirth: z
+      .date({ required_error: 'Date of birth is required' }) // ✅ Bắt buộc chọn ngày
+      .refine((date) => date instanceof Date && !isNaN(date.getTime()), {
+        message: 'Invalid date format'
+      }),
 
-    roleId: z.number()
+    roleId: z.number({ required_error: 'RoleId is required' }).min(1, 'RoleId must not be left blank')
   })
+
   .strict()
 
 export type RegisterBodyType = z.infer<typeof RegisterBody>
@@ -137,27 +142,25 @@ export const VerifyEmailPasswordBody = z
 
 export type VerifyEmailPasswordBodyType = z.TypeOf<typeof VerifyEmailPasswordBody>
 
-export const ResetPasswordBody = z
-  .object({
-    forgot_password_token: z.string(),
-    new_password: z
-      .string()
-      .min(8, 'Password must be at least 8 characters long')
-      .max(100, 'Password must be at most 100 characters long')
-      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-      .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-      .regex(/[0-9]/, 'Password must contain at least one number')
-      .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
-    confirm_password: z
-      .string()
-      .min(8, 'Password must be at least 8 characters long')
-      .max(100, 'Password must be at most 100 characters long')
-      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-      .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-      .regex(/[0-9]/, 'Password must contain at least one number')
-      .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character')
-  })
-  .strict()
+export const ResetPasswordBody = z.object({
+  forgot_password_token: z.string(),
+  new_password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters long')
+    .max(100, 'Password must be at most 100 characters long')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number')
+    .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character'),
+  confirm_password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters long')
+    .max(100, 'Password must be at most 100 characters long')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number')
+    .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character')
+})
 
 export type ResetPasswordBodyType = z.TypeOf<typeof ResetPasswordBody>
 
@@ -185,7 +188,7 @@ export type GetMeResType = z.infer<typeof GetMeRes>
 
 export const MeBody = z
   .object({
-    name: z.string(),
+    name: z.string().min(5),
     //email: z.string(),
     // username: z.string(),
     gender: z.string()

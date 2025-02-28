@@ -14,6 +14,15 @@ import { ChangePasswordBody, ChangePasswordBodyType, MeBody, MeBodyType } from '
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { handleErrorApi } from '@/lib/utils'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
 
 export default function FormProfile() {
   const [marketingEmails, setMarketingEmails] = useState(false)
@@ -52,7 +61,7 @@ export default function FormProfile() {
   const handleUpdate = (body: MeBodyType) => {
     updateMeMutation.mutate(body, {
       onSuccess: () => {
-        toast('Update Account Success!')
+        toast.success('Update Account Success!')
       },
       onError: (error) => {
         handleErrorApi({
@@ -64,9 +73,16 @@ export default function FormProfile() {
   }
 
   const handleChangePassword = (body: ChangePasswordBodyType) => {
+    if (body.new_password !== body.confirm_password) {
+      form.setError('confirm_password', {
+        type: 'manual',
+        message: 'Passwords do not match'
+      })
+      return
+    }
     changePasswordMutation.mutate(body, {
       onSuccess: () => {
-        toast('Change Password Success!')
+        toast.success('Change Password Success!')
         form.reset()
       },
       onError: (error) => {
@@ -156,15 +172,26 @@ export default function FormProfile() {
                 </div>
 
                 <div className='space-y-2'>
-                  <Label htmlFor='gender' className='dark:text-purple-300'>
-                    Gender
+                  <Label className='dark:text-purple-300' htmlFor='gender'>
+                    Select Gender
                   </Label>
-                  <Input
-                    id='gender'
-                    {...formU.register('gender')}
-                    placeholder='Giới tính'
-                    className={` dark:bg-gray-800 border-purple-500 focus:border-purple-400 focus:ring-purple-400 ${formU.formState.errors.name ? 'border-red-500' : ''}`}
-                  />
+                  <Select
+                    onValueChange={(value) => formU.setValue('gender', value)}
+                    value={formU.watch('gender') || ''}
+                  >
+                    <SelectTrigger
+                      className={`w-full dark:bg-gray-800 border-purple-500 text-gray-400 ${formU.formState.errors.gender ? 'border-red-500' : ''}`}
+                    >
+                      <SelectValue placeholder='Select Gender ' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value='male'>Male</SelectItem>
+                        <SelectItem value='female'>Female</SelectItem>
+                        <SelectItem value='other'>Other</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                   {formU.formState.errors.gender && (
                     <p className='text-red-500 text-sm'>{formU.formState.errors.gender.message}</p>
                   )}
