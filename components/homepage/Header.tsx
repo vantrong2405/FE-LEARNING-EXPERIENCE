@@ -12,6 +12,9 @@ import useStoreLocal from '@/stores/useStoreLocal'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { UserCircle, LogOut } from 'lucide-react'
 import Chatbox from '../chatbox/Chatbox'
+import { useGetMeQuery, useLogoutMutation } from '@/queries/useAuth'
+import { getRefreshTokenFromLocalStorage } from '@/lib/utils'
+import { useRouter } from 'next/navigation'
 
 const navItems = [
   { name: 'Home', href: '#home' },
@@ -29,7 +32,10 @@ export default function Header() {
   const { isMusicOn, toggleMusic } = useStoreLocal()
   const [scrollY, setScrollY] = useState(0)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [userEmail, setUserEmail] = useState('user@example.com')
+  const logoutMutation = useLogoutMutation()
+  const GetMeQuery = useGetMeQuery()
+  const { email, name } = GetMeQuery.data?.payload.data ?? {}
+  const router = useRouter()
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY)
@@ -62,9 +68,24 @@ export default function Header() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  useEffect(() => {
+    const token = localStorage.getItem('access_token')
+    setIsLoggedIn(!!token)
+  }, [])
+
   const handleSignOut = () => {
-    // Implement sign out logic here
-    setIsLoggedIn(false)
+    const refreshToken = getRefreshTokenFromLocalStorage() as string
+    logoutMutation.mutate(
+      { refreshToken },
+      {
+        onSuccess: () => {
+          localStorage.removeItem('access_token')
+          localStorage.removeItem('refresh_token')
+          setIsLoggedIn(false)
+          router.push('/login')
+        }
+      }
+    )
   }
 
   return (
@@ -143,7 +164,9 @@ export default function Header() {
                   <DropdownMenuContent className='w-56' align='end' forceMount>
                     <DropdownMenuItem className='flex items-center'>
                       <UserCircle className='mr-2 h-4 w-4' />
-                      <span>{userEmail}</span>
+                      <Link href={pathURL.profile}>
+                        <span>{name}</span>
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem className='flex items-center' onClick={handleSignOut}>
                       <LogOut className='mr-2 h-4 w-4' />
@@ -195,12 +218,14 @@ export default function Header() {
               ))}
               {isLoggedIn ? (
                 <>
-                  <Button
-                    variant='ghost'
-                    className='w-full text-left text-gray-900 dark:text-white hover:text-purple-400 transition-colors py-2'
-                  >
-                    {userEmail}
-                  </Button>
+                  <Link href={pathURL.profile}>
+                    <Button
+                      variant='ghost'
+                      className='w-full text-left text-gray-900 dark:text-white hover:text-purple-400 transition-colors py-2'
+                    >
+                      {name}
+                    </Button>
+                  </Link>
                   <Button
                     variant='ghost'
                     className='w-full text-left text-gray-900 dark:text-white hover:text-purple-400 transition-colors py-2'

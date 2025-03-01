@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -8,12 +8,91 @@ import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { User, Lock, ShoppingCart, AlertCircle, Eye, EyeOff } from 'lucide-react'
+import { useChangePasswordMutation, useGetMeQuery, useUpdateMeMutation } from '@/queries/useAuth'
+import { toast } from 'sonner'
+import { ChangePasswordBody, ChangePasswordBodyType, MeBody, MeBodyType } from '@/schemaValidator/auth.schema'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { handleErrorApi } from '@/lib/utils'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
 
 export default function FormProfile() {
   const [marketingEmails, setMarketingEmails] = useState(false)
-  const [name, setName] = useState('Văn Trọng')
-  const [phone, setPhone] = useState('0357407264')
   const [showPassword, setShowPassword] = useState(false)
+  const getMeQuery = useGetMeQuery()
+  const updateMeMutation = useUpdateMeMutation()
+  const changePasswordMutation = useChangePasswordMutation()
+  const [email, setEmail] = useState('')
+
+  const formU = useForm<MeBodyType>({
+    resolver: zodResolver(MeBody),
+    defaultValues: {
+      name: '',
+      gender: ''
+    }
+  })
+
+  useEffect(() => {
+    if (getMeQuery.data?.payload?.data) {
+      const { name, email, gender } = getMeQuery.data.payload.data
+      formU.setValue('name', name || '')
+      formU.setValue('gender', gender || '')
+      setEmail(email || '')
+    }
+  }, [getMeQuery.data])
+
+  const form = useForm<ChangePasswordBodyType>({
+    resolver: zodResolver(ChangePasswordBody),
+    defaultValues: {
+      current_password: '',
+      new_password: '',
+      confirm_password: ''
+    }
+  })
+
+  const handleUpdate = (body: MeBodyType) => {
+    updateMeMutation.mutate(body, {
+      onSuccess: () => {
+        toast.success('Update Account Success!')
+      },
+      onError: (error) => {
+        handleErrorApi({
+          error,
+          setError: formU.setError
+        })
+      }
+    })
+  }
+
+  const handleChangePassword = (body: ChangePasswordBodyType) => {
+    if (body.new_password !== body.confirm_password) {
+      form.setError('confirm_password', {
+        type: 'manual',
+        message: 'Passwords do not match'
+      })
+      return
+    }
+    changePasswordMutation.mutate(body, {
+      onSuccess: () => {
+        toast.success('Change Password Success!')
+        form.reset()
+      },
+      onError: (error) => {
+        handleErrorApi({
+          error,
+          setError: form.setError
+        })
+      }
+    })
+  }
 
   return (
     <div className='min-h-screen w-full dark:bg-gray-90 p-8'>
@@ -62,10 +141,12 @@ export default function FormProfile() {
                   </Label>
                   <Input
                     id='name'
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className='dark:bg-gray-800 border-purple-500 focus:border-purple-400 focus:ring-purple-400'
+                    {...formU.register('name')}
+                    className={` dark:bg-gray-800 border-purple-500 focus:border-purple-400 focus:ring-purple-400 ${formU.formState.errors.name ? 'border-red-500' : ''}`}
                   />
+                  {formU.formState.errors.name && (
+                    <p className='text-red-500 text-sm'>{formU.formState.errors.name.message}</p>
+                  )}
                 </div>
 
                 <div className='space-y-2'>
@@ -75,7 +156,7 @@ export default function FormProfile() {
                   <div className='flex items-center gap-2'>
                     <Input
                       id='email'
-                      value='trongdn2405@gmail.com'
+                      value={email}
                       disabled
                       className='dark:bg-gray-800 border-purple-500 text-gray-400'
                     />
@@ -91,17 +172,29 @@ export default function FormProfile() {
                 </div>
 
                 <div className='space-y-2'>
-                  <Label htmlFor='phone' className='dark:text-purple-300'>
-                    Number Phone
+                  <Label className='dark:text-purple-300' htmlFor='gender'>
+                    Select Gender
                   </Label>
-                  <Input
-                    id='phone'
-                    type='tel'
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder='Số điện thoại'
-                    className='dark:bg-gray-800 border-purple-500 focus:border-purple-400 focus:ring-purple-400'
-                  />
+                  <Select
+                    onValueChange={(value) => formU.setValue('gender', value)}
+                    value={formU.watch('gender') || ''}
+                  >
+                    <SelectTrigger
+                      className={`w-full dark:bg-gray-800 border-purple-500 text-gray-400 ${formU.formState.errors.gender ? 'border-red-500' : ''}`}
+                    >
+                      <SelectValue placeholder='Select Gender ' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value='male'>Male</SelectItem>
+                        <SelectItem value='female'>Female</SelectItem>
+                        <SelectItem value='other'>Other</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  {formU.formState.errors.gender && (
+                    <p className='text-red-500 text-sm'>{formU.formState.errors.gender.message}</p>
+                  )}
                 </div>
 
                 <div className='flex items-center justify-between'>
@@ -118,7 +211,9 @@ export default function FormProfile() {
 
                 <Button
                   variant={'secondary'}
+                  type='submit'
                   className='w-full dark:bg-purple-600 hover:dark:bg-purple-700 transition-colors duration-200'
+                  onClick={formU.handleSubmit(handleUpdate)}
                 >
                   Lưu thay đổi
                 </Button>
@@ -143,7 +238,8 @@ export default function FormProfile() {
                     <Input
                       id='current-password'
                       type={showPassword ? 'text' : 'password'}
-                      className='dark:bg-gray-800 border-purple-500 focus:border-purple-400 focus:ring-purple-400 pr-10'
+                      {...form.register('current_password')}
+                      className={` dark:bg-gray-800 border-purple-500 focus:border-purple-400 focus:ring-purple-400 pr-10 ${form.formState.errors.current_password ? 'border-red-500' : ''}`}
                     />
                     <Button
                       variant='ghost'
@@ -158,6 +254,9 @@ export default function FormProfile() {
                       )}
                     </Button>
                   </div>
+                  {form.formState.errors.current_password && (
+                    <p className='text-red-500 text-sm'>{form.formState.errors.current_password.message}</p>
+                  )}
                 </div>
 
                 <div className='space-y-2'>
@@ -167,8 +266,12 @@ export default function FormProfile() {
                   <Input
                     id='new-password'
                     type='password'
-                    className='dark:bg-gray-800 border-purple-500 focus:border-purple-400 focus:ring-purple-400'
+                    {...form.register('new_password')}
+                    className={` dark:bg-gray-800 border-purple-500 focus:border-purple-400 focus:ring-purple-400 pr-10 ${form.formState.errors.new_password ? 'border-red-500' : ''}`}
                   />
+                  {form.formState.errors.new_password && (
+                    <p className='text-red-500 text-sm'>{form.formState.errors.new_password.message}</p>
+                  )}
                 </div>
 
                 <div className='space-y-2'>
@@ -178,11 +281,17 @@ export default function FormProfile() {
                   <Input
                     id='confirm-password'
                     type='password'
-                    className='dark:bg-gray-800 border-purple-500 focus:border-purple-400 focus:ring-purple-400'
+                    {...form.register('confirm_password')}
+                    className={` dark:bg-gray-800 border-purple-500 focus:border-purple-400 focus:ring-purple-400 pr-10 ${form.formState.errors.confirm_password ? 'border-red-500' : ''}`}
                   />
+                  {form.formState.errors.confirm_password && (
+                    <p className='text-red-500 text-sm'>{form.formState.errors.confirm_password.message}</p>
+                  )}
                 </div>
 
                 <Button
+                  onClick={form.handleSubmit(handleChangePassword)}
+                  type='submit'
                   variant={'secondary'}
                   className='w-full dark:bg-purple-600 hover:dark:bg-purple-700 transition-colors duration-200'
                 >
