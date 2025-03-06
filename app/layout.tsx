@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
-import NProgressHandler from '@/components/common/nro-progress'
+// import NProgressHandler from '@/components/common/nro-progress'
 import { ThemeProvider } from '@/components/common/theme-provider'
 import AudioPlayer from '@/components/common/AudioPlayer'
 import LazyLoading from '@/components/common/lazy-loading'
+import AppProvider from '@/components/ui/app-provider'
+import { Toaster } from 'sonner'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -29,12 +31,15 @@ export default function RootLayout({
   return (
     <html lang='en' suppressHydrationWarning>
       <body className='transition-colors duration-300'>
-        <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
-          {children}
-        </ThemeProvider>
+        <Toaster richColors position='bottom-right' />
+        <AppProvider>
+          <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
+            {children}
+          </ThemeProvider>
+        </AppProvider>
         <AudioPlayer />
         <LazyLoading />
-        <NProgressHandler />
+        {/* <NProgressHandler /> */}
       </body>
     </html>
   )
