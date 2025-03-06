@@ -2,458 +2,518 @@
 
 import { useState } from 'react'
 import {
+  TrendingUp,
+  DollarSign,
   Users,
   BookOpen,
-  CreditCard,
   Star,
-  BarChart3,
-  PieChart,
-  TrendingUp,
-  Bell,
-  Search,
-  Menu,
-  X,
-  LogOut,
-  Settings,
-  Home,
-  Layers,
-  MessageSquare
+  Download,
+  Eye,
+  BarChart2,
+  Activity,
+  Calendar,
+  Award,
+  CreditCard
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import {
-  AreaChart,
-  Area,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart as RePieChart,
-  Pie,
-  Cell
-} from 'recharts'
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
+import { Bar, BarChart, Line, LineChart, XAxis, YAxis, ResponsiveContainer } from 'recharts'
 
 export default function DashboardPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [period, setPeriod] = useState('week')
 
-  // Sample data for charts
-  const userGrowthData = [
-    { month: 'Jan', users: 400 },
-    { month: 'Feb', users: 600 },
-    { month: 'Mar', users: 800 },
-    { month: 'Apr', users: 1000 },
-    { month: 'May', users: 1200 },
-    { month: 'Jun', users: 1500 }
-  ]
-
-  const courseData = [
-    { name: 'Web Dev', value: 35 },
-    { name: 'Mobile', value: 25 },
-    { name: 'Data Science', value: 20 },
-    { name: 'Design', value: 15 },
-    { name: 'Other', value: 5 }
+  // Dữ liệu mẫu cho biểu đồ
+  const userActivityData = [
+    { date: '2024-01', users: 120, courses: 15 },
+    { date: '2024-02', users: 150, courses: 18 },
+    { date: '2024-03', users: 180, courses: 22 },
+    { date: '2024-04', users: 220, courses: 25 },
+    { date: '2024-05', users: 280, courses: 30 },
+    { date: '2024-06', users: 310, courses: 35 }
   ]
 
   const revenueData = [
-    { month: 'Jan', revenue: 5000 },
-    { month: 'Feb', revenue: 7500 },
-    { month: 'Mar', revenue: 10000 },
-    { month: 'Apr', revenue: 12500 },
-    { month: 'May', revenue: 15000 },
-    { month: 'Jun', revenue: 20000 }
+    { date: '2024-01', revenue: 1200000 },
+    { date: '2024-02', revenue: 1500000 },
+    { date: '2024-03', revenue: 1800000 },
+    { date: '2024-04', revenue: 2200000 },
+    { date: '2024-05', revenue: 2800000 },
+    { date: '2024-06', revenue: 3100000 }
   ]
 
-  const COLORS = ['#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe', '#ede9fe']
-
-  const recentUsers = [
-    { id: 1, name: 'Nguyễn Văn A', email: 'nguyenvana@example.com', date: '2023-07-15', status: 'active' },
-    { id: 2, name: 'Trần Thị B', email: 'tranthib@example.com', date: '2023-07-14', status: 'active' },
-    { id: 3, name: 'Lê Văn C', email: 'levanc@example.com', date: '2023-07-13', status: 'inactive' },
-    { id: 4, name: 'Phạm Thị D', email: 'phamthid@example.com', date: '2023-07-12', status: 'active' }
+  const reviewsData = [
+    { rating: '5 sao', count: 120 },
+    { rating: '4 sao', count: 80 },
+    { rating: '3 sao', count: 40 },
+    { rating: '2 sao', count: 15 },
+    { rating: '1 sao', count: 5 }
   ]
 
   const recentPayments = [
-    {
-      id: 1,
-      user: 'Nguyễn Văn A',
-      course: 'Web Development',
-      amount: '1,200,000 VND',
-      date: '2023-07-15',
-      status: 'completed'
-    },
-    {
-      id: 2,
-      user: 'Trần Thị B',
-      course: 'Mobile App Development',
-      amount: '1,500,000 VND',
-      date: '2023-07-14',
-      status: 'completed'
-    },
-    { id: 3, user: 'Lê Văn C', course: 'Data Science', amount: '2,000,000 VND', date: '2023-07-13', status: 'pending' },
-    {
-      id: 4,
-      user: 'Phạm Thị D',
-      course: 'UI/UX Design',
-      amount: '1,800,000 VND',
-      date: '2023-07-12',
-      status: 'completed'
-    }
+    { id: 'PAY-001', user: 'Nguyễn Văn A', course: 'JavaScript Cơ Bản', amount: '599.000đ', date: '15/06/2024' },
+    { id: 'PAY-002', user: 'Trần Thị B', course: 'React Advanced', amount: '799.000đ', date: '14/06/2024' },
+    { id: 'PAY-003', user: 'Lê Văn C', course: 'Python for Data Science', amount: '899.000đ', date: '13/06/2024' },
+    { id: 'PAY-004', user: 'Phạm Thị D', course: 'UI/UX Design', amount: '699.000đ', date: '12/06/2024' }
   ]
 
   return (
-    <div className='flex h-screen bg-gradient-to-br from-[#0D0A25] to-[#1A1744] text-white'>
-      {/* Sidebar */}
-      <div
-        className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-gray-900 transition-all duration-300 ease-in-out fixed h-full z-10`}
-      >
-        <div className='flex items-center justify-between p-4 border-b border-gray-800'>
-          {sidebarOpen && <h2 className='text-xl font-bold text-purple-400'>EduAdmin</h2>}
-          <Button
-            variant='ghost'
-            size='icon'
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className='text-gray-400 hover:text-white hover:bg-gray-800'
-          >
-            {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+    <div className='max-w-7xl mx-auto'>
+      <div className='flex justify-between items-center mb-8'>
+        <h1 className='text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600'>
+          Dashboard Admin
+        </h1>
+        <div className='flex gap-4'>
+          <Button variant='outline' className='bg-gray-800 border-purple-500 hover:bg-purple-700 text-white'>
+            <Download className='w-4 h-4 mr-2' />
+            Xuất báo cáo
+          </Button>
+          <Button className='bg-purple-600 hover:bg-purple-700'>
+            <Eye className='w-4 h-4 mr-2' />
+            Xem chi tiết
           </Button>
         </div>
-        <nav className='mt-6 px-4'>
-          <div className='space-y-4'>
-            <Button variant='ghost' className='w-full justify-start text-purple-400 hover:bg-gray-800 hover:text-white'>
-              <Home className='mr-2 h-5 w-5' />
-              {sidebarOpen && 'Dashboard'}
-            </Button>
-            <Button variant='ghost' className='w-full justify-start text-gray-400 hover:bg-gray-800 hover:text-white'>
-              <Users className='mr-2 h-5 w-5' />
-              {sidebarOpen && 'Users'}
-            </Button>
-            <Button variant='ghost' className='w-full justify-start text-gray-400 hover:bg-gray-800 hover:text-white'>
-              <BookOpen className='mr-2 h-5 w-5' />
-              {sidebarOpen && 'Courses'}
-            </Button>
-            <Button variant='ghost' className='w-full justify-start text-gray-400 hover:bg-gray-800 hover:text-white'>
-              <CreditCard className='mr-2 h-5 w-5' />
-              {sidebarOpen && 'Payments'}
-            </Button>
-            <Button variant='ghost' className='w-full justify-start text-gray-400 hover:bg-gray-800 hover:text-white'>
-              <Star className='mr-2 h-5 w-5' />
-              {sidebarOpen && 'Reviews'}
-            </Button>
-            <Button variant='ghost' className='w-full justify-start text-gray-400 hover:bg-gray-800 hover:text-white'>
-              <MessageSquare className='mr-2 h-5 w-5' />
-              {sidebarOpen && 'Messages'}
-            </Button>
-            <Button variant='ghost' className='w-full justify-start text-gray-400 hover:bg-gray-800 hover:text-white'>
-              <Settings className='mr-2 h-5 w-5' />
-              {sidebarOpen && 'Settings'}
-            </Button>
-          </div>
-          <div className='absolute bottom-4 w-full left-0 px-4'>
-            <Button variant='ghost' className='w-full justify-start text-gray-400 hover:bg-gray-800 hover:text-white'>
-              <LogOut className='mr-2 h-5 w-5' />
-              {sidebarOpen && 'Logout'}
-            </Button>
-          </div>
-        </nav>
       </div>
 
-      {/* Main Content */}
-      <div
-        className={`flex-1 ${sidebarOpen ? 'ml-64' : 'ml-20'} transition-all duration-300 ease-in-out overflow-auto`}
-      >
-        {/* Header */}
-        <header className='bg-gray-900 p-4 flex justify-between items-center sticky top-0 z-10 shadow-md'>
-          <div className='flex items-center'>
-            <h1 className='text-xl font-bold text-purple-400'>Dashboard</h1>
-          </div>
-          <div className='flex items-center space-x-4'>
-            <div className='relative'>
-              <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
-              <Input
-                type='search'
-                placeholder='Search...'
-                className='w-64 pl-8 bg-gray-800 border-gray-700 focus:border-purple-500 text-white'
-              />
-            </div>
-            <Button variant='outline' size='icon' className='relative bg-gray-800 border-gray-700 hover:bg-gray-700'>
-              <Bell className='h-5 w-5 text-gray-400' />
-              <span className='absolute -top-1 -right-1 bg-purple-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center'>
-                3
-              </span>
-            </Button>
-            <div className='flex items-center space-x-2'>
-              <div className='w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center'>
-                <span className='font-semibold'>VT</span>
+      {/* Thống kê tổng quan */}
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8'>
+        <Card className='bg-gray-900 border-gray-700 shadow-xl'>
+          <CardContent className='p-6'>
+            <div className='flex justify-between items-center'>
+              <div>
+                <p className='text-sm text-gray-400'>Tổng người dùng</p>
+                <h3 className='text-3xl font-bold text-purple-400 mt-1'>1,245</h3>
+                <p className='text-sm text-green-500 mt-1 flex items-center'>
+                  <TrendingUp className='w-4 h-4 mr-1' /> +12.5%
+                </p>
               </div>
-              {sidebarOpen && <span className='text-sm font-medium'>Văn Trọng</span>}
+              <div className='bg-purple-900/50 p-3 rounded-lg'>
+                <Users className='w-8 h-8 text-purple-400' />
+              </div>
             </div>
-          </div>
-        </header>
+          </CardContent>
+        </Card>
 
-        {/* Dashboard Content */}
-        <main className='p-6'>
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6'>
-            {/* Stats Cards */}
-            <Card className='bg-gray-900 border-gray-700 shadow-xl'>
-              <CardContent className='p-6'>
-                <div className='flex items-center justify-between'>
-                  <div>
-                    <p className='text-sm font-medium text-gray-400'>Total Users</p>
-                    <h3 className='text-2xl font-bold text-white mt-1'>1,543</h3>
-                    <p className='text-sm text-green-500 mt-1 flex items-center'>
-                      <TrendingUp className='h-4 w-4 mr-1' /> +12.5%
-                    </p>
-                  </div>
-                  <div className='h-12 w-12 bg-purple-900/30 rounded-lg flex items-center justify-center'>
-                    <Users className='h-6 w-6 text-purple-400' />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+        <Card className='bg-gray-900 border-gray-700 shadow-xl'>
+          <CardContent className='p-6'>
+            <div className='flex justify-between items-center'>
+              <div>
+                <p className='text-sm text-gray-400'>Tổng khóa học</p>
+                <h3 className='text-3xl font-bold text-purple-400 mt-1'>78</h3>
+                <p className='text-sm text-green-500 mt-1 flex items-center'>
+                  <TrendingUp className='w-4 h-4 mr-1' /> +8.3%
+                </p>
+              </div>
+              <div className='bg-purple-900/50 p-3 rounded-lg'>
+                <BookOpen className='w-8 h-8 text-purple-400' />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-            <Card className='bg-gray-900 border-gray-700 shadow-xl'>
-              <CardContent className='p-6'>
-                <div className='flex items-center justify-between'>
-                  <div>
-                    <p className='text-sm font-medium text-gray-400'>Total Courses</p>
-                    <h3 className='text-2xl font-bold text-white mt-1'>42</h3>
-                    <p className='text-sm text-green-500 mt-1 flex items-center'>
-                      <TrendingUp className='h-4 w-4 mr-1' /> +8.2%
-                    </p>
-                  </div>
-                  <div className='h-12 w-12 bg-purple-900/30 rounded-lg flex items-center justify-center'>
-                    <BookOpen className='h-6 w-6 text-purple-400' />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+        <Card className='bg-gray-900 border-gray-700 shadow-xl'>
+          <CardContent className='p-6'>
+            <div className='flex justify-between items-center'>
+              <div>
+                <p className='text-sm text-gray-400'>Tổng doanh thu</p>
+                <h3 className='text-3xl font-bold text-purple-400 mt-1'>45.8M</h3>
+                <p className='text-sm text-green-500 mt-1 flex items-center'>
+                  <TrendingUp className='w-4 h-4 mr-1' /> +15.2%
+                </p>
+              </div>
+              <div className='bg-purple-900/50 p-3 rounded-lg'>
+                <DollarSign className='w-8 h-8 text-purple-400' />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-            <Card className='bg-gray-900 border-gray-700 shadow-xl'>
-              <CardContent className='p-6'>
-                <div className='flex items-center justify-between'>
-                  <div>
-                    <p className='text-sm font-medium text-gray-400'>Total Revenue</p>
-                    <h3 className='text-2xl font-bold text-white mt-1'>₫75.2M</h3>
-                    <p className='text-sm text-green-500 mt-1 flex items-center'>
-                      <TrendingUp className='h-4 w-4 mr-1' /> +18.3%
-                    </p>
-                  </div>
-                  <div className='h-12 w-12 bg-purple-900/30 rounded-lg flex items-center justify-center'>
-                    <CreditCard className='h-6 w-6 text-purple-400' />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+        <Card className='bg-gray-900 border-gray-700 shadow-xl'>
+          <CardContent className='p-6'>
+            <div className='flex justify-between items-center'>
+              <div>
+                <p className='text-sm text-gray-400'>Đánh giá trung bình</p>
+                <h3 className='text-3xl font-bold text-purple-400 mt-1'>4.7</h3>
+                <p className='text-sm text-green-500 mt-1 flex items-center'>
+                  <TrendingUp className='w-4 h-4 mr-1' /> +0.3
+                </p>
+              </div>
+              <div className='bg-purple-900/50 p-3 rounded-lg'>
+                <Star className='w-8 h-8 text-purple-400' />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-            <Card className='bg-gray-900 border-gray-700 shadow-xl'>
-              <CardContent className='p-6'>
-                <div className='flex items-center justify-between'>
-                  <div>
-                    <p className='text-sm font-medium text-gray-400'>Total Reviews</p>
-                    <h3 className='text-2xl font-bold text-white mt-1'>856</h3>
-                    <p className='text-sm text-green-500 mt-1 flex items-center'>
-                      <TrendingUp className='h-4 w-4 mr-1' /> +5.7%
-                    </p>
-                  </div>
-                  <div className='h-12 w-12 bg-purple-900/30 rounded-lg flex items-center justify-center'>
-                    <Star className='h-6 w-6 text-purple-400' />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+      {/* Tabs cho các biểu đồ */}
+      <Tabs defaultValue='overview' className='w-full'>
+        <TabsList className='grid w-full grid-cols-3 bg-gray-800 rounded-lg mb-6'>
+          <TabsTrigger
+            value='overview'
+            className='text-white data-[state=active]:bg-purple-600 transition-all duration-200'
+          >
+            <Activity className='w-5 h-5 mr-2' />
+            Tổng quan
+          </TabsTrigger>
+          <TabsTrigger
+            value='revenue'
+            className='text-white data-[state=active]:bg-purple-600 transition-all duration-200'
+          >
+            <BarChart2 className='w-5 h-5 mr-2' />
+            Doanh thu
+          </TabsTrigger>
+          <TabsTrigger
+            value='reviews'
+            className='text-white data-[state=active]:bg-purple-600 transition-all duration-200'
+          >
+            <Star className='w-5 h-5 mr-2' />
+            Đánh giá
+          </TabsTrigger>
+        </TabsList>
 
-          {/* Charts */}
-          <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6'>
+        <TabsContent value='overview'>
+          <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
             <Card className='bg-gray-900 border-gray-700 shadow-xl'>
               <CardHeader>
-                <CardTitle className='text-xl text-purple-400'>User Growth</CardTitle>
-                <CardDescription className='text-gray-400'>Monthly user registration trends</CardDescription>
+                <CardTitle className='text-xl text-purple-400'>Người dùng & Khóa học</CardTitle>
+                <CardDescription className='text-gray-400'>Số lượng người dùng và khóa học theo tháng</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className='h-80'>
-                  <ResponsiveContainer width='100%' height='100%'>
-                    <AreaChart data={userGrowthData}>
-                      <defs>
-                        <linearGradient id='colorUsers' x1='0' y1='0' x2='0' y2='1'>
-                          <stop offset='5%' stopColor='#8b5cf6' stopOpacity={0.8} />
-                          <stop offset='95%' stopColor='#8b5cf6' stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <XAxis dataKey='month' stroke='#6b7280' />
-                      <YAxis stroke='#6b7280' />
-                      <CartesianGrid strokeDasharray='3 3' stroke='#374151' />
-                      <Tooltip
-                        contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', color: '#f9fafb' }}
-                        itemStyle={{ color: '#f9fafb' }}
-                        labelStyle={{ color: '#f9fafb' }}
-                      />
-                      <Area type='monotone' dataKey='users' stroke='#8b5cf6' fillOpacity={1} fill='url(#colorUsers)' />
-                    </AreaChart>
-                  </ResponsiveContainer>
+                  <ChartContainer
+                    config={{
+                      users: {
+                        label: 'Người dùng',
+                        color: 'hsl(var(--chart-1))'
+                      },
+                      courses: {
+                        label: 'Khóa học',
+                        color: 'hsl(var(--chart-2))'
+                      }
+                    }}
+                  >
+                    <ResponsiveContainer width='100%' height='100%'>
+                      <LineChart data={userActivityData} margin={{ top: 5, right: 10, left: 10, bottom: 0 }}>
+                        <XAxis
+                          dataKey='date'
+                          stroke='#888888'
+                          fontSize={12}
+                          tickLine={false}
+                          axisLine={false}
+                          tickFormatter={(value) => {
+                            const date = new Date(value)
+                            return date.toLocaleDateString('vi-VN', { month: 'short' })
+                          }}
+                        />
+                        <YAxis
+                          stroke='#888888'
+                          fontSize={12}
+                          tickLine={false}
+                          axisLine={false}
+                          tickFormatter={(value) => `${value}`}
+                        />
+                        <Line
+                          type='monotone'
+                          dataKey='users'
+                          stroke='var(--color-users)'
+                          strokeWidth={2}
+                          dot={{ r: 4 }}
+                          activeDot={{ r: 6 }}
+                        />
+                        <Line
+                          type='monotone'
+                          dataKey='courses'
+                          stroke='var(--color-courses)'
+                          strokeWidth={2}
+                          dot={{ r: 4 }}
+                          activeDot={{ r: 6 }}
+                        />
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </ChartContainer>
                 </div>
               </CardContent>
             </Card>
 
             <Card className='bg-gray-900 border-gray-700 shadow-xl'>
               <CardHeader>
-                <CardTitle className='text-xl text-purple-400'>Revenue</CardTitle>
-                <CardDescription className='text-gray-400'>Monthly revenue in VND</CardDescription>
+                <CardTitle className='text-xl text-purple-400'>Thanh toán gần đây</CardTitle>
+                <CardDescription className='text-gray-400'>Các giao dịch thanh toán mới nhất</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className='h-80'>
+                <div className='overflow-x-auto'>
+                  <table className='w-full'>
+                    <thead>
+                      <tr className='border-b border-gray-700'>
+                        <th className='text-left py-3 px-4 text-gray-400 font-medium'>ID</th>
+                        <th className='text-left py-3 px-4 text-gray-400 font-medium'>Người dùng</th>
+                        <th className='text-left py-3 px-4 text-gray-400 font-medium'>Khóa học</th>
+                        <th className='text-left py-3 px-4 text-gray-400 font-medium'>Số tiền</th>
+                        <th className='text-left py-3 px-4 text-gray-400 font-medium'>Ngày</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {recentPayments.map((payment, index) => (
+                        <tr key={index} className='border-b border-gray-800 hover:bg-gray-800/50'>
+                          <td className='py-3 px-4 text-sm'>{payment.id}</td>
+                          <td className='py-3 px-4 text-sm'>{payment.user}</td>
+                          <td className='py-3 px-4 text-sm'>{payment.course}</td>
+                          <td className='py-3 px-4 text-sm text-purple-400 font-medium'>{payment.amount}</td>
+                          <td className='py-3 px-4 text-sm text-gray-400'>{payment.date}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div className='mt-4 flex justify-center'>
+                  <Button variant='outline' className='bg-gray-800 border-purple-500 hover:bg-purple-700 text-white'>
+                    Xem tất cả giao dịch
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        <TabsContent value='revenue'>
+          <Card className='bg-gray-900 border-gray-700 shadow-xl'>
+            <CardHeader>
+              <div className='flex justify-between items-center'>
+                <div>
+                  <CardTitle className='text-xl text-purple-400'>Doanh thu theo tháng</CardTitle>
+                  <CardDescription className='text-gray-400'>Tổng doanh thu từ các khóa học</CardDescription>
+                </div>
+                <div className='flex gap-2'>
+                  <Button
+                    variant={period === 'week' ? 'default' : 'outline'}
+                    size='sm'
+                    onClick={() => setPeriod('week')}
+                    className={
+                      period === 'week'
+                        ? 'bg-purple-600 hover:bg-purple-700'
+                        : 'bg-gray-800 border-purple-500 hover:bg-purple-700 text-white'
+                    }
+                  >
+                    Tuần
+                  </Button>
+                  <Button
+                    variant={period === 'month' ? 'default' : 'outline'}
+                    size='sm'
+                    onClick={() => setPeriod('month')}
+                    className={
+                      period === 'month'
+                        ? 'bg-purple-600 hover:bg-purple-700'
+                        : 'bg-gray-800 border-purple-500 hover:bg-purple-700 text-white'
+                    }
+                  >
+                    Tháng
+                  </Button>
+                  <Button
+                    variant={period === 'year' ? 'default' : 'outline'}
+                    size='sm'
+                    onClick={() => setPeriod('year')}
+                    className={
+                      period === 'year'
+                        ? 'bg-purple-600 hover:bg-purple-700'
+                        : 'bg-gray-800 border-purple-500 hover:bg-purple-700 text-white'
+                    }
+                  >
+                    Năm
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className='h-96'>
+                <ChartContainer
+                  config={{
+                    revenue: {
+                      label: 'Doanh thu',
+                      color: 'hsl(var(--chart-1))'
+                    }
+                  }}
+                >
                   <ResponsiveContainer width='100%' height='100%'>
-                    <BarChart data={revenueData}>
-                      <XAxis dataKey='month' stroke='#6b7280' />
-                      <YAxis stroke='#6b7280' />
-                      <CartesianGrid strokeDasharray='3 3' stroke='#374151' />
-                      <Tooltip
-                        contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', color: '#f9fafb' }}
-                        itemStyle={{ color: '#f9fafb' }}
-                        labelStyle={{ color: '#f9fafb' }}
-                        formatter={(value: number) => [`${value.toLocaleString()} VND`, 'Revenue']}
+                    <BarChart data={revenueData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                      <XAxis
+                        dataKey='date'
+                        stroke='#888888'
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(value) => {
+                          const date = new Date(value)
+                          return date.toLocaleDateString('vi-VN', { month: 'short' })
+                        }}
                       />
-                      <Bar dataKey='revenue' fill='#8b5cf6' radius={[4, 4, 0, 0]} />
+                      <YAxis
+                        stroke='#888888'
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`}
+                      />
+                      <Bar dataKey='revenue' fill='var(--color-revenue)' radius={[4, 4, 0, 0]} />
+                      <ChartTooltip
+                        content={
+                          <ChartTooltipContent
+                            formatter={(value) =>
+                              `${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number(value))}`
+                            }
+                          />
+                        }
+                      />
                     </BarChart>
                   </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                </ChartContainer>
+              </div>
+              <div className='mt-6 grid grid-cols-1 md:grid-cols-3 gap-4'>
+                <Card className='bg-gray-800 border-gray-700'>
+                  <CardContent className='p-4'>
+                    <div className='flex items-center gap-4'>
+                      <div className='bg-purple-900/50 p-2 rounded-lg'>
+                        <CreditCard className='w-6 h-6 text-purple-400' />
+                      </div>
+                      <div>
+                        <p className='text-sm text-gray-400'>Tổng giao dịch</p>
+                        <p className='text-xl font-bold text-white'>1,245</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className='bg-gray-800 border-gray-700'>
+                  <CardContent className='p-4'>
+                    <div className='flex items-center gap-4'>
+                      <div className='bg-purple-900/50 p-2 rounded-lg'>
+                        <Calendar className='w-6 h-6 text-purple-400' />
+                      </div>
+                      <div>
+                        <p className='text-sm text-gray-400'>Trung bình/ngày</p>
+                        <p className='text-xl font-bold text-white'>42</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className='bg-gray-800 border-gray-700'>
+                  <CardContent className='p-4'>
+                    <div className='flex items-center gap-4'>
+                      <div className='bg-purple-900/50 p-2 rounded-lg'>
+                        <Award className='w-6 h-6 text-purple-400' />
+                      </div>
+                      <div>
+                        <p className='text-sm text-gray-400'>Khóa học bán chạy</p>
+                        <p className='text-xl font-bold text-white'>React Pro</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-          <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6'>
+        <TabsContent value='reviews'>
+          <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
             <Card className='bg-gray-900 border-gray-700 shadow-xl'>
               <CardHeader>
-                <CardTitle className='text-xl text-purple-400'>Course Distribution</CardTitle>
-                <CardDescription className='text-gray-400'>Breakdown by category</CardDescription>
+                <CardTitle className='text-xl text-purple-400'>Phân bố đánh giá</CardTitle>
+                <CardDescription className='text-gray-400'>Số lượng đánh giá theo số sao</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className='h-64 flex items-center justify-center'>
-                  <ResponsiveContainer width='100%' height='100%'>
-                    <RePieChart>
-                      <Pie
-                        data={courseData}
-                        cx='50%'
-                        cy='50%'
-                        labelLine={false}
-                        outerRadius={80}
-                        fill='#8884d8'
-                        dataKey='value'
-                        label={({ name, percent }: { name: string; percent: number }) =>
-                          `${name} ${(percent * 100).toFixed(0)}%`
-                        }
+                <div className='h-80'>
+                  <ChartContainer
+                    config={{
+                      count: {
+                        label: 'Số lượng',
+                        color: 'hsl(var(--chart-1))'
+                      }
+                    }}
+                  >
+                    <ResponsiveContainer width='100%' height='100%'>
+                      <BarChart
+                        data={reviewsData}
+                        layout='vertical'
+                        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                       >
-                        {courseData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        contentStyle={{ backgroundColor: '#1f2937', borderColor: '#374151', color: '#f9fafb' }}
-                        itemStyle={{ color: '#f9fafb' }}
-                        labelStyle={{ color: '#f9fafb' }}
-                      />
-                    </RePieChart>
-                  </ResponsiveContainer>
+                        <XAxis type='number' stroke='#888888' fontSize={12} tickLine={false} axisLine={false} />
+                        <YAxis
+                          dataKey='rating'
+                          type='category'
+                          stroke='#888888'
+                          fontSize={12}
+                          tickLine={false}
+                          axisLine={false}
+                        />
+                        <Bar dataKey='count' fill='var(--color-count)' radius={[0, 4, 4, 0]} />
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </ChartContainer>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className='bg-gray-900 border-gray-700 shadow-xl lg:col-span-2'>
+            <Card className='bg-gray-900 border-gray-700 shadow-xl'>
               <CardHeader>
-                <CardTitle className='text-xl text-purple-400'>Recent Activity</CardTitle>
-                <CardDescription className='text-gray-400'>Latest system activities</CardDescription>
+                <CardTitle className='text-xl text-purple-400'>Đánh giá gần đây</CardTitle>
+                <CardDescription className='text-gray-400'>Các đánh giá mới nhất từ học viên</CardDescription>
               </CardHeader>
               <CardContent>
-                <Tabs defaultValue='users'>
-                  <TabsList className='bg-gray-800 mb-4'>
-                    <TabsTrigger value='users' className='text-white data-[state=active]:bg-purple-600'>
-                      Users
-                    </TabsTrigger>
-                    <TabsTrigger value='payments' className='text-white data-[state=active]:bg-purple-600'>
-                      Payments
-                    </TabsTrigger>
-                  </TabsList>
-                  <TabsContent value='users'>
-                    <div className='overflow-x-auto'>
-                      <table className='w-full'>
-                        <thead>
-                          <tr className='border-b border-gray-800'>
-                            <th className='text-left py-3 px-4 text-gray-400 font-medium'>Name</th>
-                            <th className='text-left py-3 px-4 text-gray-400 font-medium'>Email</th>
-                            <th className='text-left py-3 px-4 text-gray-400 font-medium'>Date</th>
-                            <th className='text-left py-3 px-4 text-gray-400 font-medium'>Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {recentUsers.map((user) => (
-                            <tr key={user.id} className='border-b border-gray-800'>
-                              <td className='py-3 px-4'>{user.name}</td>
-                              <td className='py-3 px-4 text-gray-400'>{user.email}</td>
-                              <td className='py-3 px-4 text-gray-400'>{user.date}</td>
-                              <td className='py-3 px-4'>
-                                <span
-                                  className={`px-2 py-1 rounded-full text-xs ${
-                                    user.status === 'active'
-                                      ? 'bg-green-900/30 text-green-500'
-                                      : 'bg-red-900/30 text-red-500'
-                                  }`}
-                                >
-                                  {user.status}
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                <div className='space-y-4'>
+                  {[
+                    {
+                      user: 'Nguyễn Văn A',
+                      course: 'JavaScript Cơ Bản',
+                      rating: 5,
+                      comment: 'Khóa học rất hay và dễ hiểu. Giảng viên giảng dạy rất tận tâm.'
+                    },
+                    {
+                      user: 'Trần Thị B',
+                      course: 'React Advanced',
+                      rating: 4,
+                      comment: 'Nội dung phong phú, tuy nhiên cần bổ sung thêm bài tập thực hành.'
+                    },
+                    {
+                      user: 'Lê Văn C',
+                      course: 'Python for Data Science',
+                      rating: 5,
+                      comment: 'Tuyệt vời! Đã giúp tôi hiểu rõ về Data Science.'
+                    }
+                  ].map((review, index) => (
+                    <div key={index} className='p-4 bg-gray-800 rounded-lg'>
+                      <div className='flex justify-between items-start'>
+                        <div>
+                          <h4 className='font-medium'>{review.user}</h4>
+                          <p className='text-sm text-gray-400'>{review.course}</p>
+                        </div>
+                        <div className='flex'>
+                          {Array(5)
+                            .fill(0)
+                            .map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`w-4 h-4 ${i < review.rating ? 'text-yellow-400' : 'text-gray-600'}`}
+                              />
+                            ))}
+                        </div>
+                      </div>
+                      <p className='mt-2 text-sm text-gray-300'>{review.comment}</p>
                     </div>
-                  </TabsContent>
-                  <TabsContent value='payments'>
-                    <div className='overflow-x-auto'>
-                      <table className='w-full'>
-                        <thead>
-                          <tr className='border-b border-gray-800'>
-                            <th className='text-left py-3 px-4 text-gray-400 font-medium'>User</th>
-                            <th className='text-left py-3 px-4 text-gray-400 font-medium'>Course</th>
-                            <th className='text-left py-3 px-4 text-gray-400 font-medium'>Amount</th>
-                            <th className='text-left py-3 px-4 text-gray-400 font-medium'>Date</th>
-                            <th className='text-left py-3 px-4 text-gray-400 font-medium'>Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {recentPayments.map((payment) => (
-                            <tr key={payment.id} className='border-b border-gray-800'>
-                              <td className='py-3 px-4'>{payment.user}</td>
-                              <td className='py-3 px-4 text-gray-400'>{payment.course}</td>
-                              <td className='py-3 px-4'>{payment.amount}</td>
-                              <td className='py-3 px-4 text-gray-400'>{payment.date}</td>
-                              <td className='py-3 px-4'>
-                                <span
-                                  className={`px-2 py-1 rounded-full text-xs ${
-                                    payment.status === 'completed'
-                                      ? 'bg-green-900/30 text-green-500'
-                                      : 'bg-yellow-900/30 text-yellow-500'
-                                  }`}
-                                >
-                                  {payment.status}
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </TabsContent>
-                </Tabs>
+                  ))}
+                </div>
+                <div className='mt-4 flex justify-center'>
+                  <Button variant='outline' className='bg-gray-800 border-purple-500 hover:bg-purple-700 text-white'>
+                    Xem tất cả đánh giá
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>
-        </main>
-      </div>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }
