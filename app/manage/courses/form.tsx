@@ -208,7 +208,7 @@ export default function CoursesPage() {
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-[#0D0A25] to-[#1A1744] text-white p-6'>
-      <div className='max-w-7xl mx-auto'>
+      <div className='max-w-9xl mx-auto'>
         <div className='flex items-center justify-between mb-6'>
           <div>
             <h1 className='text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600'>
