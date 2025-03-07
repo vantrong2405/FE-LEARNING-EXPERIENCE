@@ -2,14 +2,14 @@ import { z } from 'zod'
 
 // Schema cho Course (dành cho Level)
 export const CourseSummarySchema = z.object({
-  id: z.number(),
+  id: z.string(),
   title: z.string(),
   description: z.string()
 })
 
 // Schema cho Level
 export const LevelSchema = z.object({
-  id: z.number(),
+  id: z.string(),
   name: z.string(),
   description: z.string(),
   courses: z.array(CourseSummarySchema)

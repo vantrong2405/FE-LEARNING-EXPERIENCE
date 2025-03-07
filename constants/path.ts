@@ -7,5 +7,5 @@ export const pathURL = {
   forgot_password: '/forgot-password',
   dashboard_courses: '/dashboard/courses',
   profile: '/dashboard/profile',
-  courses_detail: (id: number) => `/dashboard/courses/${id}`
+  courses_detail: (id: string) => `/dashboard/courses/${id}`
 }

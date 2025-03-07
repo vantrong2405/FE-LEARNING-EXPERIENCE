@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken'
 import { EntityError, HttpError } from '@/lib/http'
 import { toast } from 'sonner'
 import { UseFormSetError } from 'react-hook-form'
+import { differenceInDays, differenceInWeeks, parseISO } from 'date-fns'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -64,4 +65,22 @@ export const removeTokensFromLocalStorage = () => {
 
 export const decodeToken = (token: string) => {
   return jwt.decode(token) as TokenPayload
+}
+
+export const wrapServerApi = async <T>(fn: () => Promise<T>) => {
+  let result = null
+  try {
+    result = await fn()
+  } catch (error: any) {
+    if (error.digest?.includes('NEXT_REDIRECT')) {
+      throw error
+    }
+  }
+  return result
+}
+
+export const weeksAgo = (dateString: string) => {
+  const date = parseISO(dateString)
+  const daysAgo = differenceInDays(new Date(), date)
+  return `${daysAgo} ngày trước`
 }
