@@ -42,6 +42,7 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Textarea } from '@/components/ui/textarea'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import { exportToExcel } from '@/lib/excel'
 
 // Sample FAQ data
 const faqs = [
@@ -243,6 +244,26 @@ export default function FAQsPage() {
     }
   }
 
+  // Handle export to Excel
+  const handleExportExcel = () => {
+    const columns = [
+      { key: 'id', header: 'Mã FAQ' },
+      { key: 'question', header: 'Câu hỏi' },
+      { key: 'answer', header: 'Câu trả lời' },
+      { key: 'category', header: 'Danh mục' },
+      { key: 'status', header: 'Trạng thái' },
+      { key: 'createdAt', header: 'Ngày tạo' },
+      { key: 'updatedAt', header: 'Ngày cập nhật' }
+    ]
+
+    exportToExcel({
+      filename: 'Danh_sach_FAQ',
+      sheetName: 'FAQ',
+      data: filteredFAQs,
+      columns
+    })
+  }
+
   return (
     <div className='min-h-screen bg-gradient-to-br from-[#0D0A25] to-[#1A1744] text-white p-6'>
       <div className='max-w-9xl mx-auto'>
@@ -251,6 +272,7 @@ export default function FAQsPage() {
             <Button
               variant='outline'
               className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto text-xs sm:text-sm'
+              onClick={handleExportExcel}
             >
               <Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
               <span>Xuất Excel</span>

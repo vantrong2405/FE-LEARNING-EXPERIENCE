@@ -47,6 +47,7 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import { exportToExcel, formatCurrency } from '@/lib/excel'
 
 // Sample enrollment data
 const enrollments = [
@@ -331,6 +332,35 @@ export default function EnrollmentsPage() {
     return { id: courseId, title: course.title }
   })
 
+  // Handle export to Excel
+  const handleExportExcel = () => {
+    const columns = [
+      { key: 'id', header: 'Mã ghi danh' },
+      { key: 'student.name', header: 'Học viên' },
+      { key: 'student.email', header: 'Email' },
+      { key: 'course.title', header: 'Khóa học' },
+      { key: 'enrollmentDate', header: 'Ngày ghi danh' },
+      { key: 'status', header: 'Trạng thái' },
+      { key: 'progress', header: 'Tiến độ' },
+      { key: 'completionDate', header: 'Ngày hoàn thành' }
+    ]
+
+    // Transform nested data for export
+    const exportData = filteredEnrollments.map((enrollment) => ({
+      ...enrollment,
+      'student.name': enrollment.student.name,
+      'student.email': enrollment.student.email,
+      'course.title': enrollment.course.title
+    }))
+
+    exportToExcel({
+      filename: 'Danh_sach_ghi_danh',
+      sheetName: 'Ghi danh',
+      data: exportData,
+      columns
+    })
+  }
+
   return (
     <div className='min-h-screen bg-gradient-to-br from-[#0D0A25] to-[#1A1744] text-white p-6'>
       <div className='max-w-9xl mx-auto'>
@@ -339,6 +369,7 @@ export default function EnrollmentsPage() {
             <Button
               variant='outline'
               className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto text-xs sm:text-sm'
+              onClick={handleExportExcel}
             >
               <Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
               <span>Xuất Excel</span>

@@ -47,6 +47,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
+import { exportToExcel, formatCurrency } from '@/lib/excel'
 
 // Sample course data
 const courses = [
@@ -206,6 +207,35 @@ export default function CoursesPage() {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
   }
 
+  // Handle export to Excel
+  const handleExportExcel = () => {
+    const columns = [
+      { key: 'id', header: 'Mã khóa học' },
+      { key: 'title', header: 'Tên khóa học' },
+      { key: 'instructor', header: 'Giảng viên' },
+      {
+        key: 'price',
+        header: 'Giá',
+        format: (value: number) => formatCurrency(value)
+      },
+      { key: 'category', header: 'Danh mục' },
+      { key: 'students', header: 'Số học viên' },
+      {
+        key: 'rating',
+        header: 'Đánh giá',
+        format: (value: number) => value.toFixed(1)
+      },
+      { key: 'created', header: 'Ngày tạo' }
+    ]
+
+    exportToExcel({
+      filename: 'Danh_sach_khoa_hoc',
+      sheetName: 'Khóa học',
+      data: filteredCourses,
+      columns
+    })
+  }
+
   return (
     <div className='min-h-screen bg-gradient-to-br from-[#0D0A25] to-[#1A1744] text-white p-6'>
       <div className='max-w-9xl mx-auto'>
@@ -214,8 +244,9 @@ export default function CoursesPage() {
             <Button
               variant='outline'
               className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto text-xs sm:text-sm'
+              onClick={handleExportExcel}
             >
-              <Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+              <Download className='h-3 h-3 sm:h-4 sm:w-4 mr-1 sm:mr-2' />
               <span>Xuất Excel</span>
             </Button>
             <Dialog open={isAddCourseOpen} onOpenChange={setIsAddCourseOpen}>

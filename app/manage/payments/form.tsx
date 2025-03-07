@@ -59,6 +59,7 @@ import {
 import { DatePickerWithRange } from '@/components/ui/date-range-picker'
 import type { DateRange } from 'react-day-picker'
 import { addDays } from 'date-fns'
+import { exportToExcel, formatCurrency, formatPaymentStatus } from '@/lib/excel'
 
 // Sample payment data
 const payments = [
@@ -383,6 +384,45 @@ export default function PaymentsPage() {
   // Colors for charts
   const COLORS = ['#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe', '#ede9fe']
 
+  // Handle export to Excel
+  const handleExportExcel = () => {
+    const columns = [
+      { key: 'id', header: 'Mã thanh toán' },
+      { key: 'student.name', header: 'Học viên' },
+      { key: 'student.email', header: 'Email' },
+      { key: 'course.title', header: 'Khóa học' },
+      {
+        key: 'amount',
+        header: 'Số tiền',
+        format: (value: number) => formatCurrency(value)
+      },
+      { key: 'date', header: 'Ngày thanh toán' },
+      { key: 'method', header: 'Phương thức' },
+      {
+        key: 'status',
+        header: 'Trạng thái',
+        format: (value: string) => formatPaymentStatus(value)
+      },
+      { key: 'transactionId', header: 'Mã giao dịch' },
+      { key: 'invoiceNumber', header: 'Số hóa đơn' }
+    ]
+
+    // Transform nested data for export
+    const exportData = filteredPayments.map((payment) => ({
+      ...payment,
+      'student.name': payment.student.name,
+      'student.email': payment.student.email,
+      'course.title': payment.course.title
+    }))
+
+    exportToExcel({
+      filename: 'Danh_sach_thanh_toan',
+      sheetName: 'Thanh toán',
+      data: exportData,
+      columns
+    })
+  }
+
   return (
     <div className='min-h-screen bg-gradient-to-br from-[#0D0A25] to-[#1A1744] text-white p-6'>
       <div className='max-w-9xl mx-auto'>
@@ -391,6 +431,7 @@ export default function PaymentsPage() {
             <Button
               variant='outline'
               className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto text-xs sm:text-sm'
+              onClick={handleExportExcel}
             >
               <Download className='h-3 h-3 sm:h-4 sm:w-4 mr-1 sm:mr-2' />
               <span>Xuất Excel</span>

@@ -40,6 +40,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { exportToExcel } from '@/lib/excel'
 
 // Sample user data
 const users = [
@@ -198,6 +199,33 @@ export default function UsersPage() {
     }
   }
 
+  // Handle export to Excel
+  const handleExportExcel = () => {
+    const columns = [
+      { key: 'id', header: 'Mã người dùng' },
+      { key: 'name', header: 'Họ và tên' },
+      { key: 'email', header: 'Email' },
+      { key: 'role', header: 'Vai trò' },
+      { key: 'status', header: 'Trạng thái' },
+      { key: 'courses', header: 'Số khóa học' },
+      { key: 'lastLogin', header: 'Đăng nhập cuối' },
+      { key: 'joined', header: 'Ngày tham gia' }
+    ]
+
+    const exportData = filteredUsers.map((user) => ({
+      ...user,
+      role: user.role === 'Admin' ? 'Quản trị viên' : user.role === 'Instructor' ? 'Giảng viên' : 'Học viên',
+      status: user.status === 'active' ? 'Kích hoạt' : user.status === 'inactive' ? 'Tạm khóa' : 'Chờ xác nhận'
+    }))
+
+    exportToExcel({
+      filename: 'Danh_sach_nguoi_dung',
+      sheetName: 'Người dùng',
+      data: exportData,
+      columns: columns
+    })
+  }
+
   return (
     <div className='min-h-screen bg-gradient-to-br from-[#0D0A25] to-[#1A1744] text-white p-3 sm:p-6'>
       <div className='max-w-7xl mx-auto'>
@@ -208,6 +236,7 @@ export default function UsersPage() {
             <Button
               variant='outline'
               className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto text-xs sm:text-sm'
+              onClick={handleExportExcel}
             >
               <Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
               <span>Xuất Excel</span>

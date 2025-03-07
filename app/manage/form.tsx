@@ -20,6 +20,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import { Bar, BarChart, Line, LineChart, XAxis, YAxis, ResponsiveContainer } from 'recharts'
+import { exportToExcel, formatCurrency } from '@/lib/excel'
 
 export default function DashboardPage() {
   const [period, setPeriod] = useState('week')
@@ -58,6 +59,41 @@ export default function DashboardPage() {
     { id: 'PAY-004', user: 'Phạm Thị D', course: 'UI/UX Design', amount: '699.000đ', date: '12/06/2024' }
   ]
 
+  // Handle export to Excel
+  const handleExportExcel = () => {
+    const revenueColumns = [
+      { key: 'date', header: 'Tháng' },
+      {
+        key: 'revenue',
+        header: 'Doanh thu',
+        format: (value: number) => formatCurrency(value)
+      },
+      {
+        key: 'growth',
+        header: 'Tăng trưởng',
+        format: (value: number) => `${value.toFixed(1)}%`
+      }
+    ]
+
+    const revenueExportData = revenueData.map((data, index) => {
+      const prevRevenue = index > 0 ? revenueData[index - 1].revenue : data.revenue
+      const growth = ((data.revenue - prevRevenue) / prevRevenue) * 100
+
+      return {
+        date: new Date(data.date).toLocaleDateString('vi-VN', { month: 'long', year: 'numeric' }),
+        revenue: data.revenue,
+        growth
+      }
+    })
+
+    exportToExcel({
+      filename: 'Bao_cao_doanh_thu',
+      sheetName: 'Doanh thu',
+      data: revenueExportData,
+      columns: revenueColumns
+    })
+  }
+
   return (
     <div className='w-full p-3 sm:p-4 lg:p-6 max-w-[1400px] mx-auto'>
       {/* Header buttons */}
@@ -66,6 +102,7 @@ export default function DashboardPage() {
           <Button
             variant='outline'
             className='bg-gray-800 border-purple-500 hover:bg-purple-700 text-white w-full sm:w-auto text-xs sm:text-sm'
+            onClick={handleExportExcel}
           >
             <Download className='w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2' />
             <span>Xuất Excel</span>
