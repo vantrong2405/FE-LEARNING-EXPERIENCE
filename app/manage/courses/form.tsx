@@ -246,13 +246,13 @@ export default function CoursesPage() {
               className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto text-xs sm:text-sm'
               onClick={handleExportExcel}
             >
-              <Download className='h-3 h-3 sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+              <Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
               <span>Xuất Excel</span>
             </Button>
             <Dialog open={isAddCourseOpen} onOpenChange={setIsAddCourseOpen}>
               <DialogTrigger asChild>
                 <Button className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto text-xs sm:text-sm'>
-                  <Plus className='h-3 h-3 sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+                  <Plus className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
                   <span>Thêm Khóa Học</span>
                 </Button>
               </DialogTrigger>
