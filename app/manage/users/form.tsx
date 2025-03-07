@@ -212,17 +212,10 @@ export default function UsersPage() {
               <Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
               <span>Xuất Excel</span>
             </Button>
-            <Button
-              variant='outline'
-              className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto text-xs sm:text-sm'
-            >
-              <RefreshCw className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
-              <span>Làm mới</span>
-            </Button>
             <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
               <DialogTrigger asChild>
                 <Button className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto text-xs sm:text-sm'>
-                  <Plus className='h-3 sm:h-4 sm:w-4 mr-1 ' />
+                  <Plus className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
                   <span>Thêm Người Dùng</span>
                 </Button>
               </DialogTrigger>

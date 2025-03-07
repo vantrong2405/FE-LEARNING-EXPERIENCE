@@ -246,27 +246,20 @@ export default function FAQsPage() {
   return (
     <div className='min-h-screen bg-gradient-to-br from-[#0D0A25] to-[#1A1744] text-white p-6'>
       <div className='max-w-9xl mx-auto'>
-        <div className='flex items-center justify-between mb-6'>
-          <div>
-            <h1 className='text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600'>
-              Quản lý Câu Hỏi Thường Gặp
-            </h1>
-            <p className='text-gray-400 mt-1'>Quản lý tất cả các câu hỏi thường gặp trong hệ thống</p>
-          </div>
-          <div className='flex gap-3'>
-            <Button variant='outline' className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'>
-              <Download className='h-4 w-4 mr-2' />
-              Xuất Excel
-            </Button>
-            <Button variant='outline' className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'>
-              <RefreshCw className='h-4 w-4 mr-2' />
-              Làm mới
+        <div className='flex items-center justify-end mb-6'>
+          <div className='flex flex-col sm:flex-row gap-2 sm:gap-4'>
+            <Button
+              variant='outline'
+              className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto text-xs sm:text-sm'
+            >
+              <Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+              <span>Xuất Excel</span>
             </Button>
             <Dialog open={isAddFAQOpen} onOpenChange={setIsAddFAQOpen}>
               <DialogTrigger asChild>
-                <Button className='bg-purple-600 hover:bg-purple-700'>
-                  <Plus className='h-4 w-4 mr-2' />
-                  Thêm FAQ
+                <Button className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto text-xs sm:text-sm'>
+                  <Plus className='h-3 h-3 sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+                  <span>Thêm FAQ</span>
                 </Button>
               </DialogTrigger>
               <DialogContent className='bg-gray-900 border-gray-700 text-white max-w-2xl'>
