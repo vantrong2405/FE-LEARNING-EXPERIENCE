@@ -43,6 +43,7 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Textarea } from '@/components/ui/textarea'
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { exportToExcel } from '@/lib/excel'
 
 // Sample review data
 const reviews = [
@@ -367,24 +368,56 @@ export default function ReviewsPage() {
       ))
   }
 
+  // Handle export to Excel
+  const handleExportExcel = () => {
+    const columns = [
+      { key: 'id', header: 'Mã đánh giá' },
+      { key: 'student_name', header: 'Học viên' },
+      { key: 'student_email', header: 'Email' },
+      { key: 'course_title', header: 'Khóa học' },
+      { key: 'rating', header: 'Đánh giá' },
+      { key: 'title', header: 'Tiêu đề' },
+      { key: 'content', header: 'Nội dung' },
+      { key: 'helpful', header: 'Hữu ích' },
+      { key: 'unhelpful', header: 'Không hữu ích' },
+      { key: 'date', header: 'Ngày đánh giá' },
+      { key: 'status', header: 'Trạng thái' }
+    ]
+
+    const exportData = filteredReviews.map((review) => ({
+      id: review.id,
+      student_name: review.student.name,
+      student_email: review.student.email,
+      course_title: review.course.title,
+      rating: review.rating,
+      title: review.title,
+      content: review.content,
+      helpful: review.helpful,
+      unhelpful: review.unhelpful,
+      date: review.date,
+      status: review.status === 'approved' ? 'Đã duyệt' : review.status === 'rejected' ? 'Đã từ chối' : 'Chờ duyệt'
+    }))
+
+    exportToExcel({
+      filename: 'Danh_sach_danh_gia',
+      sheetName: 'Đánh giá',
+      data: exportData,
+      columns: columns
+    })
+  }
+
   return (
     <div className='min-h-screen bg-gradient-to-br from-[#0D0A25] to-[#1A1744] text-white p-6'>
       <div className='max-w-9xl mx-auto'>
-        <div className='flex items-center justify-between mb-6'>
-          <div>
-            <h1 className='text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600'>
-              Quản lý Đánh Giá
-            </h1>
-            <p className='text-gray-400 mt-1'>Quản lý đánh giá của học viên về các khóa học</p>
-          </div>
-          <div className='flex gap-3'>
-            <Button variant='outline' className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'>
-              <Download className='h-4 w-4 mr-2' />
-              Xuất Excel
-            </Button>
-            <Button variant='outline' className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'>
-              <RefreshCw className='h-4 w-4 mr-2' />
-              Làm mới
+        <div className='flex items-center justify-end mb-6'>
+          <div className='flex flex-col sm:flex-row gap-2 sm:gap-4'>
+            <Button
+              variant='outline'
+              className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto text-xs sm:text-sm'
+              onClick={handleExportExcel}
+            >
+              <Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+              <span>Xuất Excel</span>
             </Button>
           </div>
         </div>
