@@ -49,12 +49,12 @@ export const RegisterBody = z
       .max(100, 'Confirm Password must be at most 100 characters long'),
 
     dateOfBirth: z
-      .date({ required_error: 'Date of birth is required' }) // ✅ Bắt buộc chọn ngày
+      .date({ required_error: 'Date of birth is required' })
       .refine((date) => date instanceof Date && !isNaN(date.getTime()), {
         message: 'Invalid date format'
       }),
 
-    roleId: z.number({ required_error: 'RoleId is required' }).min(1, 'RoleId must not be left blank')
+    role: z.string({ required_error: 'RoleId is required' })
   })
 
   .strict()
@@ -64,12 +64,12 @@ export type RegisterBodyType = z.infer<typeof RegisterBody>
 export const RegisterRes = z.object({
   data: z.object({
     user: z.object({
-      id: z.number(),
+      id: z.string(),
       name: z.string(),
       username: z.string(),
       email: z.string().email(),
       dateOfBirth: z.date(),
-      roleId: z.number(),
+      role: z.number(),
       createdAt: z.string()
     }),
     message: z.string()
@@ -167,7 +167,7 @@ export type ResetPasswordBodyType = z.TypeOf<typeof ResetPasswordBody>
 export const GetMeRes = z.object({
   statusCode: z.number(),
   data: z.object({
-    id: z.number(),
+    id: z.string(),
     name: z.string(),
     email: z.string(),
     username: z.string(),
@@ -177,7 +177,7 @@ export const GetMeRes = z.object({
     avatarUrl: z.string().nullable(),
     courses: z.array(z.unknown()),
     reviews: z.array(z.unknown()),
-    roleId: z.number(),
+    role: z.string(),
     verify: z.number(),
     createdAt: z.string(),
     updatedAt: z.string()

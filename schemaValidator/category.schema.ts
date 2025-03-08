@@ -2,11 +2,11 @@ import { z } from 'zod'
 
 // Schema cho Instructor
 export const InstructorSchema = z.object({
-  id: z.number(),
+  id: z.string(),
   name: z.string(),
   username: z.string(),
   email: z.string(),
-  roleId: z.number(),
+  role: z.string(),
   verify: z.number(),
   status_account: z.number(),
   dateOfBirth: z.string(),
@@ -19,7 +19,7 @@ export const InstructorSchema = z.object({
 
 // Schema cho Course
 export const CourseSchema = z.object({
-  id: z.number(),
+  id: z.string(),
   title: z.string(),
   description: z.string(),
   price: z.number(),
@@ -33,7 +33,7 @@ export const CourseSchema = z.object({
 
 // Schema cho Category
 export const CategorySchema = z.object({
-  id: z.number(),
+  id: z.string(),
   name: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),

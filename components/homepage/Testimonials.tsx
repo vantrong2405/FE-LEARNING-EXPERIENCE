@@ -6,16 +6,14 @@ const testimonials = [
   {
     name: 'Sarah Johnson',
     role: 'Data Scientist',
-    image:
-      'https://static.vecteezy.com/system/resources/thumbnails/022/059/000/small/no-image-available-icon-vector.jpg',
+    image: 'https://p2amia.upertis.ac.id/wp-content/uploads/2017/12/instructor4.jpg',
     quote:
       "ELearn's courses have been instrumental in advancing my career in data science. The quality of instruction is unparalleled."
   },
   {
     name: 'Michael Chen',
     role: 'Software Engineer',
-    image:
-      'https://static.vecteezy.com/system/resources/thumbnails/022/059/000/small/no-image-available-icon-vector.jpg',
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkAJEkJQ1WumU0hXNpXdgBt9NUKc0QDVIiaw&s',
     quote:
       "I've taken multiple programming courses on ELearn, and each one has significantly improved my coding skills. Highly recommended!"
   },
@@ -23,7 +21,7 @@ const testimonials = [
     name: 'Emily Rodriguez',
     role: 'Marketing Manager',
     image:
-      'https://static.vecteezy.com/system/resources/thumbnails/022/059/000/small/no-image-available-icon-vector.jpg',
+      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbsB8JQHddPH1KvZYLJAUfjFJ5FTr9jd0wsn2mB968OxOaNP_IZSUEP_yo_Aii4GvQ9Zg&usqp=CAU',
     quote:
       'The digital marketing courses on ELearn have helped me stay ahead in this rapidly evolving field. Great investment in my professional growth.'
   }
