@@ -39,7 +39,7 @@ export default function RootLayout({
         </AppProvider>
         <AudioPlayer />
         <LazyLoading />
-        <NProgressHandler />
+        {/* <NProgressHandler /> */}
       </body>
     </html>
   )
