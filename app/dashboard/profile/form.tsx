@@ -95,7 +95,7 @@ export default function FormProfile() {
   }
 
   return (
-    <div className='min-h-screen w-full dark:bg-gray-90 p-8'>
+    <div className='min-h-screen w-full dark:bg-gray-900 p-8'>
       <div className='max-w-4xl mx-auto'>
         <h1 className='text-4xl font-bold mb-8 text-center mt-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600'>
           Account Management

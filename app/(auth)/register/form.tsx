@@ -44,7 +44,7 @@ export default function FormRegister() {
       password: '',
       confirmPassword: '',
       dateOfBirth: undefined,
-      roleId: undefined
+      role: undefined
     }
   })
 
@@ -222,7 +222,7 @@ export default function FormRegister() {
           </div>
           <div className='space-y-2'>
             <Label htmlFor='roleId'>Select Role</Label>
-            <Select onValueChange={(value) => form.setValue('roleId', Number(value))}>
+            <Select onValueChange={(value) => form.setValue('role', String(value))}>
               <SelectTrigger
                 className={`w-full dark:bg-gray-700 border-gray-600 placeholder-gray-400 ${form.formState.errors.confirmPassword ? 'border-red-500' : ''}`}
               >
@@ -231,14 +231,12 @@ export default function FormRegister() {
               <SelectContent>
                 <SelectGroup>
                   <SelectLabel>Role</SelectLabel>
-                  <SelectItem value='0'>User</SelectItem>
-                  <SelectItem value='1'>Intructer</SelectItem>
+                  <SelectItem value='User'>User</SelectItem>
+                  <SelectItem value='Instructor'>Intructer</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
-            {form.formState.errors.roleId && (
-              <p className='text-red-500 text-sm'>{form.formState.errors.roleId.message}</p>
-            )}
+            {form.formState.errors.role && <p className='text-red-500 text-sm'>{form.formState.errors.role.message}</p>}
           </div>
         </CardContent>
         <CardFooter className='flex flex-col space-y-4'>
