@@ -59,6 +59,7 @@ import {
 import { DatePickerWithRange } from '@/components/ui/date-range-picker'
 import type { DateRange } from 'react-day-picker'
 import { addDays } from 'date-fns'
+import { exportToExcel, formatCurrency, formatPaymentStatus } from '@/lib/excel'
 
 // Sample payment data
 const payments = [
@@ -383,30 +384,63 @@ export default function PaymentsPage() {
   // Colors for charts
   const COLORS = ['#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe', '#ede9fe']
 
+  // Handle export to Excel
+  const handleExportExcel = () => {
+    const columns = [
+      { key: 'id', header: 'Mã thanh toán' },
+      { key: 'student.name', header: 'Học viên' },
+      { key: 'student.email', header: 'Email' },
+      { key: 'course.title', header: 'Khóa học' },
+      {
+        key: 'amount',
+        header: 'Số tiền',
+        format: (value: number) => formatCurrency(value)
+      },
+      { key: 'date', header: 'Ngày thanh toán' },
+      { key: 'method', header: 'Phương thức' },
+      {
+        key: 'status',
+        header: 'Trạng thái',
+        format: (value: string) => formatPaymentStatus(value)
+      },
+      { key: 'transactionId', header: 'Mã giao dịch' },
+      { key: 'invoiceNumber', header: 'Số hóa đơn' }
+    ]
+
+    // Transform nested data for export
+    const exportData = filteredPayments.map((payment) => ({
+      ...payment,
+      'student.name': payment.student.name,
+      'student.email': payment.student.email,
+      'course.title': payment.course.title
+    }))
+
+    exportToExcel({
+      filename: 'Danh_sach_thanh_toan',
+      sheetName: 'Thanh toán',
+      data: exportData,
+      columns
+    })
+  }
+
   return (
     <div className='min-h-screen bg-gradient-to-br from-[#0D0A25] to-[#1A1744] text-white p-6'>
-      <div className='max-w-7xl mx-auto'>
-        <div className='flex items-center justify-between mb-6'>
-          <div>
-            <h1 className='text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600'>
-              Quản lý Thanh Toán
-            </h1>
-            <p className='text-gray-400 mt-1'>Quản lý tất cả các giao dịch thanh toán trong hệ thống</p>
-          </div>
-          <div className='flex gap-3'>
-            <Button variant='outline' className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'>
-              <Download className='h-4 w-4 mr-2' />
-              Xuất Excel
-            </Button>
-            <Button variant='outline' className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'>
-              <RefreshCw className='h-4 w-4 mr-2' />
-              Làm mới
+      <div className='max-w-9xl mx-auto'>
+        <div className='flex items-center justify-end mb-6'>
+          <div className='flex flex-col sm:flex-row gap-2 sm:gap-4'>
+            <Button
+              variant='outline'
+              className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto text-xs sm:text-sm'
+              onClick={handleExportExcel}
+            >
+              <Download className='h-3 h-3 sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+              <span>Xuất Excel</span>
             </Button>
             <Dialog open={isAddPaymentOpen} onOpenChange={setIsAddPaymentOpen}>
               <DialogTrigger asChild>
-                <Button className='bg-purple-600 hover:bg-purple-700'>
-                  <Plus className='h-4 w-4 mr-2' />
-                  Tạo Thanh Toán
+                <Button className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto text-xs sm:text-sm'>
+                  <Plus className='h-3 h-3 sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+                  <span>Tạo Thanh Toán</span>
                 </Button>
               </DialogTrigger>
               <DialogContent className='bg-gray-900 border-gray-700 text-white max-w-2xl'>

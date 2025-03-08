@@ -188,7 +188,7 @@ const QRPayment = () => {
                   className='bg-purple-600 hover:bg-purple-700 text-white transition duration-300 ease-in-out transform hover:scale-105'
                 >
                   {paymentStatus === 'checking' ? (
-                    <RefreshCw className='mr-2 h-4 w-4 animate-spin' />
+                    <RefreshCw className='mr-2 h-4 w-4' />
                   ) : (
                     <RefreshCw className='mr-2 h-4 w-4' />
                   )}

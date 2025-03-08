@@ -47,6 +47,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
+import { exportToExcel, formatCurrency } from '@/lib/excel'
 
 // Sample course data
 const courses = [
@@ -206,30 +207,53 @@ export default function CoursesPage() {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
   }
 
+  // Handle export to Excel
+  const handleExportExcel = () => {
+    const columns = [
+      { key: 'id', header: 'Mã khóa học' },
+      { key: 'title', header: 'Tên khóa học' },
+      { key: 'instructor', header: 'Giảng viên' },
+      {
+        key: 'price',
+        header: 'Giá',
+        format: (value: number) => formatCurrency(value)
+      },
+      { key: 'category', header: 'Danh mục' },
+      { key: 'students', header: 'Số học viên' },
+      {
+        key: 'rating',
+        header: 'Đánh giá',
+        format: (value: number) => value.toFixed(1)
+      },
+      { key: 'created', header: 'Ngày tạo' }
+    ]
+
+    exportToExcel({
+      filename: 'Danh_sach_khoa_hoc',
+      sheetName: 'Khóa học',
+      data: filteredCourses,
+      columns
+    })
+  }
+
   return (
     <div className='min-h-screen bg-gradient-to-br from-[#0D0A25] to-[#1A1744] text-white p-6'>
-      <div className='max-w-7xl mx-auto'>
-        <div className='flex items-center justify-between mb-6'>
-          <div>
-            <h1 className='text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600'>
-              Quản lý Khóa Học
-            </h1>
-            <p className='text-gray-400 mt-1'>Quản lý tất cả khóa học trong hệ thống</p>
-          </div>
-          <div className='flex gap-3'>
-            <Button variant='outline' className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'>
-              <Download className='h-4 w-4 mr-2' />
-              Xuất Excel
-            </Button>
-            <Button variant='outline' className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'>
-              <RefreshCw className='h-4 w-4 mr-2' />
-              Làm mới
+      <div className='max-w-9xl mx-auto'>
+        <div className='flex items-center justify-end mb-6'>
+          <div className='flex flex-col sm:flex-row gap-2 sm:gap-4'>
+            <Button
+              variant='outline'
+              className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto text-xs sm:text-sm'
+              onClick={handleExportExcel}
+            >
+              <Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+              <span>Xuất Excel</span>
             </Button>
             <Dialog open={isAddCourseOpen} onOpenChange={setIsAddCourseOpen}>
               <DialogTrigger asChild>
-                <Button className='bg-purple-600 hover:bg-purple-700'>
-                  <Plus className='h-4 w-4 mr-2' />
-                  Thêm Khóa Học
+                <Button className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto text-xs sm:text-sm'>
+                  <Plus className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+                  <span>Thêm Khóa Học</span>
                 </Button>
               </DialogTrigger>
               <DialogContent className='bg-gray-900 border-gray-700 text-white max-w-4xl max-h-[90vh] overflow-y-auto'>

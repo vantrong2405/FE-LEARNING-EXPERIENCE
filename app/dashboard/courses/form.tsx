@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useCourseQuery } from '@/queries/useCourse'
+import { useCourseQuery, useSearchCourseQuery } from '@/queries/useCourse'
 import { useCategoryListQuery } from '@/queries/useCategory'
 import { useLevelListQuery } from '@/queries/useLevel'
 import { pagination } from '@/constants/pagination-config'
@@ -32,6 +32,8 @@ export default function CoursesPage() {
   const [priceRange, setPriceRange] = useState([0, 1000000])
   const [searchQuery, setSearchQuery] = useState('')
   const [filteredCourses, setFilteredCourses] = useState(courses)
+  const searchCourseQuery = useSearchCourseQuery(pagination.LIMIT, pagination.PAGE, searchQuery)
+  const searchCourse = searchCourseQuery.data?.payload.data.data ?? []
 
   useEffect(() => {
     if (!courses.length) return
@@ -263,7 +265,7 @@ export default function CoursesPage() {
                       </span>
                     )}
                   </div>
-                  <Link href={pathURL.courses_detail(course.id ?? 1)}>
+                  <Link href={pathURL.courses_detail(course.id ?? '')}>
                     {' '}
                     {/* Tránh truyền giá trị cố định */}
                     <Button className='bg-purple-600 hover:bg-purple-700 text-white'>View Details</Button>
@@ -329,7 +331,7 @@ export default function CoursesPage() {
                       {course.price.toLocaleString()}đ
                     </span>
                   </div>
-                  <Link href={pathURL.courses_detail(1)}>
+                  <Link href={pathURL.courses_detail(course.id)}>
                     <Button className='bg-purple-600 hover:bg-purple-700 text-white'>View Details</Button>
                   </Link>
                 </div>

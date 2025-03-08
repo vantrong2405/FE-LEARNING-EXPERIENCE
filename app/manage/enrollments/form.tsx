@@ -47,6 +47,7 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
+import { exportToExcel, formatCurrency } from '@/lib/excel'
 
 // Sample enrollment data
 const enrollments = [
@@ -331,24 +332,47 @@ export default function EnrollmentsPage() {
     return { id: courseId, title: course.title }
   })
 
+  // Handle export to Excel
+  const handleExportExcel = () => {
+    const columns = [
+      { key: 'id', header: 'Mã ghi danh' },
+      { key: 'student.name', header: 'Học viên' },
+      { key: 'student.email', header: 'Email' },
+      { key: 'course.title', header: 'Khóa học' },
+      { key: 'enrollmentDate', header: 'Ngày ghi danh' },
+      { key: 'status', header: 'Trạng thái' },
+      { key: 'progress', header: 'Tiến độ' },
+      { key: 'completionDate', header: 'Ngày hoàn thành' }
+    ]
+
+    // Transform nested data for export
+    const exportData = filteredEnrollments.map((enrollment) => ({
+      ...enrollment,
+      'student.name': enrollment.student.name,
+      'student.email': enrollment.student.email,
+      'course.title': enrollment.course.title
+    }))
+
+    exportToExcel({
+      filename: 'Danh_sach_ghi_danh',
+      sheetName: 'Ghi danh',
+      data: exportData,
+      columns
+    })
+  }
+
   return (
     <div className='min-h-screen bg-gradient-to-br from-[#0D0A25] to-[#1A1744] text-white p-6'>
-      <div className='max-w-7xl mx-auto'>
-        <div className='flex items-center justify-between mb-6'>
-          <div>
-            <h1 className='text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600'>
-              Quản lý Học Viên
-            </h1>
-            <p className='text-gray-400 mt-1'>Quản lý đăng ký khóa học và thanh toán của học viên</p>
-          </div>
-          <div className='flex gap-3'>
-            <Button variant='outline' className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'>
-              <Download className='h-4 w-4 mr-2' />
-              Xuất Excel
-            </Button>
-            <Button variant='outline' className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'>
-              <RefreshCw className='h-4 w-4 mr-2' />
-              Làm mới
+      <div className='max-w-9xl mx-auto'>
+        <div className='flex items-center justify-end mb-6'>
+          <div className='flex flex-col sm:flex-row gap-2 sm:gap-4'>
+            <Button
+              variant='outline'
+              className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto text-xs sm:text-sm'
+              onClick={handleExportExcel}
+            >
+              <Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+              <span>Xuất Excel</span>
             </Button>
           </div>
         </div>

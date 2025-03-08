@@ -7,3 +7,15 @@ export const useCourseQuery = (page: number, limit: number) => {
     queryFn: () => courseApiRequest.list(page, limit)
   })
 }
+export const useGetCourseQuery = (id: string) => {
+  return useQuery({
+    queryKey: ['course', id],
+    queryFn: () => courseApiRequest.getCourse(id)
+  })
+}
+export const useSearchCourseQuery = (limit: number, page: number, query: string) => {
+  return useQuery({
+    queryKey: ['course', page, limit, query],
+    queryFn: () => courseApiRequest.courseSearch(page, limit, query)
+  })
+}

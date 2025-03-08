@@ -2,9 +2,7 @@
 
 import { useState } from 'react'
 import {
-  Users,
   Search,
-  Filter,
   Plus,
   Edit,
   Trash2,
@@ -14,7 +12,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Download,
-  RefreshCw
+  RefreshCw,
+  Menu
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -40,6 +39,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { exportToExcel } from '@/lib/excel'
 
 // Sample user data
 const users = [
@@ -198,33 +199,56 @@ export default function UsersPage() {
     }
   }
 
+  // Handle export to Excel
+  const handleExportExcel = () => {
+    const columns = [
+      { key: 'id', header: 'Mã người dùng' },
+      { key: 'name', header: 'Họ và tên' },
+      { key: 'email', header: 'Email' },
+      { key: 'role', header: 'Vai trò' },
+      { key: 'status', header: 'Trạng thái' },
+      { key: 'courses', header: 'Số khóa học' },
+      { key: 'lastLogin', header: 'Đăng nhập cuối' },
+      { key: 'joined', header: 'Ngày tham gia' }
+    ]
+
+    const exportData = filteredUsers.map((user) => ({
+      ...user,
+      role: user.role === 'Admin' ? 'Quản trị viên' : user.role === 'Instructor' ? 'Giảng viên' : 'Học viên',
+      status: user.status === 'active' ? 'Kích hoạt' : user.status === 'inactive' ? 'Tạm khóa' : 'Chờ xác nhận'
+    }))
+
+    exportToExcel({
+      filename: 'Danh_sach_nguoi_dung',
+      sheetName: 'Người dùng',
+      data: exportData,
+      columns: columns
+    })
+  }
+
   return (
-    <div className='min-h-screen bg-gradient-to-br from-[#0D0A25] to-[#1A1744] text-white p-6'>
+    <div className='min-h-screen bg-gradient-to-br from-[#0D0A25] to-[#1A1744] text-white p-3 sm:p-6'>
       <div className='max-w-7xl mx-auto'>
-        <div className='flex items-center justify-between mb-6'>
-          <div>
-            <h1 className='text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600'>
-              Quản lý Người Dùng
-            </h1>
-            <p className='text-gray-400 mt-1'>Quản lý tất cả người dùng trong hệ thống</p>
-          </div>
-          <div className='flex gap-3'>
-            <Button variant='outline' className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'>
-              <Download className='h-4 w-4 mr-2' />
-              Xuất Excel
-            </Button>
-            <Button variant='outline' className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'>
-              <RefreshCw className='h-4 w-4 mr-2' />
-              Làm mới
+        {/* Header Section - Responsive */}
+        <div className='flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6'>
+          {/* Desktop Action Buttons */}
+          <div className='flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto sm:ml-auto'>
+            <Button
+              variant='outline'
+              className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto text-xs sm:text-sm'
+              onClick={handleExportExcel}
+            >
+              <Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+              <span>Xuất Excel</span>
             </Button>
             <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
               <DialogTrigger asChild>
-                <Button className='bg-purple-600 hover:bg-purple-700'>
-                  <Plus className='h-4 w-4 mr-2' />
-                  Thêm Người Dùng
+                <Button className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto text-xs sm:text-sm'>
+                  <Plus className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+                  <span>Thêm Người Dùng</span>
                 </Button>
               </DialogTrigger>
-              <DialogContent className='bg-gray-900 border-gray-700 text-white max-w-2xl'>
+              <DialogContent className='bg-gray-900 border-gray-700 text-white max-w-2xl max-h-[90vh] overflow-y-auto'>
                 <DialogHeader>
                   <DialogTitle className='text-xl text-purple-400'>Thêm Người Dùng Mới</DialogTitle>
                   <DialogDescription className='text-gray-400'>
@@ -303,7 +327,7 @@ export default function UsersPage() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className='col-span-2 space-y-2'>
+                  <div className='col-span-1 md:col-span-2 space-y-2'>
                     <Label htmlFor='bio' className='text-white'>
                       Thông tin thêm
                     </Label>
@@ -315,30 +339,33 @@ export default function UsersPage() {
                     />
                   </div>
                 </div>
-                <DialogFooter>
+                <DialogFooter className='flex-col sm:flex-row gap-2 sm:gap-0'>
                   <Button
                     variant='outline'
                     onClick={() => setIsAddUserOpen(false)}
-                    className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
+                    className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto'
                   >
                     Hủy
                   </Button>
-                  <Button className='bg-purple-600 hover:bg-purple-700'>Tạo người dùng</Button>
+                  <Button className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto'>Tạo người dùng</Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
           </div>
         </div>
 
+        {/* Filter Card - Responsive */}
         <Card className='bg-gray-900 border-gray-700 shadow-xl mb-6'>
-          <CardHeader>
-            <CardTitle className='text-xl text-purple-400'>Bộ lọc</CardTitle>
-            <CardDescription className='text-gray-400'>Lọc danh sách người dùng theo các tiêu chí</CardDescription>
+          <CardHeader className='p-4 sm:p-6'>
+            <CardTitle className='text-lg sm:text-xl text-purple-400'>Bộ lọc</CardTitle>
+            <CardDescription className='text-gray-400 text-xs sm:text-sm'>
+              Lọc danh sách người dùng theo các tiêu chí
+            </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+          <CardContent className='p-4 sm:p-6 pt-0'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
               <div>
-                <Label htmlFor='search' className='text-white mb-2 block'>
+                <Label htmlFor='search' className='text-white mb-2 block text-sm'>
                   Tìm kiếm
                 </Label>
                 <div className='relative'>
@@ -354,7 +381,7 @@ export default function UsersPage() {
                 </div>
               </div>
               <div>
-                <Label htmlFor='role' className='text-white mb-2 block'>
+                <Label htmlFor='role' className='text-white mb-2 block text-sm'>
                   Vai trò
                 </Label>
                 <Select value={selectedRole} onValueChange={setSelectedRole}>
@@ -370,7 +397,7 @@ export default function UsersPage() {
                 </Select>
               </div>
               <div>
-                <Label htmlFor='status' className='text-white mb-2 block'>
+                <Label htmlFor='status' className='text-white mb-2 block text-sm'>
                   Trạng thái
                 </Label>
                 <Select value={selectedStatus} onValueChange={setSelectedStatus}>
@@ -389,103 +416,119 @@ export default function UsersPage() {
           </CardContent>
         </Card>
 
+        {/* Users List Card - Responsive */}
         <Card className='bg-gray-900 border-gray-700 shadow-xl'>
-          <CardHeader>
-            <div className='flex justify-between items-center'>
+          <CardHeader className='p-4 sm:p-6'>
+            <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3'>
               <div>
-                <CardTitle className='text-xl text-purple-400'>Danh sách người dùng</CardTitle>
-                <CardDescription className='text-gray-400'>
+                <CardTitle className='text-lg sm:text-xl text-purple-400'>Danh sách người dùng</CardTitle>
+                <CardDescription className='text-gray-400 text-xs sm:text-sm'>
                   {filteredUsers.length} người dùng được tìm thấy
                 </CardDescription>
               </div>
               {selectedUsers.length > 0 && (
-                <div className='flex items-center gap-2'>
-                  <span className='text-sm text-gray-400'>Đã chọn {selectedUsers.length} người dùng</span>
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
-                  >
-                    <CheckCircle className='h-4 w-4 mr-1' /> Kích hoạt
-                  </Button>
-                  <Button
-                    variant='outline'
-                    size='sm'
-                    className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
-                  >
-                    <XCircle className='h-4 w-4 mr-1' /> Tạm khóa
-                  </Button>
-                  <Button variant='destructive' size='sm'>
-                    <Trash2 className='h-4 w-4 mr-1' /> Xóa
-                  </Button>
+                <div className='flex flex-wrap items-center gap-2 w-full sm:w-auto'>
+                  <span className='text-xs sm:text-sm text-gray-400'>Đã chọn {selectedUsers.length} người dùng</span>
+                  <div className='flex flex-wrap gap-2 w-full sm:w-auto'>
+                    <Button
+                      variant='outline'
+                      size='sm'
+                      className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white text-xs'
+                    >
+                      <CheckCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-1' /> Kích hoạt
+                    </Button>
+                    <Button
+                      variant='outline'
+                      size='sm'
+                      className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white text-xs'
+                    >
+                      <XCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-1' /> Tạm khóa
+                    </Button>
+                    <Button variant='destructive' size='sm' className='text-xs'>
+                      <Trash2 className='h-3 w-3 sm:h-4 sm:w-4 mr-1' /> Xóa
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>
           </CardHeader>
-          <CardContent>
-            <div className='overflow-x-auto'>
-              <table className='w-full'>
+          <CardContent className='p-4 sm:p-6 pt-0'>
+            {/* Responsive Table with Horizontal Scroll */}
+            <div className='overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0'>
+              <table className='w-full min-w-[800px]'>
                 <thead>
                   <tr className='border-b border-gray-800'>
-                    <th className='text-left py-3 px-4'>
+                    <th className='text-left py-2 sm:py-3 px-2 sm:px-4'>
                       <Checkbox
                         checked={selectedUsers.length === currentUsers.length && currentUsers.length > 0}
                         onCheckedChange={handleSelectAll}
                         className='border-gray-600'
                       />
                     </th>
-                    <th className='text-left py-3 px-4 text-gray-400 font-medium'>Tên</th>
-                    <th className='text-left py-3 px-4 text-gray-400 font-medium'>Email</th>
-                    <th className='text-left py-3 px-4 text-gray-400 font-medium'>Vai trò</th>
-                    <th className='text-left py-3 px-4 text-gray-400 font-medium'>Trạng thái</th>
-                    <th className='text-left py-3 px-4 text-gray-400 font-medium'>Đăng nhập cuối</th>
-                    <th className='text-left py-3 px-4 text-gray-400 font-medium'>Hành động</th>
+                    <th className='text-left py-2 sm:py-3 px-2 sm:px-4 text-gray-400 font-medium text-xs sm:text-sm'>
+                      Tên
+                    </th>
+                    <th className='text-left py-2 sm:py-3 px-2 sm:px-4 text-gray-400 font-medium text-xs sm:text-sm'>
+                      Email
+                    </th>
+                    <th className='text-left py-2 sm:py-3 px-2 sm:px-4 text-gray-400 font-medium text-xs sm:text-sm'>
+                      Vai trò
+                    </th>
+                    <th className='text-left py-2 sm:py-3 px-2 sm:px-4 text-gray-400 font-medium text-xs sm:text-sm'>
+                      Trạng thái
+                    </th>
+                    <th className='text-left py-2 sm:py-3 px-2 sm:px-4 text-gray-400 font-medium text-xs sm:text-sm'>
+                      Đăng nhập cuối
+                    </th>
+                    <th className='text-left py-2 sm:py-3 px-2 sm:px-4 text-gray-400 font-medium text-xs sm:text-sm'>
+                      Hành động
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {currentUsers.map((user) => (
                     <tr key={user.id} className='border-b border-gray-800 hover:bg-gray-800/50'>
-                      <td className='py-3 px-4'>
+                      <td className='py-2 sm:py-3 px-2 sm:px-4'>
                         <Checkbox
                           checked={selectedUsers.includes(user.id)}
                           onCheckedChange={() => handleSelectUser(user.id)}
                           className='border-gray-600'
                         />
                       </td>
-                      <td className='py-3 px-4'>
+                      <td className='py-2 sm:py-3 px-2 sm:px-4'>
                         <div className='flex items-center'>
-                          <div className='w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center mr-3'>
-                            <span className='font-semibold'>{user.name.charAt(0)}</span>
+                          <div className='w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-purple-600 flex items-center justify-center mr-2 sm:mr-3'>
+                            <span className='font-semibold text-xs sm:text-sm'>{user.name.charAt(0)}</span>
                           </div>
                           <div>
-                            <div className='font-medium'>{user.name}</div>
+                            <div className='font-medium text-xs sm:text-sm'>{user.name}</div>
                             <div className='text-xs text-gray-400'>Tham gia: {user.joined}</div>
                           </div>
                         </div>
                       </td>
-                      <td className='py-3 px-4 text-gray-300'>{user.email}</td>
-                      <td className='py-3 px-4'>
+                      <td className='py-2 sm:py-3 px-2 sm:px-4 text-gray-300 text-xs sm:text-sm'>{user.email}</td>
+                      <td className='py-2 sm:py-3 px-2 sm:px-4'>
                         <Badge
-                          className={
+                          className={`text-xs ${
                             user.role === 'Admin'
                               ? 'bg-red-900/30 text-red-500 hover:bg-red-900/40'
                               : user.role === 'Instructor'
                                 ? 'bg-blue-900/30 text-blue-500 hover:bg-blue-900/40'
                                 : 'bg-green-900/30 text-green-500 hover:bg-green-900/40'
-                          }
+                          }`}
                         >
                           {user.role}
                         </Badge>
                       </td>
-                      <td className='py-3 px-4'>
+                      <td className='py-2 sm:py-3 px-2 sm:px-4'>
                         <Badge
-                          className={
+                          className={`text-xs ${
                             user.status === 'active'
                               ? 'bg-green-900/30 text-green-500 hover:bg-green-900/40'
                               : user.status === 'inactive'
                                 ? 'bg-red-900/30 text-red-500 hover:bg-red-900/40'
                                 : 'bg-yellow-900/30 text-yellow-500 hover:bg-yellow-900/40'
-                          }
+                          }`}
                         >
                           {user.status === 'active'
                             ? 'Kích hoạt'
@@ -494,41 +537,41 @@ export default function UsersPage() {
                               : 'Chờ xác nhận'}
                         </Badge>
                       </td>
-                      <td className='py-3 px-4 text-gray-300'>{user.lastLogin}</td>
-                      <td className='py-3 px-4'>
+                      <td className='py-2 sm:py-3 px-2 sm:px-4 text-gray-300 text-xs sm:text-sm'>{user.lastLogin}</td>
+                      <td className='py-2 sm:py-3 px-2 sm:px-4'>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant='ghost'
                               size='icon'
-                              className='h-8 w-8 text-gray-400 hover:text-white hover:bg-gray-800'
+                              className='h-7 w-7 sm:h-8 sm:w-8 text-gray-400 hover:text-white hover:bg-gray-800'
                             >
                               <MoreHorizontal className='h-4 w-4' />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent className='bg-gray-800 border-gray-700 text-white'>
-                            <DropdownMenuLabel>Hành động</DropdownMenuLabel>
+                            <DropdownMenuLabel className='text-xs sm:text-sm'>Hành động</DropdownMenuLabel>
                             <DropdownMenuSeparator className='bg-gray-700' />
                             <DropdownMenuItem
-                              className='hover:bg-gray-700 cursor-pointer'
+                              className='hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'
                               onClick={() => handleEditUser(user)}
                             >
-                              <Edit className='h-4 w-4 mr-2' /> Chỉnh sửa
+                              <Edit className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Chỉnh sửa
                             </DropdownMenuItem>
-                            <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer'>
+                            <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'>
                               {user.status === 'active' ? (
                                 <>
-                                  <XCircle className='h-4 w-4 mr-2' /> Tạm khóa
+                                  <XCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Tạm khóa
                                 </>
                               ) : (
                                 <>
-                                  <CheckCircle className='h-4 w-4 mr-2' /> Kích hoạt
+                                  <CheckCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Kích hoạt
                                 </>
                               )}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className='bg-gray-700' />
-                            <DropdownMenuItem className='text-red-500 hover:bg-gray-700 cursor-pointer'>
-                              <Trash2 className='h-4 w-4 mr-2' /> Xóa
+                            <DropdownMenuItem className='text-red-500 hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'>
+                              <Trash2 className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Xóa
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -539,19 +582,19 @@ export default function UsersPage() {
               </table>
             </div>
 
-            {/* Pagination */}
-            <div className='flex items-center justify-between mt-6'>
-              <div className='text-sm text-gray-400'>
+            {/* Responsive Pagination */}
+            <div className='flex flex-col sm:flex-row items-center justify-between gap-4 mt-6'>
+              <div className='text-xs sm:text-sm text-gray-400 order-2 sm:order-1'>
                 Hiển thị {indexOfFirstUser + 1}-{Math.min(indexOfLastUser, filteredUsers.length)} trong số{' '}
                 {filteredUsers.length} người dùng
               </div>
-              <div className='flex items-center space-x-2'>
+              <div className='flex items-center space-x-1 sm:space-x-2 order-1 sm:order-2'>
                 <Button
                   variant='outline'
                   size='icon'
                   onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                   disabled={currentPage === 1}
-                  className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
+                  className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white h-8 w-8 sm:h-9 sm:w-9'
                 >
                   <ChevronLeft className='h-4 w-4' />
                 </Button>
@@ -561,11 +604,11 @@ export default function UsersPage() {
                     variant={currentPage === page ? 'default' : 'outline'}
                     size='sm'
                     onClick={() => setCurrentPage(page)}
-                    className={
+                    className={`text-xs ${
                       currentPage === page
                         ? 'bg-purple-600 hover:bg-purple-700'
                         : 'bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
-                    }
+                    }`}
                   >
                     {page}
                   </Button>
@@ -575,7 +618,7 @@ export default function UsersPage() {
                   size='icon'
                   onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                   disabled={currentPage === totalPages}
-                  className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
+                  className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white h-8 w-8 sm:h-9 sm:w-9'
                 >
                   <ChevronRight className='h-4 w-4' />
                 </Button>
@@ -584,17 +627,17 @@ export default function UsersPage() {
           </CardContent>
         </Card>
 
-        {/* Edit User Dialog */}
+        {/* Edit User Dialog - Responsive */}
         {currentUser && (
           <Dialog open={isEditUserOpen} onOpenChange={setIsEditUserOpen}>
-            <DialogContent className='bg-gray-900 border-gray-700 text-white max-w-2xl'>
+            <DialogContent className='bg-gray-900 border-gray-700 text-white max-w-2xl max-h-[90vh] overflow-y-auto'>
               <DialogHeader>
                 <DialogTitle className='text-xl text-purple-400'>Chỉnh sửa Người Dùng</DialogTitle>
-                <DialogDescription className='text-gray-400'>Cập nhật thông tin người dùng</DialogDescription>
+                <DialogDescription className='text-gray-400 text-sm'>Cập nhật thông tin người dùng</DialogDescription>
               </DialogHeader>
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4 py-4'>
                 <div className='space-y-2'>
-                  <Label htmlFor='edit-firstName' className='text-white'>
+                  <Label htmlFor='edit-firstName' className='text-white text-sm'>
                     Họ
                   </Label>
                   <Input
@@ -604,7 +647,7 @@ export default function UsersPage() {
                   />
                 </div>
                 <div className='space-y-2'>
-                  <Label htmlFor='edit-lastName' className='text-white'>
+                  <Label htmlFor='edit-lastName' className='text-white text-sm'>
                     Tên
                   </Label>
                   <Input
@@ -614,7 +657,7 @@ export default function UsersPage() {
                   />
                 </div>
                 <div className='space-y-2'>
-                  <Label htmlFor='edit-email' className='text-white'>
+                  <Label htmlFor='edit-email' className='text-white text-sm'>
                     Email
                   </Label>
                   <Input
@@ -625,13 +668,13 @@ export default function UsersPage() {
                   />
                 </div>
                 <div className='space-y-2'>
-                  <Label htmlFor='edit-phone' className='text-white'>
+                  <Label htmlFor='edit-phone' className='text-white text-sm'>
                     Số điện thoại
                   </Label>
                   <Input id='edit-phone' placeholder='0912345678' className='bg-gray-800 border-gray-700 text-white' />
                 </div>
                 <div className='space-y-2'>
-                  <Label htmlFor='edit-role' className='text-white'>
+                  <Label htmlFor='edit-role' className='text-white text-sm'>
                     Vai trò
                   </Label>
                   <Select defaultValue={currentUser.role.toLowerCase()}>
@@ -646,7 +689,7 @@ export default function UsersPage() {
                   </Select>
                 </div>
                 <div className='space-y-2'>
-                  <Label htmlFor='edit-status' className='text-white'>
+                  <Label htmlFor='edit-status' className='text-white text-sm'>
                     Trạng thái
                   </Label>
                   <Select defaultValue={currentUser.status}>
@@ -660,8 +703,8 @@ export default function UsersPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className='col-span-2 space-y-2'>
-                  <Label htmlFor='edit-bio' className='text-white'>
+                <div className='col-span-1 md:col-span-2 space-y-2'>
+                  <Label htmlFor='edit-bio' className='text-white text-sm'>
                     Thông tin thêm
                   </Label>
                   <textarea
@@ -672,15 +715,15 @@ export default function UsersPage() {
                   />
                 </div>
               </div>
-              <DialogFooter>
+              <DialogFooter className='flex-col sm:flex-row gap-2 sm:gap-0'>
                 <Button
                   variant='outline'
                   onClick={() => setIsEditUserOpen(false)}
-                  className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
+                  className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto'
                 >
                   Hủy
                 </Button>
-                <Button className='bg-purple-600 hover:bg-purple-700'>Lưu thay đổi</Button>
+                <Button className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto'>Lưu thay đổi</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
