@@ -5,21 +5,7 @@ import type React from 'react'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import {
-  Home,
-  Users,
-  BookOpen,
-  Star,
-  MessageSquare,
-  Settings,
-  LogOut,
-  Bell,
-  Search,
-  Menu,
-  X,
-  HelpCircle,
-  Receipt
-} from 'lucide-react'
+import { Home, Users, BookOpen, Star, Settings, LogOut, Bell, Search, Menu, X, HelpCircle, Receipt } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog'
@@ -38,6 +24,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { href: '/manage/users', label: 'Người dùng', icon: Users },
     { href: '/manage/courses', label: 'Khóa học', icon: BookOpen },
     { href: '/manage/enrollments', label: 'Đăng ký', icon: BookOpen },
+    { href: '/manage/lessons', label: 'Lesson', icon: BookOpen },
+    { href: '/manage/videos', label: 'Videos', icon: BookOpen },
     { href: '/manage/reviews', label: 'Đánh giá', icon: Star },
     { href: '/manage/payments', label: 'Thanh toán', icon: Receipt },
     { href: '/manage/faqs', label: 'FAQs', icon: HelpCircle }

@@ -8,18 +8,21 @@ import { Badge } from '@/components/ui/badge'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Star, Clock, Users, PlayCircle, FileText, Download, Globe, CheckCircle, Coffee, Award } from 'lucide-react'
 import Carousel from '@/components/courses/related-courses'
-import { weeksAgo } from '@/lib/utils'
+import { handleErrorApi, weeksAgo } from '@/lib/utils'
 import { useCourseQuery, useGetCourseQuery, useSearchCourseQuery } from '@/queries/useCourse'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useRef, useState } from 'react'
 import { pagination } from '@/constants/pagination-config'
 import Link from 'next/link'
 import { pathURL } from '@/constants/path'
+import { useCartMutation } from '@/queries/useCart'
+import { CartBodyType } from '@/schemaValidator/cart.schema'
 
 const placeholderImage =
   'https://img.freepik.com/free-vector/students-using-e-learning-platform-video-laptop-graduation-cap-online-education-platform-e-learning-platform-online-teaching-concept_335657-795.jpg'
 
 export default function CoursePage() {
+  const router = useRouter()
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const { id } = useParams()
@@ -27,6 +30,7 @@ export default function CoursePage() {
 
   const getCourse = useGetCourseQuery(courseId)
   const course = getCourse.data?.payload.data
+  const cartMutation = useCartMutation()
   const courseQuery = useCourseQuery(3, pagination.PAGE)
   const courses = courseQuery.data?.payload.data.data ?? []
 
@@ -37,6 +41,17 @@ export default function CoursePage() {
       videoRef.current.load()
       videoRef.current.play()
     }
+  }
+
+  const handleAddCart = (body: CartBodyType) => {
+    cartMutation.mutate(body, {
+      onSuccess: (data) => {
+        router.push(pathURL.cart)
+      },
+      onError: (error) => {
+        handleErrorApi({ error })
+      }
+    })
   }
 
   return (
@@ -93,9 +108,13 @@ export default function CoursePage() {
               className='rounded-lg mb-6 mx-auto'
             />
             <div className='text-4xl font-bold mb-6 text-purple-400'>${course?.price}</div>
-            <Button className='w-full text-lg py-6 mb-6 bg-purple-400 hover:bg-purple-700 text-white'>
-              Enroll Now
+            <Button
+              onClick={() => handleAddCart({ courseId: course?.id as string })}
+              className='w-full text-lg py-6 mb-6 bg-purple-400 hover:bg-purple-700 text-white'
+            >
+              Add Cart
             </Button>
+
             <div className='text-center text-gray-700 dark:text-gray-300 mb-6'>30-Day Money-Back Guarantee</div>
             <div className='space-y-4'>
               <div className='flex items-center'>

@@ -3,36 +3,15 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useCourseQuery } from '@/queries/useCourse'
+import { pagination } from '@/constants/pagination-config'
 import { pathURL } from '@/constants/path'
 
-const courses = [
-  {
-    title: 'Data Analysis Mastery',
-    image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-EpJNu9CU0HsswhZUgf8c6eAiGOJNRn.png',
-    badge: 'Bestseller',
-    description: 'Unlock the power of data with real-world projects and advanced techniques.'
-  },
-  {
-    title: 'Advanced Excel Skills',
-    image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-EpJNu9CU0HsswhZUgf8c6eAiGOJNRn.png',
-    badge: 'New',
-    description: 'Become an Excel wizard with advanced formulas and data modeling.'
-  },
-  {
-    title: 'Business Law Fundamentals',
-    image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-EpJNu9CU0HsswhZUgf8c6eAiGOJNRn.png',
-    badge: 'Popular',
-    description: 'Navigate the legal landscape of business with confidence.'
-  },
-  {
-    title: 'Agile Project Management',
-    image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-EpJNu9CU0HsswhZUgf8c6eAiGOJNRn.png',
-    badge: 'Trending',
-    description: 'Master Agile methodologies and lead high-performing teams.'
-  }
-]
-
 export default function FeaturedCourses() {
+  const courseQuery = useCourseQuery(4, pagination.PAGE)
+  const courses = courseQuery.data?.payload.data.data ?? []
+  console.log('🚀 ~ FeaturedCourses ~ courses:', courses)
+
   return (
     <div className='dark:bg-gray-900 py-24'>
       <div className='container mx-auto px-4'>
@@ -48,23 +27,23 @@ export default function FeaturedCourses() {
                 <CardHeader className='p-0'>
                   <div className='relative'>
                     <Image
-                      src={course.image || '/placeholder.svg'}
+                      src={course.bannerUrl || '/placeholder.svg'}
                       alt={course.title}
                       width={400}
                       height={225}
                       className='w-full h-48 object-cover'
                     />
                     <Badge className='absolute top-2 right-2 bg-gradient-to-r from-purple-500 to-pink-500 font-semibold px-3 py-1'>
-                      {course.badge}
+                      {'Hot trend'}
                     </Badge>
                   </div>
                 </CardHeader>
                 <CardContent className='p-6'>
-                  <CardTitle className='text-xl mb-3'>{course.title}</CardTitle>
+                  <CardTitle className='text-xl mb-3 truncate'>{course.title}</CardTitle>
                   <p className='text-gray-400 text-sm mb-4'>{course.description}</p>
                 </CardContent>
                 <CardFooter className='dark:bg-gray-800 border-t dark:border-gray-700 p-4'>
-                  <Link href={pathURL.dashboard_courses} className='w-full'>
+                  <Link href={pathURL.courses_detail(course.id)} className='w-full'>
                     <Button
                       variant='secondary'
                       className='w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
