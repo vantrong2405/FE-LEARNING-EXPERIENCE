@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Search,
   Plus,
@@ -11,9 +11,7 @@ import {
   XCircle,
   ChevronLeft,
   ChevronRight,
-  Download,
-  RefreshCw,
-  Menu
+  Download
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -39,92 +37,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { exportToExcel } from '@/lib/excel'
-
-// Sample user data
-const users = [
-  {
-    id: 1,
-    name: 'Nguyễn Văn A',
-    email: 'nguyenvana@example.com',
-    role: 'Admin',
-    status: 'active',
-    lastLogin: '2023-07-15 14:30',
-    courses: 5,
-    joined: '2023-01-10'
-  },
-  {
-    id: 2,
-    name: 'Trần Thị B',
-    email: 'tranthib@example.com',
-    role: 'Instructor',
-    status: 'active',
-    lastLogin: '2023-07-14 09:15',
-    courses: 3,
-    joined: '2023-02-15'
-  },
-  {
-    id: 3,
-    name: 'Lê Văn C',
-    email: 'levanc@example.com',
-    role: 'User',
-    status: 'inactive',
-    lastLogin: '2023-06-30 16:45',
-    courses: 0,
-    joined: '2023-03-20'
-  },
-  {
-    id: 4,
-    name: 'Phạm Thị D',
-    email: 'phamthid@example.com',
-    role: 'User',
-    status: 'active',
-    lastLogin: '2023-07-12 11:20',
-    courses: 2,
-    joined: '2023-04-05'
-  },
-  {
-    id: 5,
-    name: 'Hoàng Văn E',
-    email: 'hoangvane@example.com',
-    role: 'Instructor',
-    status: 'active',
-    lastLogin: '2023-07-13 13:10',
-    courses: 4,
-    joined: '2023-02-28'
-  },
-  {
-    id: 6,
-    name: 'Vũ Thị F',
-    email: 'vuthif@example.com',
-    role: 'User',
-    status: 'pending',
-    lastLogin: 'Never',
-    courses: 0,
-    joined: '2023-07-10'
-  },
-  {
-    id: 7,
-    name: 'Đặng Văn G',
-    email: 'dangvang@example.com',
-    role: 'User',
-    status: 'active',
-    lastLogin: '2023-07-11 10:05',
-    courses: 1,
-    joined: '2023-05-15'
-  },
-  {
-    id: 8,
-    name: 'Ngô Thị H',
-    email: 'ngothih@example.com',
-    role: 'Instructor',
-    status: 'inactive',
-    lastLogin: '2023-06-25 08:30',
-    courses: 2,
-    joined: '2023-03-10'
-  }
-]
+import { useGetListQuery, useUpdateMeMutation } from '@/queries/useAuth'
+import { formatDate, handleErrorApi } from '@/lib/utils'
+import { useForm } from 'react-hook-form'
+import { MeBody, MeBodyType } from '@/schemaValidator/auth.schema'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
 
 export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -133,17 +52,20 @@ export default function UsersPage() {
   const [isAddUserOpen, setIsAddUserOpen] = useState(false)
   const [isEditUserOpen, setIsEditUserOpen] = useState(false)
   const [currentUser, setCurrentUser] = useState<EditUser | null>(null)
-  const [selectedUsers, setSelectedUsers] = useState<number[]>([])
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const usersPerPage = 5
+  const getListQuery = useGetListQuery()
+  const updateMeMutation = useUpdateMeMutation()
+  const users = getListQuery.data?.payload.data ?? []
 
-  // Filter users based on search term, role, and status
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesRole = selectedRole === 'all' || user.role.toLowerCase() === selectedRole.toLowerCase()
-    const matchesStatus = selectedStatus === 'all' || user.status.toLowerCase() === selectedStatus.toLowerCase()
+    const matchesStatus =
+      selectedStatus === 'all' || (user.verify === 1 ? 'active' : 'unactive') === selectedStatus.toLowerCase()
 
     return matchesSearch && matchesRole && matchesStatus
   })
@@ -156,14 +78,59 @@ export default function UsersPage() {
 
   // Handle edit user
   interface EditUser {
-    id: number
+    id: string
     name: string
     email: string
     role: string
-    status: string
-    lastLogin: string
-    courses: number
-    joined: string
+    verify: number
+    username: string
+    gender: string
+    avatarUrl: string
+    bio: string
+    courses: {
+      id: string
+      title: string
+      description: string
+    }[]
+  }
+
+  const form = useForm<MeBodyType>({
+    resolver: zodResolver(MeBody),
+    defaultValues: {
+      name: currentUser?.name || '',
+      gender: currentUser?.gender.toLowerCase() || '',
+      username: currentUser?.username || '',
+      bio: currentUser?.bio || '',
+      email: currentUser?.email || '',
+      role: currentUser?.role.toLowerCase() || ''
+    }
+  })
+
+  useEffect(() => {
+    if (currentUser) {
+      form.reset({
+        name: currentUser.name || '',
+        gender: currentUser?.gender.toLowerCase() || '',
+        username: currentUser.username || '',
+        bio: currentUser.bio || '',
+        email: currentUser.email || '',
+        role: currentUser.role.toLowerCase() || ''
+      })
+    }
+  }, [currentUser, form.reset])
+
+  const handleUpdate = (body: MeBodyType) => {
+    updateMeMutation.mutate(body, {
+      onSuccess: () => {
+        toast.success('Update Account Success!')
+      },
+      onError: (error) => {
+        handleErrorApi({
+          error,
+          setError: form.setError
+        })
+      }
+    })
   }
 
   const handleEditUser = (user: EditUser) => {
@@ -173,17 +140,17 @@ export default function UsersPage() {
 
   // Handle checkbox selection
   interface User {
-    id: number
+    id: string
     name: string
     email: string
     role: string
-    status: string
+    verify: number
     lastLogin: string
     courses: number
     joined: string
   }
 
-  const handleSelectUser = (userId: number) => {
+  const handleSelectUser = (userId: string) => {
     if (selectedUsers.includes(userId)) {
       setSelectedUsers(selectedUsers.filter((id) => id !== userId))
     } else {
@@ -215,7 +182,7 @@ export default function UsersPage() {
     const exportData = filteredUsers.map((user) => ({
       ...user,
       role: user.role === 'Admin' ? 'Quản trị viên' : user.role === 'Instructor' ? 'Giảng viên' : 'Học viên',
-      status: user.status === 'active' ? 'Kích hoạt' : user.status === 'inactive' ? 'Tạm khóa' : 'Chờ xác nhận'
+      status: user.verify === 1 ? 'Kích hoạt' : user.verify === 0 ? 'Tạm khóa' : 'Chờ xác nhận'
     }))
 
     exportToExcel({
@@ -502,7 +469,7 @@ export default function UsersPage() {
                           </div>
                           <div>
                             <div className='font-medium text-xs sm:text-sm'>{user.name}</div>
-                            <div className='text-xs text-gray-400'>Tham gia: {user.joined}</div>
+                            <div className='text-xs text-gray-400'>Tham gia: {formatDate(user.dateOfBirth)}</div>
                           </div>
                         </div>
                       </td>
@@ -523,21 +490,19 @@ export default function UsersPage() {
                       <td className='py-2 sm:py-3 px-2 sm:px-4'>
                         <Badge
                           className={`text-xs ${
-                            user.status === 'active'
+                            user.verify === 1
                               ? 'bg-green-900/30 text-green-500 hover:bg-green-900/40'
-                              : user.status === 'inactive'
+                              : user.verify === 0
                                 ? 'bg-red-900/30 text-red-500 hover:bg-red-900/40'
                                 : 'bg-yellow-900/30 text-yellow-500 hover:bg-yellow-900/40'
                           }`}
                         >
-                          {user.status === 'active'
-                            ? 'Kích hoạt'
-                            : user.status === 'inactive'
-                              ? 'Tạm khóa'
-                              : 'Chờ xác nhận'}
+                          {user.verify === 1 ? 'Kích hoạt' : user.verify === 0 ? 'Tạm khóa' : 'Chờ xác nhận'}
                         </Badge>
                       </td>
-                      <td className='py-2 sm:py-3 px-2 sm:px-4 text-gray-300 text-xs sm:text-sm'>{user.lastLogin}</td>
+                      <td className='py-2 sm:py-3 px-2 sm:px-4 text-gray-300 text-xs sm:text-sm'>
+                        {formatDate(user.dateOfBirth)}
+                      </td>
                       <td className='py-2 sm:py-3 px-2 sm:px-4'>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -559,7 +524,7 @@ export default function UsersPage() {
                               <Edit className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Chỉnh sửa
                             </DropdownMenuItem>
                             <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'>
-                              {user.status === 'active' ? (
+                              {user.verify === 1 ? (
                                 <>
                                   <XCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Tạm khóa
                                 </>
@@ -638,21 +603,21 @@ export default function UsersPage() {
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4 py-4'>
                 <div className='space-y-2'>
                   <Label htmlFor='edit-firstName' className='text-white text-sm'>
-                    Họ
+                    Name
                   </Label>
                   <Input
                     id='edit-firstName'
-                    defaultValue={currentUser.name.split(' ').slice(0, -1).join(' ')}
+                    {...form.register('name')}
                     className='bg-gray-800 border-gray-700 text-white'
                   />
                 </div>
                 <div className='space-y-2'>
                   <Label htmlFor='edit-lastName' className='text-white text-sm'>
-                    Tên
+                    UserName
                   </Label>
                   <Input
                     id='edit-lastName'
-                    defaultValue={currentUser.name.split(' ').slice(-1).join(' ')}
+                    {...form.register('username')}
                     className='bg-gray-800 border-gray-700 text-white'
                   />
                 </div>
@@ -663,21 +628,33 @@ export default function UsersPage() {
                   <Input
                     id='edit-email'
                     type='email'
-                    defaultValue={currentUser.email}
+                    {...form.register('email')}
                     className='bg-gray-800 border-gray-700 text-white'
                   />
                 </div>
                 <div className='space-y-2'>
                   <Label htmlFor='edit-phone' className='text-white text-sm'>
-                    Số điện thoại
+                    Giới tính
                   </Label>
-                  <Input id='edit-phone' placeholder='0912345678' className='bg-gray-800 border-gray-700 text-white' />
+                  <Select onValueChange={(value) => form.setValue('gender', value)}>
+                    <SelectTrigger className='bg-gray-800 border-gray-700 text-white'>
+                      <SelectValue placeholder='Chọn giới tính' />
+                    </SelectTrigger>
+                    <SelectContent className='bg-gray-800 border-gray-700 text-white'>
+                      <SelectItem value='male'>male</SelectItem>
+                      <SelectItem value='feMale'>female</SelectItem>
+                      <SelectItem value='other'>other</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className='space-y-2'>
                   <Label htmlFor='edit-role' className='text-white text-sm'>
                     Vai trò
                   </Label>
-                  <Select defaultValue={currentUser.role.toLowerCase()}>
+                  <Select
+                    onValueChange={(value) => form.setValue('role', value)}
+                    defaultValue={currentUser.role.toLowerCase()}
+                  >
                     <SelectTrigger className='bg-gray-800 border-gray-700 text-white'>
                       <SelectValue placeholder='Chọn vai trò' />
                     </SelectTrigger>
@@ -688,26 +665,13 @@ export default function UsersPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className='space-y-2'>
-                  <Label htmlFor='edit-status' className='text-white text-sm'>
-                    Trạng thái
-                  </Label>
-                  <Select defaultValue={currentUser.status}>
-                    <SelectTrigger className='bg-gray-800 border-gray-700 text-white'>
-                      <SelectValue placeholder='Chọn trạng thái' />
-                    </SelectTrigger>
-                    <SelectContent className='bg-gray-800 border-gray-700 text-white'>
-                      <SelectItem value='active'>Kích hoạt</SelectItem>
-                      <SelectItem value='inactive'>Tạm khóa</SelectItem>
-                      <SelectItem value='pending'>Chờ xác nhận</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+
                 <div className='col-span-1 md:col-span-2 space-y-2'>
                   <Label htmlFor='edit-bio' className='text-white text-sm'>
                     Thông tin thêm
                   </Label>
                   <textarea
+                    {...form.register('bio')}
                     id='edit-bio'
                     rows={3}
                     placeholder='Thông tin thêm về người dùng...'
@@ -723,7 +687,12 @@ export default function UsersPage() {
                 >
                   Hủy
                 </Button>
-                <Button className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto'>Lưu thay đổi</Button>
+                <Button
+                  onClick={form.handleSubmit(handleUpdate)}
+                  className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto'
+                >
+                  Lưu thay đổi
+                </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>

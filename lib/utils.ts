@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken'
 import { EntityError, HttpError } from '@/lib/http'
 import { toast } from 'sonner'
 import { UseFormSetError } from 'react-hook-form'
-import { differenceInDays, differenceInWeeks, parseISO } from 'date-fns'
+import { differenceInDays, format, parseISO } from 'date-fns'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -83,4 +83,8 @@ export const weeksAgo = (dateString: string) => {
   const date = parseISO(dateString)
   const daysAgo = differenceInDays(new Date(), date)
   return `${daysAgo} ngày trước`
+}
+
+export const formatDate = (isoString: string): string => {
+  return format(parseISO(isoString), 'dd/MM/yyyy')
 }

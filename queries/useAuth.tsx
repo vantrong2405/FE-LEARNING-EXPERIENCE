@@ -57,3 +57,9 @@ export const useChangePasswordMutation = () => {
     mutationFn: authApiRequest.changePassword
   })
 }
+export const useGetListQuery = () => {
+  return useQuery({
+    queryKey: ['list'],
+    queryFn: authApiRequest.list
+  })
+}
