@@ -48,82 +48,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { exportToExcel, formatCurrency } from '@/lib/excel'
-
-// Sample course data
-const courses = [
-  {
-    id: 1,
-    title: 'JavaScript Cơ Bản',
-    instructor: 'Nguyễn Văn A',
-    price: 599000,
-    status: 'published',
-    students: 120,
-    rating: 4.7,
-    created: '2023-01-15',
-    category: 'Web Development',
-    thumbnail: '/placeholder.svg?height=80&width=120'
-  },
-  {
-    id: 2,
-    title: 'React Advanced',
-    instructor: 'Trần Thị B',
-    price: 799000,
-    status: 'published',
-    students: 85,
-    rating: 4.8,
-    created: '2023-02-20',
-    category: 'Web Development',
-    thumbnail: '/placeholder.svg?height=80&width=120'
-  },
-  {
-    id: 3,
-    title: 'Python for Data Science',
-    instructor: 'Lê Văn C',
-    price: 899000,
-    status: 'draft',
-    students: 0,
-    rating: 0,
-    created: '2023-06-10',
-    category: 'Data Science',
-    thumbnail: '/placeholder.svg?height=80&width=120'
-  },
-  {
-    id: 4,
-    title: 'UI/UX Design',
-    instructor: 'Phạm Thị D',
-    price: 699000,
-    status: 'published',
-    students: 65,
-    rating: 4.5,
-    created: '2023-03-05',
-    category: 'Design',
-    thumbnail: '/placeholder.svg?height=80&width=120'
-  },
-  {
-    id: 5,
-    title: 'Mobile App Development with Flutter',
-    instructor: 'Hoàng Văn E',
-    price: 899000,
-    status: 'published',
-    students: 45,
-    rating: 4.6,
-    created: '2023-04-15',
-    category: 'Mobile Development',
-    thumbnail: '/placeholder.svg?height=80&width=120'
-  },
-  {
-    id: 6,
-    title: 'Machine Learning Fundamentals',
-    instructor: 'Ngô Thị H',
-    price: 999000,
-    status: 'draft',
-    students: 0,
-    rating: 0,
-    created: '2023-07-01',
-    category: 'Data Science',
-    thumbnail: '/placeholder.svg?height=80&width=120'
-  }
-]
+import { useCourseQuery, useDeleteCourseMutation } from '@/queries/useCourse'
+import { pagination } from '@/constants/pagination-config'
+import { formatDate, handleErrorApi } from '@/lib/utils'
+import { toast } from 'sonner'
 
 export default function CoursesPage() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -132,18 +60,21 @@ export default function CoursesPage() {
   const [isAddCourseOpen, setIsAddCourseOpen] = useState(false)
   const [isEditCourseOpen, setIsEditCourseOpen] = useState(false)
   const [currentCourse, setCurrentCourse] = useState<Course | null>(null)
-  const [selectedCourses, setSelectedCourses] = useState<number[]>([])
+  const [selectedCourses, setSelectedCourses] = useState<string[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [currentTab, setCurrentTab] = useState('basic')
   const coursesPerPage = 5
+  const [page, setPage] = useState(1)
+  const courseQuery = useCourseQuery(pagination.LIMIT, page)
+  const courses = courseQuery.data?.payload.data.data ?? []
 
   // Filter courses based on search term, category, and status
   const filteredCourses = courses.filter((course) => {
     const matchesSearch =
       course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      course.instructor.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory = selectedCategory === 'all' || course.category === selectedCategory
-    const matchesStatus = selectedStatus === 'all' || course.status === selectedStatus
+      course.instructor.name.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesCategory = selectedCategory === 'all' || course.category.id === selectedCategory
+    const matchesStatus = selectedStatus === 'all' || course.isPublished === (selectedStatus === 'published')
 
     return matchesSearch && matchesCategory && matchesStatus
   })
@@ -156,16 +87,26 @@ export default function CoursesPage() {
 
   // Handle edit course
   interface Course {
-    id: number
+    id: string
     title: string
-    instructor: string
+    instructor: {
+      id: string
+      name: string
+      email: string
+      avatarUrl: string | null
+    }
     price: number
-    status: string
-    students: number
+    isPublished: boolean
+    totalReviews: number
     rating: number
-    created: string
-    category: string
-    thumbnail: string
+    createdAt: string
+    category: {
+      id: string
+      createdAt: string
+      updatedAt: string
+      name: string // 👈 Đây là vấn đề
+    }
+    thumbnailUrl: string
   }
 
   interface HandleEditCourse {
@@ -179,11 +120,11 @@ export default function CoursesPage() {
 
   // Handle checkbox selection
   interface HandleSelectCourse {
-    (courseId: number): void
+    (courseId: string): void
   }
 
   const handleSelectCourse: HandleSelectCourse = (courseId) => {
-    if (selectedCourses.includes(courseId)) {
+    if (selectedCourses.includes(String(courseId))) {
       setSelectedCourses(selectedCourses.filter((id) => id !== courseId))
     } else {
       setSelectedCourses([...selectedCourses, courseId])
@@ -195,6 +136,21 @@ export default function CoursesPage() {
       setSelectedCourses([])
     } else {
       setSelectedCourses(currentCourses.map((course) => course.id))
+    }
+  }
+
+  const { mutateAsync } = useDeleteCourseMutation()
+  const deleteCourse = async (id: string) => {
+    if (id) {
+      try {
+        await mutateAsync(id)
+
+        toast.success('Delete Course Successfully')
+      } catch (error) {
+        handleErrorApi({
+          error
+        })
+      }
     }
   }
 
@@ -805,19 +761,19 @@ export default function CoursesPage() {
                       <td className='py-3 px-4'>
                         <div className='flex items-center'>
                           <img
-                            src={course.thumbnail || '/placeholder.svg'}
+                            src={course.thumbnailUrl || '/placeholder.svg'}
                             alt={course.title}
                             className='w-12 h-8 object-cover rounded mr-3'
                           />
                           <div>
                             <div className='font-medium'>{course.title}</div>
-                            <div className='text-xs text-gray-400'>Tạo: {course.created}</div>
+                            <div className='text-xs text-gray-400'>Tạo: {formatDate(course.createdAt)}</div>
                           </div>
                         </div>
                       </td>
-                      <td className='py-3 px-4 text-gray-300'>{course.instructor}</td>
+                      <td className='py-3 px-4 text-gray-300'>{course.instructor.name}</td>
                       <td className='py-3 px-4 text-purple-400 font-medium'>{formatPrice(course.price)}</td>
-                      <td className='py-3 px-4 text-gray-300'>{course.students}</td>
+                      <td className='py-3 px-4 text-gray-300'>{course.totalReviews}</td>
                       <td className='py-3 px-4'>
                         {course.rating > 0 ? (
                           <div className='flex items-center'>
@@ -831,12 +787,12 @@ export default function CoursesPage() {
                       <td className='py-3 px-4'>
                         <Badge
                           className={
-                            course.status === 'published'
+                            course.isPublished === true
                               ? 'bg-green-900/30 text-green-500 hover:bg-green-900/40'
                               : 'bg-yellow-900/30 text-yellow-500 hover:bg-yellow-900/40'
                           }
                         >
-                          {course.status === 'published' ? 'Đã xuất bản' : 'Bản nháp'}
+                          {course.isPublished === true ? 'Đã xuất bản' : 'Bản nháp'}
                         </Badge>
                       </td>
                       <td className='py-3 px-4'>
@@ -863,7 +819,7 @@ export default function CoursesPage() {
                               <Eye className='h-4 w-4 mr-2' /> Xem trước
                             </DropdownMenuItem>
                             <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer'>
-                              {course.status === 'published' ? (
+                              {course.isPublished === true ? (
                                 <>
                                   <EyeOff className='h-4 w-4 mr-2' /> Ẩn khóa học
                                 </>
@@ -874,7 +830,10 @@ export default function CoursesPage() {
                               )}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className='bg-gray-700' />
-                            <DropdownMenuItem className='text-red-500 hover:bg-gray-700 cursor-pointer'>
+                            <DropdownMenuItem
+                              className='text-red-500 hover:bg-gray-700 cursor-pointer'
+                              onClick={() => deleteCourse(course.id)}
+                            >
                               <Trash2 className='h-4 w-4 mr-2' /> Xóa
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -972,7 +931,7 @@ export default function CoursesPage() {
                       <Label htmlFor='edit-category' className='text-white'>
                         Danh mục
                       </Label>
-                      <Select defaultValue={currentCourse.category.toLowerCase().replace(/\s+/g, '-')}>
+                      <Select defaultValue={currentCourse.category.name.toLowerCase().replace(/\s+/g, '-')}>
                         <SelectTrigger className='bg-gray-800 border-gray-700 text-white'>
                           <SelectValue placeholder='Chọn danh mục' />
                         </SelectTrigger>
@@ -1018,7 +977,7 @@ export default function CoursesPage() {
                       <Label htmlFor='edit-status' className='text-white'>
                         Trạng thái
                       </Label>
-                      <Select defaultValue={currentCourse.status}>
+                      <Select defaultValue={currentCourse.isPublished ? 'published' : 'draft'}>
                         <SelectTrigger className='bg-gray-800 border-gray-700 text-white'>
                           <SelectValue placeholder='Chọn trạng thái' />
                         </SelectTrigger>

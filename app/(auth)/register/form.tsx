@@ -21,15 +21,23 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { cn, handleErrorApi } from '@/lib/utils'
+import { cn, getAccessTokenFromLocalStorage, getRefreshTokenFromLocalStorage, handleErrorApi } from '@/lib/utils'
 import { CalendarIcon } from 'lucide-react'
 import { format } from 'date-fns'
 import { useRegisterMutation } from '@/queries/useAuth'
 import { useForm } from 'react-hook-form'
 import { RegisterBody, RegisterBodyType } from '@/schemaValidator/auth.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useRouter } from 'next/navigation'
 
 export default function FormRegister() {
+  const router = useRouter()
+
+  const accessToken = getAccessTokenFromLocalStorage()
+  const refreshToken = getRefreshTokenFromLocalStorage()
+  if (accessToken && refreshToken) {
+    router.back()
+  }
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const togglePasswordVisibility = () => setShowPassword(!showPassword)

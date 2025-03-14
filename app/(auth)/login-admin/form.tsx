@@ -9,9 +9,72 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import Link from 'next/link'
 import { Icons } from '@/components/ui/icons'
 import { pathURL } from '@/constants/path'
+import { useForm } from 'react-hook-form'
+import { LoginBody, LoginBodyType } from '@/schemaValidator/auth.schema'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useLoginMutation } from '@/queries/useAuth'
+import { useRouter } from 'next/navigation'
+import {
+  decodeToken,
+  getAccessTokenFromLocalStorage,
+  getRefreshTokenFromLocalStorage,
+  handleErrorApi,
+  setAccessTokenToLocalStorage,
+  setRefreshTokenToLocalStorage
+} from '@/lib/utils'
+import { toast } from 'sonner'
 
 export default function AdminLogin() {
+  const router = useRouter()
+
+  const accessToken = getAccessTokenFromLocalStorage()
+  const refreshToken = getRefreshTokenFromLocalStorage()
+  if (accessToken && refreshToken) {
+    router.back()
+  }
   const [showPassword, setShowPassword] = useState(false)
+
+  const form = useForm<LoginBodyType>({
+    resolver: zodResolver(LoginBody),
+    defaultValues: {
+      email: '',
+      password: ''
+    }
+  })
+  const loginMutation = useLoginMutation()
+
+  const handleLogin = (body: LoginBodyType) => {
+    loginMutation.mutate(body, {
+      onSuccess: (data) => {
+        const access_token = data.payload.data.accessToken
+        const refresh_token = data.payload.data.refreshToken
+        const token = decodeToken(access_token)
+        if (token.role === 'User') {
+          toast.warning('You dont have permission to log in here!')
+          router.push(pathURL.login)
+          return
+        }
+
+        if (access_token && refresh_token) {
+          setAccessTokenToLocalStorage(access_token)
+          setRefreshTokenToLocalStorage(refresh_token)
+        }
+        router.push(pathURL.manage)
+      },
+      onError: (error) => {
+        handleErrorApi({
+          error,
+          setError: form.setError
+        })
+      }
+    })
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      form.handleSubmit(handleLogin)()
+    }
+  }
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword)
 
@@ -57,26 +120,30 @@ export default function AdminLogin() {
         <CardContent className='space-y-4'>
           <div className='space-y-2'>
             <Label htmlFor='email'>Email</Label>
-            <div className='relative'>
-              <Icons.Mail className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' size={20} />
-              <Input
-                id='email'
-                placeholder='Enter your admin email'
-                type='email'
-                className='pl-10 dark:bg-gray-700 border-gray-600 placeholder-gray-400'
-              />
-            </div>
+            <Input
+              id='email'
+              placeholder='Enter your email'
+              type='email'
+              {...form.register('email')}
+              className={`dark:bg-gray-700 border-gray-600 placeholder-gray-400 ${form.formState.errors.email ? 'border-red-500' : ''}`}
+              onKeyDown={handleKeyDown}
+            />
+            {form.formState.errors.email && (
+              <p className='text-red-500 text-sm'>{form.formState.errors.email.message}</p>
+            )}
           </div>
           <div className='space-y-2'>
             <Label htmlFor='password'>Password</Label>
             <div className='relative'>
-              <Icons.Lock className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400' size={20} />
               <Input
                 id='password'
                 type={showPassword ? 'text' : 'password'}
                 placeholder='Enter your password'
-                className='pl-10 pr-10 dark:bg-gray-700 border-gray-600 placeholder-gray-400'
+                {...form.register('password')}
+                className={`dark:bg-gray-700 border-gray-600 placeholder-gray-400 ${form.formState.errors.password ? 'border-red-500' : ''}`}
+                onKeyDown={handleKeyDown}
               />
+
               <button
                 type='button'
                 onClick={togglePasswordVisibility}
@@ -85,10 +152,16 @@ export default function AdminLogin() {
                 {showPassword ? <Icons.EyeOff size={20} /> : <Icons.Eye size={20} />}
               </button>
             </div>
+            {form.formState.errors.password && (
+              <p className='text-red-500 text-sm'>{form.formState.errors.password.message}</p>
+            )}
           </div>
         </CardContent>
         <CardFooter className='flex flex-col space-y-4'>
-          <Button className='w-full bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600'>
+          <Button
+            onClick={() => form.handleSubmit(handleLogin)()}
+            className='w-full bg-gradient-to-r from-blue-500 to-green-500 hover:from-blue-600 hover:to-green-600'
+          >
             Sign In to Admin
           </Button>
           <div className='text-sm text-center text-gray-400'>
@@ -97,7 +170,7 @@ export default function AdminLogin() {
               Go to user login
             </Link>
           </div>
-          <Link href={pathURL.admin_forgot_password} className='text-sm text-center text-blue-400 hover:text-blue-300'>
+          <Link href={pathURL.forgot_password} className='text-sm text-center text-blue-400 hover:text-blue-300'>
             Forgot admin password?
           </Link>
         </CardFooter>

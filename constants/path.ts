@@ -8,5 +8,7 @@ export const pathURL = {
   dashboard_courses: '/dashboard/courses',
   profile: '/dashboard/profile',
   cart: '/dashboard/cart',
+  manage: '/manage',
+  payment: '/dashboard/courses-payment',
   courses_detail: (id: string) => `/dashboard/courses/${id}`
 }

@@ -11,7 +11,8 @@ import {
   XCircle,
   ChevronLeft,
   ChevronRight,
-  Download
+  Download,
+  CalendarIcon
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -38,12 +39,15 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { exportToExcel } from '@/lib/excel'
-import { useGetListQuery, useUpdateMeMutation } from '@/queries/useAuth'
-import { formatDate, handleErrorApi } from '@/lib/utils'
+import { useDeleteMutation, useGetListQuery, useRegisterMutation, useUpdateMeMutation } from '@/queries/useAuth'
+import { cn, formatDate, handleErrorApi } from '@/lib/utils'
 import { useForm } from 'react-hook-form'
-import { MeBody, MeBodyType } from '@/schemaValidator/auth.schema'
+import { MeBody, MeBodyType, RegisterBody, RegisterBodyType } from '@/schemaValidator/auth.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Calendar } from '@/components/ui/calendar'
+import { format } from 'date-fns'
 
 export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -57,6 +61,7 @@ export default function UsersPage() {
   const usersPerPage = 5
   const getListQuery = useGetListQuery()
   const updateMeMutation = useUpdateMeMutation()
+  const registerMutation = useRegisterMutation()
   const users = getListQuery.data?.payload.data ?? []
 
   const filteredUsers = users.filter((user) => {
@@ -133,6 +138,43 @@ export default function UsersPage() {
     })
   }
 
+  const formR = useForm<RegisterBodyType>({
+    resolver: zodResolver(RegisterBody),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      dateOfBirth: undefined,
+      role: undefined,
+      verify: undefined
+    }
+  })
+
+  const handleCreateSubmit = (body: RegisterBodyType) => {
+    if (body.password !== body.confirmPassword) {
+      formR.setError('confirmPassword', {
+        type: 'manual',
+        message: 'Passwords do not match'
+      })
+      return
+    }
+
+    registerMutation.mutate(body, {
+      onSuccess: (data) => {
+        form.reset()
+        setIsAddUserOpen(false)
+        toast.success('Create Account Success !')
+      },
+      onError: (error) => {
+        handleErrorApi({
+          error,
+          setError: form.setError
+        })
+      }
+    })
+  }
+
   const handleEditUser = (user: EditUser) => {
     setCurrentUser(user)
     setIsEditUserOpen(true)
@@ -193,6 +235,21 @@ export default function UsersPage() {
     })
   }
 
+  const { mutateAsync } = useDeleteMutation()
+  const deleteAccount = async (id: string) => {
+    if (id) {
+      try {
+        await mutateAsync(id)
+
+        toast.success('Delete Account Successfully')
+      } catch (error) {
+        handleErrorApi({
+          error
+        })
+      }
+    }
+  }
+
   return (
     <div className='min-h-screen bg-gradient-to-br from-[#0D0A25] to-[#1A1744] text-white p-3 sm:p-6'>
       <div className='max-w-7xl mx-auto'>
@@ -225,15 +282,17 @@ export default function UsersPage() {
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4 py-4'>
                   <div className='space-y-2'>
                     <Label htmlFor='firstName' className='text-white'>
-                      Họ
-                    </Label>
-                    <Input id='firstName' placeholder='Nguyễn' className='bg-gray-800 border-gray-700 text-white' />
-                  </div>
-                  <div className='space-y-2'>
-                    <Label htmlFor='lastName' className='text-white'>
                       Tên
                     </Label>
-                    <Input id='lastName' placeholder='Văn A' className='bg-gray-800 border-gray-700 text-white' />
+                    <Input
+                      id='name'
+                      {...formR.register('name')}
+                      className={`bg-gray-800 border text-white 
+                        ${formR.formState.errors.name ? 'border-red-500' : 'border-gray-700'}`}
+                    />
+                    {formR.formState.errors.name && (
+                      <p className='text-red-500 text-sm'>{formR.formState.errors.name.message}</p>
+                    )}
                   </div>
                   <div className='space-y-2'>
                     <Label htmlFor='email' className='text-white'>
@@ -241,69 +300,101 @@ export default function UsersPage() {
                     </Label>
                     <Input
                       id='email'
+                      {...formR.register('email')}
                       type='email'
                       placeholder='example@domain.com'
-                      className='bg-gray-800 border-gray-700 text-white'
+                      className={`bg-gray-800 border text-white 
+                        ${formR.formState.errors.email ? 'border-red-500' : 'border-gray-700'}`}
                     />
-                  </div>
-                  <div className='space-y-2'>
-                    <Label htmlFor='phone' className='text-white'>
-                      Số điện thoại
-                    </Label>
-                    <Input id='phone' placeholder='0912345678' className='bg-gray-800 border-gray-700 text-white' />
+                    {formR.formState.errors.email && (
+                      <p className='text-red-500 text-sm'>{formR.formState.errors.email.message}</p>
+                    )}
                   </div>
                   <div className='space-y-2'>
                     <Label htmlFor='password' className='text-white'>
                       Mật khẩu
                     </Label>
-                    <Input id='password' type='password' className='bg-gray-800 border-gray-700 text-white' />
+                    <Input
+                      id='password'
+                      {...formR.register('password')}
+                      type='password'
+                      className={`bg-gray-800 border text-white 
+                        ${formR.formState.errors.password ? 'border-red-500' : 'border-gray-700'}`}
+                    />
+                    {formR.formState.errors.password && (
+                      <p className='text-red-500 text-sm'>{formR.formState.errors.password.message}</p>
+                    )}
                   </div>
                   <div className='space-y-2'>
                     <Label htmlFor='confirmPassword' className='text-white'>
                       Xác nhận mật khẩu
                     </Label>
-                    <Input id='confirmPassword' type='password' className='bg-gray-800 border-gray-700 text-white' />
+                    <Input
+                      id='confirmPassword'
+                      {...formR.register('confirmPassword')}
+                      type='password'
+                      className={`bg-gray-800 border text-white 
+                        ${formR.formState.errors.confirmPassword ? 'border-red-500' : 'border-gray-700'}`}
+                    />
+                    {formR.formState.errors.confirmPassword && (
+                      <p className='text-red-500 text-sm'>{formR.formState.errors.confirmPassword.message}</p>
+                    )}
+                  </div>
+                  <div className='space-y-2'>
+                    <Label htmlFor='confirmPassword' className='text-white'>
+                      Ngày sinh
+                    </Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant='outline'
+                          className={cn(
+                            'bg-gray-800 border-gray-700 text-white placeholder-gray-400 w-full pl-3 text-left font-normal',
+                            formR.formState.errors.dateOfBirth && 'border-red-500',
+                            !formR.watch('dateOfBirth') && 'text-muted-foreground'
+                          )}
+                        >
+                          {formR.watch('dateOfBirth') ? (
+                            format(new Date(formR.watch('dateOfBirth')), 'PPP')
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className='w-auto p-0' align='start'>
+                        <Calendar
+                          mode='single'
+                          selected={formR.watch('dateOfBirth') || new Date()}
+                          onSelect={(date) => formR.setValue('dateOfBirth', date || new Date())}
+                          disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    {formR.formState.errors.dateOfBirth && (
+                      <p className='text-red-500 text-sm'>{formR.formState.errors.dateOfBirth.message}</p>
+                    )}
                   </div>
                   <div className='space-y-2'>
                     <Label htmlFor='role' className='text-white'>
                       Vai trò
                     </Label>
-                    <Select>
-                      <SelectTrigger className='bg-gray-800 border-gray-700 text-white'>
+                    <Select onValueChange={(value) => formR.setValue('role', value)}>
+                      <SelectTrigger
+                        className={`bg-gray-800 border text-white 
+                        ${formR.formState.errors.role ? 'border-red-500' : 'border-gray-700'}`}
+                      >
                         <SelectValue placeholder='Chọn vai trò' />
                       </SelectTrigger>
                       <SelectContent className='bg-gray-800 border-gray-700 text-white'>
-                        <SelectItem value='user'>User</SelectItem>
-                        <SelectItem value='instructor'>Instructor</SelectItem>
-                        <SelectItem value='admin'>Admin</SelectItem>
+                        <SelectItem value='User'>User</SelectItem>
+                        <SelectItem value='Instructor'>Instructor</SelectItem>
                       </SelectContent>
                     </Select>
-                  </div>
-                  <div className='space-y-2'>
-                    <Label htmlFor='status' className='text-white'>
-                      Trạng thái
-                    </Label>
-                    <Select>
-                      <SelectTrigger className='bg-gray-800 border-gray-700 text-white'>
-                        <SelectValue placeholder='Chọn trạng thái' />
-                      </SelectTrigger>
-                      <SelectContent className='bg-gray-800 border-gray-700 text-white'>
-                        <SelectItem value='active'>Kích hoạt</SelectItem>
-                        <SelectItem value='inactive'>Tạm khóa</SelectItem>
-                        <SelectItem value='pending'>Chờ xác nhận</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className='col-span-1 md:col-span-2 space-y-2'>
-                    <Label htmlFor='bio' className='text-white'>
-                      Thông tin thêm
-                    </Label>
-                    <textarea
-                      id='bio'
-                      rows={3}
-                      placeholder='Thông tin thêm về người dùng...'
-                      className='w-full rounded-md bg-gray-800 border-gray-700 text-white p-2'
-                    />
+                    {formR.formState.errors.role && (
+                      <p className='text-red-500 text-sm'>{formR.formState.errors.role.message}</p>
+                    )}
                   </div>
                 </div>
                 <DialogFooter className='flex-col sm:flex-row gap-2 sm:gap-0'>
@@ -314,7 +405,12 @@ export default function UsersPage() {
                   >
                     Hủy
                   </Button>
-                  <Button className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto'>Tạo người dùng</Button>
+                  <Button
+                    onClick={formR.handleSubmit(handleCreateSubmit)}
+                    className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto'
+                  >
+                    Tạo người dùng
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -535,7 +631,10 @@ export default function UsersPage() {
                               )}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className='bg-gray-700' />
-                            <DropdownMenuItem className='text-red-500 hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'>
+                            <DropdownMenuItem
+                              className='text-red-500 hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'
+                              onClick={() => deleteAccount(user.id)}
+                            >
                               <Trash2 className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Xóa
                             </DropdownMenuItem>
                           </DropdownMenuContent>

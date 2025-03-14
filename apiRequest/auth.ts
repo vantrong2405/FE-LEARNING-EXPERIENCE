@@ -33,6 +33,7 @@ const authApiRequest = {
   getMe: () => http.get<GetMeResType>('auth/get-me'),
   updateMe: (body: MeBodyType) => http.post<GetMeResType>('auth/update-me', body),
   changePassword: (body: ChangePasswordBodyType) => http.post('auth/change-password', body),
-  list: () => http.get<GetListMeResType>('/auth/users')
+  list: () => http.get<GetListMeResType>('/auth/users'),
+  delete: (id: string) => http.delete(`auth/users/${id}`)
 }
 export default authApiRequest
