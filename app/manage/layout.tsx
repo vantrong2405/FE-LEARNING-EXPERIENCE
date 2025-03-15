@@ -3,27 +3,16 @@
 import type React from 'react'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import {
-  Home,
-  Users,
-  BookOpen,
-  Star,
-  MessageSquare,
-  Settings,
-  LogOut,
-  Bell,
-  Search,
-  Menu,
-  X,
-  HelpCircle,
-  Receipt
-} from 'lucide-react'
+import { Home, Users, BookOpen, Star, Settings, LogOut, Bell, Search, Menu, X, HelpCircle, Receipt } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog'
 import { DialogTitle } from '@radix-ui/react-dialog'
+import { useGetMeQuery, useLogoutMutation } from '@/queries/useAuth'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { getRefreshTokenFromLocalStorage } from '@/lib/utils'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -31,6 +20,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [searchDialogOpen, setSearchDialogOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const pathname = usePathname()
+  const router = useRouter()
+
+  const getMeQuery = useGetMeQuery()
+  const logoutMutation = useLogoutMutation()
+  const { name, avatarUrl } = getMeQuery.data?.payload.data ?? {}
 
   // Define navigation items
   const navItems = [
@@ -38,6 +32,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { href: '/manage/users', label: 'Người dùng', icon: Users },
     { href: '/manage/courses', label: 'Khóa học', icon: BookOpen },
     { href: '/manage/enrollments', label: 'Đăng ký', icon: BookOpen },
+    { href: '/manage/lessons', label: 'Lesson', icon: BookOpen },
+    { href: '/manage/videos', label: 'Videos', icon: BookOpen },
     { href: '/manage/reviews', label: 'Đánh giá', icon: Star },
     { href: '/manage/payments', label: 'Thanh toán', icon: Receipt },
     { href: '/manage/faqs', label: 'FAQs', icon: HelpCircle }
@@ -89,6 +85,32 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
+  const handleSignOut = () => {
+    const refreshToken = getRefreshTokenFromLocalStorage() as string | null
+
+    if (refreshToken) {
+      logoutMutation.mutate(
+        { refreshToken },
+        {
+          onSuccess: () => {
+            cleanUpAndRedirect()
+          },
+          onError: () => {
+            cleanUpAndRedirect()
+          }
+        }
+      )
+    } else {
+      cleanUpAndRedirect()
+    }
+  }
+
+  const cleanUpAndRedirect = () => {
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
+    router.push('/login-admin')
+  }
+
   return (
     <div className='flex h-screen bg-gradient-to-br from-[#0D0A25] to-[#1A1744] text-white'>
       {/* Sidebar */}
@@ -127,7 +149,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             ))}
           </div>
           <div className='absolute bottom-4 w-full left-0 px-4'>
-            <Button variant='ghost' className='w-full justify-start text-gray-400 hover:bg-gray-800 hover:text-white'>
+            <Button
+              onClick={handleSignOut}
+              variant='ghost'
+              className='w-full justify-start text-gray-400 hover:bg-gray-800 hover:text-white'
+            >
               <LogOut className='mr-2 h-5 w-5' />
               {sidebarOpen && 'Đăng xuất'}
             </Button>
@@ -184,9 +210,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
                 <div className='flex items-center gap-2'>
                   <div className='w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center'>
-                    <span className='font-semibold'>VT</span>
+                    <Avatar>
+                      <AvatarImage src={avatarUrl as string} alt='@shadcn' />
+                      <AvatarFallback>{name}</AvatarFallback>
+                    </Avatar>
                   </div>
-                  <span className='text-sm font-medium hidden sm:inline-block'>Văn Trọng</span>
+                  <span className='text-sm font-medium hidden sm:inline-block'>{name}</span>
                 </div>
               </div>
             </div>

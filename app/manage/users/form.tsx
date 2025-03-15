@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Search,
   Plus,
@@ -12,8 +12,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Download,
-  RefreshCw,
-  Menu
+  CalendarIcon
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -39,92 +38,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { exportToExcel } from '@/lib/excel'
-
-// Sample user data
-const users = [
-  {
-    id: 1,
-    name: 'Nguyễn Văn A',
-    email: 'nguyenvana@example.com',
-    role: 'Admin',
-    status: 'active',
-    lastLogin: '2023-07-15 14:30',
-    courses: 5,
-    joined: '2023-01-10'
-  },
-  {
-    id: 2,
-    name: 'Trần Thị B',
-    email: 'tranthib@example.com',
-    role: 'Instructor',
-    status: 'active',
-    lastLogin: '2023-07-14 09:15',
-    courses: 3,
-    joined: '2023-02-15'
-  },
-  {
-    id: 3,
-    name: 'Lê Văn C',
-    email: 'levanc@example.com',
-    role: 'User',
-    status: 'inactive',
-    lastLogin: '2023-06-30 16:45',
-    courses: 0,
-    joined: '2023-03-20'
-  },
-  {
-    id: 4,
-    name: 'Phạm Thị D',
-    email: 'phamthid@example.com',
-    role: 'User',
-    status: 'active',
-    lastLogin: '2023-07-12 11:20',
-    courses: 2,
-    joined: '2023-04-05'
-  },
-  {
-    id: 5,
-    name: 'Hoàng Văn E',
-    email: 'hoangvane@example.com',
-    role: 'Instructor',
-    status: 'active',
-    lastLogin: '2023-07-13 13:10',
-    courses: 4,
-    joined: '2023-02-28'
-  },
-  {
-    id: 6,
-    name: 'Vũ Thị F',
-    email: 'vuthif@example.com',
-    role: 'User',
-    status: 'pending',
-    lastLogin: 'Never',
-    courses: 0,
-    joined: '2023-07-10'
-  },
-  {
-    id: 7,
-    name: 'Đặng Văn G',
-    email: 'dangvang@example.com',
-    role: 'User',
-    status: 'active',
-    lastLogin: '2023-07-11 10:05',
-    courses: 1,
-    joined: '2023-05-15'
-  },
-  {
-    id: 8,
-    name: 'Ngô Thị H',
-    email: 'ngothih@example.com',
-    role: 'Instructor',
-    status: 'inactive',
-    lastLogin: '2023-06-25 08:30',
-    courses: 2,
-    joined: '2023-03-10'
-  }
-]
+import { useDeleteMutation, useGetListQuery, useRegisterMutation, useUpdateMeMutation } from '@/queries/useAuth'
+import { cn, formatDate, handleErrorApi } from '@/lib/utils'
+import { useForm } from 'react-hook-form'
+import { MeBody, MeBodyType, RegisterBody, RegisterBodyType } from '@/schemaValidator/auth.schema'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Calendar } from '@/components/ui/calendar'
+import { format } from 'date-fns'
 
 export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -133,17 +56,21 @@ export default function UsersPage() {
   const [isAddUserOpen, setIsAddUserOpen] = useState(false)
   const [isEditUserOpen, setIsEditUserOpen] = useState(false)
   const [currentUser, setCurrentUser] = useState<EditUser | null>(null)
-  const [selectedUsers, setSelectedUsers] = useState<number[]>([])
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const usersPerPage = 5
+  const getListQuery = useGetListQuery()
+  const updateMeMutation = useUpdateMeMutation()
+  const registerMutation = useRegisterMutation()
+  const users = getListQuery.data?.payload.data ?? []
 
-  // Filter users based on search term, role, and status
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesRole = selectedRole === 'all' || user.role.toLowerCase() === selectedRole.toLowerCase()
-    const matchesStatus = selectedStatus === 'all' || user.status.toLowerCase() === selectedStatus.toLowerCase()
+    const matchesStatus =
+      selectedStatus === 'all' || (user.verify === 1 ? 'active' : 'unactive') === selectedStatus.toLowerCase()
 
     return matchesSearch && matchesRole && matchesStatus
   })
@@ -156,14 +83,96 @@ export default function UsersPage() {
 
   // Handle edit user
   interface EditUser {
-    id: number
+    id: string
     name: string
     email: string
     role: string
-    status: string
-    lastLogin: string
-    courses: number
-    joined: string
+    verify: number
+    username: string
+    gender: string
+    avatarUrl: string
+    bio: string
+    courses: {
+      id: string
+      title: string
+      description: string
+    }[]
+  }
+
+  const form = useForm<MeBodyType>({
+    resolver: zodResolver(MeBody),
+    defaultValues: {
+      name: currentUser?.name || '',
+      gender: currentUser?.gender.toLowerCase() || '',
+      username: currentUser?.username || '',
+      bio: currentUser?.bio || '',
+      email: currentUser?.email || '',
+      role: currentUser?.role.toLowerCase() || ''
+    }
+  })
+
+  useEffect(() => {
+    if (currentUser) {
+      form.reset({
+        name: currentUser.name || '',
+        gender: currentUser?.gender.toLowerCase() || '',
+        username: currentUser.username || '',
+        bio: currentUser.bio || '',
+        email: currentUser.email || '',
+        role: currentUser.role.toLowerCase() || ''
+      })
+    }
+  }, [currentUser, form.reset])
+
+  const handleUpdate = (body: MeBodyType) => {
+    updateMeMutation.mutate(body, {
+      onSuccess: () => {
+        toast.success('Update Account Success!')
+      },
+      onError: (error) => {
+        handleErrorApi({
+          error,
+          setError: form.setError
+        })
+      }
+    })
+  }
+
+  const formR = useForm<RegisterBodyType>({
+    resolver: zodResolver(RegisterBody),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      dateOfBirth: undefined,
+      role: undefined,
+      verify: undefined
+    }
+  })
+
+  const handleCreateSubmit = (body: RegisterBodyType) => {
+    if (body.password !== body.confirmPassword) {
+      formR.setError('confirmPassword', {
+        type: 'manual',
+        message: 'Passwords do not match'
+      })
+      return
+    }
+
+    registerMutation.mutate(body, {
+      onSuccess: (data) => {
+        form.reset()
+        setIsAddUserOpen(false)
+        toast.success('Create Account Success !')
+      },
+      onError: (error) => {
+        handleErrorApi({
+          error,
+          setError: form.setError
+        })
+      }
+    })
   }
 
   const handleEditUser = (user: EditUser) => {
@@ -173,17 +182,17 @@ export default function UsersPage() {
 
   // Handle checkbox selection
   interface User {
-    id: number
+    id: string
     name: string
     email: string
     role: string
-    status: string
+    verify: number
     lastLogin: string
     courses: number
     joined: string
   }
 
-  const handleSelectUser = (userId: number) => {
+  const handleSelectUser = (userId: string) => {
     if (selectedUsers.includes(userId)) {
       setSelectedUsers(selectedUsers.filter((id) => id !== userId))
     } else {
@@ -215,7 +224,7 @@ export default function UsersPage() {
     const exportData = filteredUsers.map((user) => ({
       ...user,
       role: user.role === 'Admin' ? 'Quản trị viên' : user.role === 'Instructor' ? 'Giảng viên' : 'Học viên',
-      status: user.status === 'active' ? 'Kích hoạt' : user.status === 'inactive' ? 'Tạm khóa' : 'Chờ xác nhận'
+      status: user.verify === 1 ? 'Kích hoạt' : user.verify === 0 ? 'Tạm khóa' : 'Chờ xác nhận'
     }))
 
     exportToExcel({
@@ -224,6 +233,21 @@ export default function UsersPage() {
       data: exportData,
       columns: columns
     })
+  }
+
+  const { mutateAsync } = useDeleteMutation()
+  const deleteAccount = async (id: string) => {
+    if (id) {
+      try {
+        await mutateAsync(id)
+
+        toast.success('Delete Account Successfully')
+      } catch (error) {
+        handleErrorApi({
+          error
+        })
+      }
+    }
   }
 
   return (
@@ -258,15 +282,17 @@ export default function UsersPage() {
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4 py-4'>
                   <div className='space-y-2'>
                     <Label htmlFor='firstName' className='text-white'>
-                      Họ
-                    </Label>
-                    <Input id='firstName' placeholder='Nguyễn' className='bg-gray-800 border-gray-700 text-white' />
-                  </div>
-                  <div className='space-y-2'>
-                    <Label htmlFor='lastName' className='text-white'>
                       Tên
                     </Label>
-                    <Input id='lastName' placeholder='Văn A' className='bg-gray-800 border-gray-700 text-white' />
+                    <Input
+                      id='name'
+                      {...formR.register('name')}
+                      className={`bg-gray-800 border text-white 
+                        ${formR.formState.errors.name ? 'border-red-500' : 'border-gray-700'}`}
+                    />
+                    {formR.formState.errors.name && (
+                      <p className='text-red-500 text-sm'>{formR.formState.errors.name.message}</p>
+                    )}
                   </div>
                   <div className='space-y-2'>
                     <Label htmlFor='email' className='text-white'>
@@ -274,69 +300,101 @@ export default function UsersPage() {
                     </Label>
                     <Input
                       id='email'
+                      {...formR.register('email')}
                       type='email'
                       placeholder='example@domain.com'
-                      className='bg-gray-800 border-gray-700 text-white'
+                      className={`bg-gray-800 border text-white 
+                        ${formR.formState.errors.email ? 'border-red-500' : 'border-gray-700'}`}
                     />
-                  </div>
-                  <div className='space-y-2'>
-                    <Label htmlFor='phone' className='text-white'>
-                      Số điện thoại
-                    </Label>
-                    <Input id='phone' placeholder='0912345678' className='bg-gray-800 border-gray-700 text-white' />
+                    {formR.formState.errors.email && (
+                      <p className='text-red-500 text-sm'>{formR.formState.errors.email.message}</p>
+                    )}
                   </div>
                   <div className='space-y-2'>
                     <Label htmlFor='password' className='text-white'>
                       Mật khẩu
                     </Label>
-                    <Input id='password' type='password' className='bg-gray-800 border-gray-700 text-white' />
+                    <Input
+                      id='password'
+                      {...formR.register('password')}
+                      type='password'
+                      className={`bg-gray-800 border text-white 
+                        ${formR.formState.errors.password ? 'border-red-500' : 'border-gray-700'}`}
+                    />
+                    {formR.formState.errors.password && (
+                      <p className='text-red-500 text-sm'>{formR.formState.errors.password.message}</p>
+                    )}
                   </div>
                   <div className='space-y-2'>
                     <Label htmlFor='confirmPassword' className='text-white'>
                       Xác nhận mật khẩu
                     </Label>
-                    <Input id='confirmPassword' type='password' className='bg-gray-800 border-gray-700 text-white' />
+                    <Input
+                      id='confirmPassword'
+                      {...formR.register('confirmPassword')}
+                      type='password'
+                      className={`bg-gray-800 border text-white 
+                        ${formR.formState.errors.confirmPassword ? 'border-red-500' : 'border-gray-700'}`}
+                    />
+                    {formR.formState.errors.confirmPassword && (
+                      <p className='text-red-500 text-sm'>{formR.formState.errors.confirmPassword.message}</p>
+                    )}
+                  </div>
+                  <div className='space-y-2'>
+                    <Label htmlFor='confirmPassword' className='text-white'>
+                      Ngày sinh
+                    </Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant='outline'
+                          className={cn(
+                            'bg-gray-800 border-gray-700 text-white placeholder-gray-400 w-full pl-3 text-left font-normal',
+                            formR.formState.errors.dateOfBirth && 'border-red-500',
+                            !formR.watch('dateOfBirth') && 'text-muted-foreground'
+                          )}
+                        >
+                          {formR.watch('dateOfBirth') ? (
+                            format(new Date(formR.watch('dateOfBirth')), 'PPP')
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className='w-auto p-0' align='start'>
+                        <Calendar
+                          mode='single'
+                          selected={formR.watch('dateOfBirth') || new Date()}
+                          onSelect={(date) => formR.setValue('dateOfBirth', date || new Date())}
+                          disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    {formR.formState.errors.dateOfBirth && (
+                      <p className='text-red-500 text-sm'>{formR.formState.errors.dateOfBirth.message}</p>
+                    )}
                   </div>
                   <div className='space-y-2'>
                     <Label htmlFor='role' className='text-white'>
                       Vai trò
                     </Label>
-                    <Select>
-                      <SelectTrigger className='bg-gray-800 border-gray-700 text-white'>
+                    <Select onValueChange={(value) => formR.setValue('role', value)}>
+                      <SelectTrigger
+                        className={`bg-gray-800 border text-white 
+                        ${formR.formState.errors.role ? 'border-red-500' : 'border-gray-700'}`}
+                      >
                         <SelectValue placeholder='Chọn vai trò' />
                       </SelectTrigger>
                       <SelectContent className='bg-gray-800 border-gray-700 text-white'>
-                        <SelectItem value='user'>User</SelectItem>
-                        <SelectItem value='instructor'>Instructor</SelectItem>
-                        <SelectItem value='admin'>Admin</SelectItem>
+                        <SelectItem value='User'>User</SelectItem>
+                        <SelectItem value='Instructor'>Instructor</SelectItem>
                       </SelectContent>
                     </Select>
-                  </div>
-                  <div className='space-y-2'>
-                    <Label htmlFor='status' className='text-white'>
-                      Trạng thái
-                    </Label>
-                    <Select>
-                      <SelectTrigger className='bg-gray-800 border-gray-700 text-white'>
-                        <SelectValue placeholder='Chọn trạng thái' />
-                      </SelectTrigger>
-                      <SelectContent className='bg-gray-800 border-gray-700 text-white'>
-                        <SelectItem value='active'>Kích hoạt</SelectItem>
-                        <SelectItem value='inactive'>Tạm khóa</SelectItem>
-                        <SelectItem value='pending'>Chờ xác nhận</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className='col-span-1 md:col-span-2 space-y-2'>
-                    <Label htmlFor='bio' className='text-white'>
-                      Thông tin thêm
-                    </Label>
-                    <textarea
-                      id='bio'
-                      rows={3}
-                      placeholder='Thông tin thêm về người dùng...'
-                      className='w-full rounded-md bg-gray-800 border-gray-700 text-white p-2'
-                    />
+                    {formR.formState.errors.role && (
+                      <p className='text-red-500 text-sm'>{formR.formState.errors.role.message}</p>
+                    )}
                   </div>
                 </div>
                 <DialogFooter className='flex-col sm:flex-row gap-2 sm:gap-0'>
@@ -347,7 +405,12 @@ export default function UsersPage() {
                   >
                     Hủy
                   </Button>
-                  <Button className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto'>Tạo người dùng</Button>
+                  <Button
+                    onClick={formR.handleSubmit(handleCreateSubmit)}
+                    className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto'
+                  >
+                    Tạo người dùng
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -502,7 +565,7 @@ export default function UsersPage() {
                           </div>
                           <div>
                             <div className='font-medium text-xs sm:text-sm'>{user.name}</div>
-                            <div className='text-xs text-gray-400'>Tham gia: {user.joined}</div>
+                            <div className='text-xs text-gray-400'>Tham gia: {formatDate(user.dateOfBirth)}</div>
                           </div>
                         </div>
                       </td>
@@ -523,21 +586,19 @@ export default function UsersPage() {
                       <td className='py-2 sm:py-3 px-2 sm:px-4'>
                         <Badge
                           className={`text-xs ${
-                            user.status === 'active'
+                            user.verify === 1
                               ? 'bg-green-900/30 text-green-500 hover:bg-green-900/40'
-                              : user.status === 'inactive'
+                              : user.verify === 0
                                 ? 'bg-red-900/30 text-red-500 hover:bg-red-900/40'
                                 : 'bg-yellow-900/30 text-yellow-500 hover:bg-yellow-900/40'
                           }`}
                         >
-                          {user.status === 'active'
-                            ? 'Kích hoạt'
-                            : user.status === 'inactive'
-                              ? 'Tạm khóa'
-                              : 'Chờ xác nhận'}
+                          {user.verify === 1 ? 'Kích hoạt' : user.verify === 0 ? 'Tạm khóa' : 'Chờ xác nhận'}
                         </Badge>
                       </td>
-                      <td className='py-2 sm:py-3 px-2 sm:px-4 text-gray-300 text-xs sm:text-sm'>{user.lastLogin}</td>
+                      <td className='py-2 sm:py-3 px-2 sm:px-4 text-gray-300 text-xs sm:text-sm'>
+                        {formatDate(user.dateOfBirth)}
+                      </td>
                       <td className='py-2 sm:py-3 px-2 sm:px-4'>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -559,7 +620,7 @@ export default function UsersPage() {
                               <Edit className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Chỉnh sửa
                             </DropdownMenuItem>
                             <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'>
-                              {user.status === 'active' ? (
+                              {user.verify === 1 ? (
                                 <>
                                   <XCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Tạm khóa
                                 </>
@@ -570,7 +631,10 @@ export default function UsersPage() {
                               )}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className='bg-gray-700' />
-                            <DropdownMenuItem className='text-red-500 hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'>
+                            <DropdownMenuItem
+                              className='text-red-500 hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'
+                              onClick={() => deleteAccount(user.id)}
+                            >
                               <Trash2 className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Xóa
                             </DropdownMenuItem>
                           </DropdownMenuContent>
@@ -638,21 +702,21 @@ export default function UsersPage() {
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4 py-4'>
                 <div className='space-y-2'>
                   <Label htmlFor='edit-firstName' className='text-white text-sm'>
-                    Họ
+                    Name
                   </Label>
                   <Input
                     id='edit-firstName'
-                    defaultValue={currentUser.name.split(' ').slice(0, -1).join(' ')}
+                    {...form.register('name')}
                     className='bg-gray-800 border-gray-700 text-white'
                   />
                 </div>
                 <div className='space-y-2'>
                   <Label htmlFor='edit-lastName' className='text-white text-sm'>
-                    Tên
+                    UserName
                   </Label>
                   <Input
                     id='edit-lastName'
-                    defaultValue={currentUser.name.split(' ').slice(-1).join(' ')}
+                    {...form.register('username')}
                     className='bg-gray-800 border-gray-700 text-white'
                   />
                 </div>
@@ -663,21 +727,33 @@ export default function UsersPage() {
                   <Input
                     id='edit-email'
                     type='email'
-                    defaultValue={currentUser.email}
+                    {...form.register('email')}
                     className='bg-gray-800 border-gray-700 text-white'
                   />
                 </div>
                 <div className='space-y-2'>
                   <Label htmlFor='edit-phone' className='text-white text-sm'>
-                    Số điện thoại
+                    Giới tính
                   </Label>
-                  <Input id='edit-phone' placeholder='0912345678' className='bg-gray-800 border-gray-700 text-white' />
+                  <Select onValueChange={(value) => form.setValue('gender', value)}>
+                    <SelectTrigger className='bg-gray-800 border-gray-700 text-white'>
+                      <SelectValue placeholder='Chọn giới tính' />
+                    </SelectTrigger>
+                    <SelectContent className='bg-gray-800 border-gray-700 text-white'>
+                      <SelectItem value='male'>male</SelectItem>
+                      <SelectItem value='feMale'>female</SelectItem>
+                      <SelectItem value='other'>other</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className='space-y-2'>
                   <Label htmlFor='edit-role' className='text-white text-sm'>
                     Vai trò
                   </Label>
-                  <Select defaultValue={currentUser.role.toLowerCase()}>
+                  <Select
+                    onValueChange={(value) => form.setValue('role', value)}
+                    defaultValue={currentUser.role.toLowerCase()}
+                  >
                     <SelectTrigger className='bg-gray-800 border-gray-700 text-white'>
                       <SelectValue placeholder='Chọn vai trò' />
                     </SelectTrigger>
@@ -688,26 +764,13 @@ export default function UsersPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className='space-y-2'>
-                  <Label htmlFor='edit-status' className='text-white text-sm'>
-                    Trạng thái
-                  </Label>
-                  <Select defaultValue={currentUser.status}>
-                    <SelectTrigger className='bg-gray-800 border-gray-700 text-white'>
-                      <SelectValue placeholder='Chọn trạng thái' />
-                    </SelectTrigger>
-                    <SelectContent className='bg-gray-800 border-gray-700 text-white'>
-                      <SelectItem value='active'>Kích hoạt</SelectItem>
-                      <SelectItem value='inactive'>Tạm khóa</SelectItem>
-                      <SelectItem value='pending'>Chờ xác nhận</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+
                 <div className='col-span-1 md:col-span-2 space-y-2'>
                   <Label htmlFor='edit-bio' className='text-white text-sm'>
                     Thông tin thêm
                   </Label>
                   <textarea
+                    {...form.register('bio')}
                     id='edit-bio'
                     rows={3}
                     placeholder='Thông tin thêm về người dùng...'
@@ -723,7 +786,12 @@ export default function UsersPage() {
                 >
                   Hủy
                 </Button>
-                <Button className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto'>Lưu thay đổi</Button>
+                <Button
+                  onClick={form.handleSubmit(handleUpdate)}
+                  className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto'
+                >
+                  Lưu thay đổi
+                </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>

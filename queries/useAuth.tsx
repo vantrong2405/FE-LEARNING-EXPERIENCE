@@ -1,6 +1,6 @@
 import authApiRequest from '@/apiRequest/auth'
 import { GetMeResType } from '@/schemaValidator/auth.schema'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 export const useLoginMutation = () => {
   return useMutation({
@@ -55,5 +55,23 @@ export const useUpdateMeMutation = () => {
 export const useChangePasswordMutation = () => {
   return useMutation({
     mutationFn: authApiRequest.changePassword
+  })
+}
+export const useGetListQuery = () => {
+  return useQuery({
+    queryKey: ['list'],
+    queryFn: authApiRequest.list
+  })
+}
+
+export const useDeleteMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: authApiRequest.delete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['user']
+      })
+    }
   })
 }

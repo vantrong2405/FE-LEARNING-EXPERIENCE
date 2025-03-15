@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
@@ -15,25 +15,30 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useCourseQuery, useSearchCourseQuery } from '@/queries/useCourse'
+import { useCourseQuery } from '@/queries/useCourse'
 import { useCategoryListQuery } from '@/queries/useCategory'
 import { useLevelListQuery } from '@/queries/useLevel'
-import { pagination } from '@/constants/pagination-config'
+import { pagination, paginationGeneral } from '@/constants/pagination-config'
+import { PaginationDemo } from '@/lib/pagination'
+import { useRouter } from 'next/navigation'
 
 export default function CoursesPage() {
-  const courseQuery = useCourseQuery(pagination.LIMIT, pagination.PAGE)
-  const categoryQuery = useCategoryListQuery(pagination.LIMIT, pagination.PAGE)
-  const levelQuery = useLevelListQuery(pagination.LIMIT, pagination.PAGE)
+  const [page, setPage] = useState(1)
+  const courseQuery = useCourseQuery(pagination.LIMIT, page)
+  const categoryQuery = useCategoryListQuery(paginationGeneral.LIMIT, pagination.PAGE)
+  const levelQuery = useLevelListQuery(paginationGeneral.LIMIT, pagination.PAGE)
 
   const courses = courseQuery.data?.payload.data.data ?? []
+  const data = courseQuery.data?.payload.data.pagination
+
   const categories = categoryQuery.data?.payload.data.data ?? []
   const levels = levelQuery.data?.payload.data.data ?? []
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [priceRange, setPriceRange] = useState([0, 1000000])
   const [searchQuery, setSearchQuery] = useState('')
   const [filteredCourses, setFilteredCourses] = useState(courses)
-  const searchCourseQuery = useSearchCourseQuery(pagination.LIMIT, pagination.PAGE, searchQuery)
-  const searchCourse = searchCourseQuery.data?.payload.data.data ?? []
+
+  const router = useRouter()
 
   useEffect(() => {
     if (!courses.length) return
@@ -53,11 +58,15 @@ export default function CoursesPage() {
   const [category, setCategory] = useState('')
   const [level, setLevel] = useState('')
 
+  const handlePageChange = useCallback((newPage: number) => {
+    setPage(newPage)
+  }, [])
   const handleFilter = () => {
     // Implement your filter logic here
     console.log('Filtering with:', { searchQuery, priceRange, category, level })
     setIsDialogOpen(false)
   }
+
   return (
     <div className='container mx-auto px-4 py-8 space-y-12 bg-white dark:bg-gray-900'>
       <section className='space-y-4'>
@@ -339,6 +348,13 @@ export default function CoursesPage() {
             </Card>
           ))}
         </div>
+        <PaginationDemo
+          total={data?.total ?? 0}
+          page={data?.page ?? 1}
+          limit={data?.limit ?? 2}
+          totalPages={data?.totalPages ?? 1}
+          onPageChange={handlePageChange}
+        />
       </section>
 
       <section className='space-y-6'>

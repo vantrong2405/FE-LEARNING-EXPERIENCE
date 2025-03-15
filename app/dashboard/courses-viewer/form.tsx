@@ -3,17 +3,21 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Progress } from '@/components/ui/progress'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { PlayCircle, CheckCircle, ChevronLeft, BookOpen, Clock, Users, Star, Github, Menu } from 'lucide-react'
+import { useLessonByIdQuery } from '@/queries/useLesson'
+import { pagination } from '@/constants/pagination-config'
+import { useCourseQuery } from '@/queries/useCourse'
 
 const CourseViewer = () => {
   const [currentLesson, setCurrentLesson] = useState(0)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const courseListQuery = useCourseQuery(pagination.LIMIT, pagination.PAGE)
+  const courseIds = courseListQuery.data?.payload.data?.data.map((course) => course.id) || []
+  //const lessonByIdQuery = useLessonByIdQuery(pagination.LIMIT, pagination.PAGE,courseIds)
 
   const course = {
     title: 'Mastering Full-Stack Web Development: React, Node.js, and Beyond',

@@ -1,5 +1,5 @@
 import courseApiRequest from '@/apiRequest/course'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 export const useCourseQuery = (page: number, limit: number) => {
   return useQuery({
@@ -17,5 +17,16 @@ export const useSearchCourseQuery = (limit: number, page: number, query: string)
   return useQuery({
     queryKey: ['course', page, limit, query],
     queryFn: () => courseApiRequest.courseSearch(page, limit, query)
+  })
+}
+export const useDeleteCourseMutation = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: courseApiRequest.delete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['course']
+      })
+    }
   })
 }

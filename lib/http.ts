@@ -7,7 +7,7 @@ type CustomOptions = Omit<RequestInit, 'method'> & {
 }
 
 const ENTITY_ERROR_STATUS = 422
-const AUTHENTICATION_ERROR_STATUS = 400
+const AUTHENTICATION_ERROR_STATUS = 401
 
 type EntityErrorPayload = {
   message: string
@@ -96,7 +96,7 @@ const request = async <Response>(
       )
     } else if (res.status === AUTHENTICATION_ERROR_STATUS) {
       const access_token = (options?.headers as any)?.Authorization?.split('Bearer ')[1]
-      redirect(`/logout?accessToken=${access_token}`)
+      redirect(`/auth/logout?accessToken=${access_token}`)
     } else {
       throw new HttpError(data)
     }

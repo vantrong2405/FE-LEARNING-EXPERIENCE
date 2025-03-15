@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Search, Trash2, CreditCard, Plus, Minus, ShoppingCart, ChevronLeft, Info, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
@@ -8,64 +8,32 @@ import { Checkbox } from '@/components/ui/checkbox'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Badge } from '@/components/ui/badge'
-
-// Sample data with updated image URL
-const cartItems = [
-  {
-    id: 'cart-1',
-    price: 599000,
-    originalPrice: 799000,
-    quantity: 1,
-    course: {
-      id: 'course-1',
-      title: 'Excel Cấp Tốc - Từ Cơ Bản Đến Nâng Cao Cho Dân Văn Phòng',
-      thumbnailUrl:
-        'https://trungtamtinhocdanang.com/wp-content/uploads/2021/11/khoa-hoc-excel-cap-toc-tu-co-ban-den-nang-cao.jpg',
-      instructor: {
-        name: 'Nguyễn Văn A'
-      }
-    }
-  },
-  {
-    id: 'cart-2',
-    price: 799000,
-    originalPrice: 999000,
-    quantity: 1,
-    course: {
-      id: 'course-2',
-      title: 'Power BI - Phân Tích Dữ Liệu Chuyên Nghiệp Cho Doanh Nghiệp',
-      thumbnailUrl:
-        'https://trungtamtinhocdanang.com/wp-content/uploads/2021/11/khoa-hoc-excel-cap-toc-tu-co-ban-den-nang-cao.jpg',
-      instructor: {
-        name: 'Trần Thị B'
-      }
-    }
-  },
-  {
-    id: 'cart-3',
-    price: 899000,
-    originalPrice: 1299000,
-    quantity: 1,
-    course: {
-      id: 'course-3',
-      title: 'SQL Server - Từ Cơ Bản Đến Nâng Cao Cho Người Mới Bắt Đầu',
-      thumbnailUrl:
-        'https://trungtamtinhocdanang.com/wp-content/uploads/2021/11/khoa-hoc-excel-cap-toc-tu-co-ban-den-nang-cao.jpg',
-      instructor: {
-        name: 'Lê Văn C'
-      }
-    }
-  }
-]
+import { useCartQuery, useDeleteCartItemMutation, useTotalCartMutation } from '@/queries/useCart'
+import { pathURL } from '@/constants/path'
+import { handleErrorApi } from '@/lib/utils'
+import { TotalCartBodyType } from '@/schemaValidator/cart.schema'
+import { useCart } from '@/components/ui/cart-context'
 
 export default function CartPage() {
-  const [cart, setCart] = useState(cartItems)
-  const [selectedItems, setSelectedItems] = useState<string[]>([])
+  const { cart, setCart, selectedItems, setSelectedItems } = useCart()
+  const deleteCartItemMutation = useDeleteCartItemMutation()
+  const totalCartMutation = useTotalCartMutation()
 
-  const handleRemoveItem = (id: string) => {
-    setCart(cart.filter((item) => item.id !== id))
-    setSelectedItems(selectedItems.filter((itemId) => itemId !== id))
+  const deleteCartItem = async (id: string) => {
+    try {
+      deleteCartItemMutation.mutateAsync(id)
+    } catch (error) {
+      handleErrorApi({ error })
+    }
+  }
+
+  const handleTotalCart = (body: TotalCartBodyType) => {
+    totalCartMutation.mutate(body, {
+      onSuccess: (data) => {},
+      onError: (error) => {
+        handleErrorApi({ error })
+      }
+    })
   }
 
   const handleQuantityChange = (id: string, quantity: number) => {
@@ -92,7 +60,7 @@ export default function CartPage() {
 
   const selectedItemsData = cart.filter((item) => selectedItems.includes(item.id))
   const totalAmount = selectedItemsData.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const totalOriginalAmount = selectedItemsData.reduce((sum, item) => sum + item.originalPrice * item.quantity, 0)
+  const totalOriginalAmount = selectedItemsData.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const totalDiscount = totalOriginalAmount - totalAmount
 
   return (
@@ -112,7 +80,7 @@ export default function CartPage() {
             className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white hidden sm:flex'
             asChild
           >
-            <Link href='/courses'>
+            <Link href={pathURL.dashboard_courses}>
               <ChevronLeft className='h-5 w-5 mr-2' />
               Tiếp tục mua sắm
             </Link>
@@ -128,7 +96,15 @@ export default function CartPage() {
                 <div className='w-8 mr-6'>
                   <Checkbox
                     checked={isAllSelected}
-                    onCheckedChange={(checked) => handleSelectAll(checked as boolean)}
+                    onCheckedChange={(checked) => {
+                      handleSelectAll(checked as boolean)
+
+                      if (checked) {
+                        handleTotalCart({ courseIds: cart.map((item) => item.courseId) })
+                      } else {
+                        handleTotalCart({ courseIds: [] })
+                      }
+                    }}
                     className='border-gray-600 h-5 w-5'
                   />
                 </div>
@@ -183,9 +159,7 @@ export default function CartPage() {
 
                       <div className='flex justify-between items-center mt-3'>
                         <div>
-                          <p className='text-sm text-gray-400 line-through'>
-                            {item.originalPrice.toLocaleString('vi-VN')}đ
-                          </p>
+                          <p className='text-sm text-gray-400 line-through'>{item.price.toLocaleString('vi-VN')}đ</p>
                           <p className='text-xl font-bold text-purple-400'>{item.price.toLocaleString('vi-VN')}đ</p>
                         </div>
                         <div className='flex items-center gap-3'>
@@ -204,7 +178,7 @@ export default function CartPage() {
                             className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                             asChild
                           >
-                            <Link href={`/courses/${item.course.id}`}>
+                            <Link href={pathURL.courses_detail(item.course.id)}>
                               <Search className='h-4 w-4 mr-2' />
                               Chi tiết
                             </Link>
@@ -213,7 +187,7 @@ export default function CartPage() {
                             variant='outline'
                             size='sm'
                             className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
-                            onClick={() => handleRemoveItem(item.id)}
+                            onClick={() => deleteCartItem(item.id)}
                           >
                             <Trash2 className='h-4 w-4 mr-2' />
                             Xóa
@@ -234,7 +208,7 @@ export default function CartPage() {
                             className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                             asChild
                           >
-                            <Link href={`/courses/${item.course.id}`}>
+                            <Link href={pathURL.courses_detail(item.course.id)}>
                               <Search className='h-4 w-4 mr-2' />
                               Chi tiết
                             </Link>
@@ -243,7 +217,7 @@ export default function CartPage() {
                             variant='outline'
                             size='sm'
                             className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
-                            onClick={() => handleRemoveItem(item.id)}
+                            onClick={() => deleteCartItem(item.id)}
                           >
                             <Trash2 className='h-4 w-4 mr-2' />
                             Xóa
@@ -252,9 +226,7 @@ export default function CartPage() {
                       </div>
 
                       <div className='w-36 text-center'>
-                        <p className='text-sm text-gray-400 line-through'>
-                          {item.originalPrice.toLocaleString('vi-VN')}đ
-                        </p>
+                        <p className='text-sm text-gray-400 line-through'>{item.price.toLocaleString('vi-VN')}đ</p>
                         <p className='text-xl font-bold text-purple-400'>{item.price.toLocaleString('vi-VN')}đ</p>
                       </div>
 
@@ -356,15 +328,17 @@ export default function CartPage() {
                   </div>
                 </div>
               </CardContent>
-              <CardFooter className='p-6 pt-0'>
-                <Button
-                  className='w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-7 text-lg'
-                  disabled={selectedItems.length === 0}
-                >
-                  <CreditCard className='h-6 w-6 mr-3' />
-                  Thanh Toán Ngay
-                </Button>
-              </CardFooter>
+              <Link href={pathURL.payment}>
+                <CardFooter className='p-6 pt-0'>
+                  <Button
+                    className='w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-7 text-lg'
+                    disabled={selectedItems.length === 0}
+                  >
+                    <CreditCard className='h-6 w-6 mr-3' />
+                    Thanh Toán Ngay
+                  </Button>
+                </CardFooter>
+              </Link>
             </Card>
 
             {/* Mobile Continue Shopping Button */}
@@ -374,7 +348,7 @@ export default function CartPage() {
                 className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full'
                 asChild
               >
-                <Link href='/courses'>
+                <Link href={pathURL.dashboard_courses}>
                   <ChevronLeft className='h-4 w-4 mr-2' />
                   Tiếp tục mua sắm
                 </Link>
@@ -391,7 +365,7 @@ export default function CartPage() {
                 className='mt-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-lg py-6 px-8'
                 asChild
               >
-                <Link href='/courses'>Khám Phá Khóa Học</Link>
+                <Link href={pathURL.dashboard_courses}>Khám Phá Khóa Học</Link>
               </Button>
             </div>
           </Card>
