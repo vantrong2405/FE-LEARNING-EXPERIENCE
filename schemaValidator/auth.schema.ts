@@ -54,7 +54,8 @@ export const RegisterBody = z
         message: 'Invalid date format'
       }),
 
-    role: z.string({ required_error: 'RoleId is required' })
+    role: z.string({ required_error: 'Role is required' }),
+    verify: z.number({ required_error: 'Role is required' }).optional()
   })
 
   .strict()
@@ -188,13 +189,13 @@ export type GetMeResType = z.infer<typeof GetMeRes>
 
 export const MeBody = z
   .object({
-    name: z.string().min(5),
-    //email: z.string(),
-    // username: z.string(),
-    gender: z.string()
-    // dateOfBirth: z.string(),
-    // bio: z.string().nullable(),
-    // avatarUrl: z.string().nullable()
+    name: z.string().min(2),
+    email: z.string().optional(),
+    username: z.string().optional(),
+    gender: z.string({ required_error: 'gender is required' }),
+    bio: z.string().nullable().optional(),
+    role: z.string({ required_error: 'Role is required' }).optional(),
+    avatarUrl: z.string().optional()
   })
   .strict()
 
@@ -231,3 +232,60 @@ export const ChangePasswordBody = z
   .strict()
 
 export type ChangePasswordBodyType = z.TypeOf<typeof ChangePasswordBody>
+
+const ReviewSchema = z.object({
+  id: z.string().uuid(),
+  userId: z.string().uuid(),
+  courseId: z.string().uuid(),
+  rating: z.number().min(1).max(5),
+  comment: z.string(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime()
+})
+
+const CourseSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string(),
+  description: z.string(),
+  price: z.number().positive(),
+  thumbnailUrl: z.string().url(),
+  bannerUrl: z.string().url(),
+  instructorId: z.string().uuid(),
+  categoryId: z.string().uuid(),
+  isPublished: z.boolean(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+  rating: z.number().min(0).max(5),
+  totalReviews: z.number().nonnegative(),
+  moneyBackGuarantee: z.boolean(),
+  videoHours: z.number().positive(),
+  articlesCount: z.number().nonnegative(),
+  downloadableResources: z.number().nonnegative(),
+  lifetimeAccess: z.boolean(),
+  certificate: z.boolean(),
+  courseOverview: z.string(),
+  learningObjectives: z.string(),
+  courseFeatures: z.string(),
+  requirements: z.string(),
+  levelId: z.string().uuid()
+})
+
+const UserSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  email: z.string().email(),
+  username: z.string(),
+  gender: z.enum(['Male', 'Female', 'Other']),
+  dateOfBirth: z.string().datetime(),
+  bio: z.string(),
+  avatarUrl: z.string().url(),
+  courses: z.array(CourseSchema),
+  reviews: z.array(ReviewSchema),
+  role: z.string(),
+  verify: z.number().min(0).max(1)
+})
+
+const DataSchema = z.object({
+  data: z.array(UserSchema)
+})
+export type GetListMeResType = z.TypeOf<typeof DataSchema>

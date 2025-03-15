@@ -14,7 +14,7 @@ import { UserCircle, LogOut } from 'lucide-react'
 import Chatbox from '../chatbox/Chatbox'
 import { useGetMeQuery, useLogoutMutation } from '@/queries/useAuth'
 import { getRefreshTokenFromLocalStorage } from '@/lib/utils'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 
 const navItems = [
   { name: 'Home', href: '#home' },
@@ -36,6 +36,8 @@ export default function Header() {
   const GetMeQuery = useGetMeQuery()
   const { email, name } = GetMeQuery.data?.payload.data ?? {}
   const router = useRouter()
+  const pathname = usePathname()
+  const isHomePage = pathname === pathURL.home
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY)
@@ -74,18 +76,30 @@ export default function Header() {
   }, [])
 
   const handleSignOut = () => {
-    const refreshToken = getRefreshTokenFromLocalStorage() as string
-    logoutMutation.mutate(
-      { refreshToken },
-      {
-        onSuccess: () => {
-          localStorage.removeItem('access_token')
-          localStorage.removeItem('refresh_token')
-          setIsLoggedIn(false)
-          router.push('/login')
+    const refreshToken = getRefreshTokenFromLocalStorage() as string | null
+
+    if (refreshToken) {
+      logoutMutation.mutate(
+        { refreshToken },
+        {
+          onSuccess: () => {
+            cleanUpAndRedirect()
+          },
+          onError: () => {
+            cleanUpAndRedirect()
+          }
         }
-      }
-    )
+      )
+    } else {
+      cleanUpAndRedirect()
+    }
+  }
+
+  const cleanUpAndRedirect = () => {
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
+    setIsLoggedIn(false)
+    router.push('/login')
   }
 
   return (
@@ -101,45 +115,48 @@ export default function Header() {
                 ELearn
               </span>
             </Link>
-            <nav className='hidden md:flex space-x-6'>
-              {navItems.map((item, index) => (
-                <Button
-                  key={index}
-                  variant='ghost'
-                  className='text-gray-900 dark:text-white hover:text-purple-400 transition-colors'
-                  onClick={() => scrollToSection(item.name.toLowerCase())}
-                >
-                  {item.name}
-                </Button>
-              ))}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+            {isHomePage && (
+              <nav className='hidden md:flex space-x-6'>
+                {navItems.map((item, index) => (
                   <Button
+                    key={index}
                     variant='ghost'
                     className='text-gray-900 dark:text-white hover:text-purple-400 transition-colors'
+                    onClick={() => scrollToSection(item.name.toLowerCase())}
                   >
-                    More <Icons.ChevronDown className='ml-1 h-4 w-4' />
+                    {item.name}
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className='bg-white dark:bg-gray-800'>
-                  <DropdownMenuItem>
-                    <Link href='#' className='text-gray-900 dark:text-white hover:text-purple-400'>
-                      Blog
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link href='#' className='text-gray-900 dark:text-white hover:text-purple-400'>
-                      About Us
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Link href='#' className='text-gray-900 dark:text-white hover:text-purple-400'>
-                      Contact
-                    </Link>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </nav>
+                ))}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant='ghost'
+                      className='text-gray-900 dark:text-white hover:text-purple-400 transition-colors'
+                    >
+                      More <Icons.ChevronDown className='ml-1 h-4 w-4' />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className='bg-white dark:bg-gray-800'>
+                    <DropdownMenuItem>
+                      <Link href='#' className='text-gray-900 dark:text-white hover:text-purple-400'>
+                        Blog
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Link href='#' className='text-gray-900 dark:text-white hover:text-purple-400'>
+                        About Us
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Link href='#' className='text-gray-900 dark:text-white hover:text-purple-400'>
+                        Contact
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </nav>
+            )}
+
             <div className='hidden md:flex items-center space-x-4'>
               <ModeToggle />
               <Button
@@ -162,12 +179,12 @@ export default function Header() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className='w-56' align='end' forceMount>
-                    <DropdownMenuItem className='flex items-center'>
-                      <UserCircle className='mr-2 h-4 w-4' />
-                      <Link href={pathURL.profile}>
+                    <Link href={pathURL.profile}>
+                      <DropdownMenuItem className='flex items-center'>
+                        <UserCircle className='mr-2 h-4 w-4' />
                         <span>{name}</span>
-                      </Link>
-                    </DropdownMenuItem>
+                      </DropdownMenuItem>
+                    </Link>
                     <DropdownMenuItem className='flex items-center' onClick={handleSignOut}>
                       <LogOut className='mr-2 h-4 w-4' />
                       <span>Sign out</span>
@@ -201,7 +218,7 @@ export default function Header() {
               {isMenuOpen ? <Icons.X className='h-6 w-6' /> : <Icons.Menu className='h-6 w-6' />}
             </Button>
           </div>
-          {isMenuOpen && (
+          {isHomePage && isMenuOpen && (
             <div className='mt-4 md:hidden transition-all duration-300 ease-in-out'>
               {navItems.map((item, index) => (
                 <Button

@@ -2,6 +2,7 @@ import http from '@/lib/http'
 import {
   ChangePasswordBodyType,
   ForgotPasswordBodyType,
+  GetListMeResType,
   GetMeResType,
   LoginBodyType,
   LoginResType,
@@ -31,6 +32,8 @@ const authApiRequest = {
   resetPassword: (body: ResetPasswordBodyType) => http.post('auth/reset-password', body),
   getMe: () => http.get<GetMeResType>('auth/get-me'),
   updateMe: (body: MeBodyType) => http.post<GetMeResType>('auth/update-me', body),
-  changePassword: (body: ChangePasswordBodyType) => http.post('auth/change-password', body)
+  changePassword: (body: ChangePasswordBodyType) => http.post('auth/change-password', body),
+  list: () => http.get<GetListMeResType>('/auth/users'),
+  delete: (id: string) => http.delete(`auth/users/${id}`)
 }
 export default authApiRequest

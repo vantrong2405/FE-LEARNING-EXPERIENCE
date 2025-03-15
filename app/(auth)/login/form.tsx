@@ -10,13 +10,27 @@ import { Icons } from '@/components/ui/icons'
 import { pathURL } from '@/constants/path'
 import { useLoginMutation } from '@/queries/useAuth'
 import { useRouter } from 'next/navigation'
-import { getOauthGoogleUrl } from '@/app/hooks/auth/useLoginOathGoogle'
-import { handleErrorApi, setAccessTokenToLocalStorage, setRefreshTokenToLocalStorage } from '@/lib/utils'
+import {
+  getAccessTokenFromLocalStorage,
+  getRefreshTokenFromLocalStorage,
+  handleErrorApi,
+  setAccessTokenToLocalStorage,
+  setRefreshTokenToLocalStorage
+} from '@/lib/utils'
 import { useForm } from 'react-hook-form'
 import { LoginBody, LoginBodyType } from '@/schemaValidator/auth.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
+import envConfig from '@/config'
 
 export default function FormLogin() {
+  const router = useRouter()
+
+  const accessToken = getAccessTokenFromLocalStorage()
+  const refreshToken = getRefreshTokenFromLocalStorage()
+  if (accessToken && refreshToken) {
+    router.back()
+  }
+
   const [showPassword, setShowPassword] = useState(false)
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
@@ -27,7 +41,6 @@ export default function FormLogin() {
   })
 
   const loginMutation = useLoginMutation()
-  const router = useRouter()
 
   const handleLogin = (body: LoginBodyType) => {
     loginMutation.mutate(body, {
@@ -59,7 +72,23 @@ export default function FormLogin() {
   const togglePasswordVisibility = () => setShowPassword(!showPassword)
 
   // URL đăng nhập với Google OAuth
-  const oauthURL = getOauthGoogleUrl()
+  const getOauthGoogleUrl = () => {
+    const rootUrl = 'https://accounts.google.com/o/oauth2/v2/auth'
+    const options = {
+      redirect_uri: envConfig.NEXT_PUBLIC_VITE_GOOGLE_AUTHORIZED_REDIRECT_URI,
+      client_id: envConfig.NEXT_PUBLIC_VITE_GOOGLE_CLIENT_ID,
+      access_type: 'offline',
+      response_type: 'code',
+      prompt: 'consent',
+      scope: [
+        'https://www.googleapis.com/auth/userinfo.profile',
+        'https://www.googleapis.com/auth/userinfo.email'
+      ].join(' ')
+    }
+    const qs = new URLSearchParams(options)
+    return `${rootUrl}?${qs.toString()}`
+  }
+  const gogleOauthUrl = getOauthGoogleUrl()
 
   return (
     <div className='min-h-screen flex items-center justify-center dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden'>
@@ -123,7 +152,7 @@ export default function FormLogin() {
           >
             Sign In
           </Button>
-          <Link href={oauthURL}>
+          <Link href={gogleOauthUrl}>
             <Button variant='secondary' className='w-full flex items-center'>
               <Icons.Globe className='mr-2' />
               Sign in with Google
