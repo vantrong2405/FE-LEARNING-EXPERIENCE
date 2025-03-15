@@ -53,10 +53,17 @@ export const CourseSchema = z.object({
   category: CategorySchema
 })
 
+export const paginationRes = z.object({
+  total: z.number(),
+  page: z.number(),
+  limit: z.number(),
+  totalPages: z.number()
+})
 export const GetCourseRes = z.object({
   statusCode: z.number(),
   data: z.object({
-    data: z.array(CourseSchema)
+    data: z.array(CourseSchema),
+    pagination: paginationRes
   })
 })
 

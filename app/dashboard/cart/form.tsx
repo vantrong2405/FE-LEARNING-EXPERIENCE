@@ -12,16 +12,10 @@ import { useCartQuery, useDeleteCartItemMutation, useTotalCartMutation } from '@
 import { pathURL } from '@/constants/path'
 import { handleErrorApi } from '@/lib/utils'
 import { TotalCartBodyType } from '@/schemaValidator/cart.schema'
+import { useCart } from '@/components/ui/cart-context'
 
 export default function CartPage() {
-  const cartlistQuery = useCartQuery()
-  const cartItems = cartlistQuery.data?.payload.data.cartItems || []
-  const [cart, setCart] = useState(cartItems)
-  useEffect(() => {
-    setCart(cartItems)
-  }, [cartItems])
-
-  const [selectedItems, setSelectedItems] = useState<string[]>([])
+  const { cart, setCart, selectedItems, setSelectedItems } = useCart()
   const deleteCartItemMutation = useDeleteCartItemMutation()
   const totalCartMutation = useTotalCartMutation()
 
@@ -334,15 +328,17 @@ export default function CartPage() {
                   </div>
                 </div>
               </CardContent>
-              <CardFooter className='p-6 pt-0'>
-                <Button
-                  className='w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-7 text-lg'
-                  disabled={selectedItems.length === 0}
-                >
-                  <CreditCard className='h-6 w-6 mr-3' />
-                  Thanh Toán Ngay
-                </Button>
-              </CardFooter>
+              <Link href={pathURL.payment}>
+                <CardFooter className='p-6 pt-0'>
+                  <Button
+                    className='w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-7 text-lg'
+                    disabled={selectedItems.length === 0}
+                  >
+                    <CreditCard className='h-6 w-6 mr-3' />
+                    Thanh Toán Ngay
+                  </Button>
+                </CardFooter>
+              </Link>
             </Card>
 
             {/* Mobile Continue Shopping Button */}

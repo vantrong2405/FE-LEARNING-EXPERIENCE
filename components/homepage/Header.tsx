@@ -76,18 +76,30 @@ export default function Header() {
   }, [])
 
   const handleSignOut = () => {
-    const refreshToken = getRefreshTokenFromLocalStorage() as string
-    logoutMutation.mutate(
-      { refreshToken },
-      {
-        onSuccess: () => {
-          localStorage.removeItem('access_token')
-          localStorage.removeItem('refresh_token')
-          setIsLoggedIn(false)
-          router.push('/login')
+    const refreshToken = getRefreshTokenFromLocalStorage() as string | null
+
+    if (refreshToken) {
+      logoutMutation.mutate(
+        { refreshToken },
+        {
+          onSuccess: () => {
+            cleanUpAndRedirect()
+          },
+          onError: () => {
+            cleanUpAndRedirect()
+          }
         }
-      }
-    )
+      )
+    } else {
+      cleanUpAndRedirect()
+    }
+  }
+
+  const cleanUpAndRedirect = () => {
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
+    setIsLoggedIn(false)
+    router.push('/login')
   }
 
   return (
@@ -167,12 +179,12 @@ export default function Header() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className='w-56' align='end' forceMount>
-                    <DropdownMenuItem className='flex items-center'>
-                      <UserCircle className='mr-2 h-4 w-4' />
-                      <Link href={pathURL.profile}>
+                    <Link href={pathURL.profile}>
+                      <DropdownMenuItem className='flex items-center'>
+                        <UserCircle className='mr-2 h-4 w-4' />
                         <span>{name}</span>
-                      </Link>
-                    </DropdownMenuItem>
+                      </DropdownMenuItem>
+                    </Link>
                     <DropdownMenuItem className='flex items-center' onClick={handleSignOut}>
                       <LogOut className='mr-2 h-4 w-4' />
                       <span>Sign out</span>

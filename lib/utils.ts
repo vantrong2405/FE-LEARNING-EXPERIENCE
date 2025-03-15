@@ -37,7 +37,7 @@ export const handleErrorApi = ({
       duration: duration ?? 5000
     })
   } else {
-    toast.error('Đã xảy ra lỗi, vui lòng thử lại!', {
+    toast.error('Bạn chưa đăng nhập!', {
       duration: duration ?? 5000
     })
   }

@@ -10,7 +10,6 @@ import { pathURL } from '@/constants/path'
 export default function FeaturedCourses() {
   const courseQuery = useCourseQuery(4, pagination.PAGE)
   const courses = courseQuery.data?.payload.data.data ?? []
-  console.log('🚀 ~ FeaturedCourses ~ courses:', courses)
 
   return (
     <div className='dark:bg-gray-900 py-24'>
@@ -23,7 +22,7 @@ export default function FeaturedCourses() {
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8'>
           {courses.map((course, index) => (
             <div key={index} className='animate-fade-in-up' style={{ animationDelay: `${index * 100}ms` }}>
-              <Card className='dark:bg-gray-800 dark:border-gray-700 overflow-hidden transform hover:scale-105 transition-transform duration-300'>
+              <Card className='dark:bg-gray-800 dark:border-gray-700 overflow-hidden transform hover:scale-105 transition-transform duration-300 flex flex-col h-full'>
                 <CardHeader className='p-0'>
                   <div className='relative'>
                     <Image
@@ -33,21 +32,18 @@ export default function FeaturedCourses() {
                       height={225}
                       className='w-full h-48 object-cover'
                     />
-                    <Badge className='absolute top-2 right-2 bg-gradient-to-r from-purple-500 to-pink-500 font-semibold px-3 py-1'>
-                      {'Hot trend'}
-                    </Badge>
+                    {/* <Badge className='absolute top-2 right-2 bg-gradient-to-r from-purple-500 to-pink-500 font-semibold px-3 py-1'>
+                      {course.badge || 'Hot Trend'}
+                    </Badge> */}
                   </div>
                 </CardHeader>
-                <CardContent className='p-6'>
+                <CardContent className='p-6 flex-1 flex flex-col'>
                   <CardTitle className='text-xl mb-3 truncate'>{course.title}</CardTitle>
-                  <p className='text-gray-400 text-sm mb-4'>{course.description}</p>
+                  <p className='text-gray-400 text-sm mb-4 flex-grow'>{course.description}</p>
                 </CardContent>
-                <CardFooter className='dark:bg-gray-800 border-t dark:border-gray-700 p-4'>
+                <CardFooter className='dark:bg-gray-800 border-t dark:border-gray-700 p-4 mt-auto'>
                   <Link href={pathURL.courses_detail(course.id)} className='w-full'>
-                    <Button
-                      variant='secondary'
-                      className='w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
-                    >
+                    <Button className='w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'>
                       Learn More
                     </Button>
                   </Link>

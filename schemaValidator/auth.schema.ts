@@ -54,7 +54,8 @@ export const RegisterBody = z
         message: 'Invalid date format'
       }),
 
-    role: z.string({ required_error: 'Role is required' })
+    role: z.string({ required_error: 'Role is required' }),
+    verify: z.number({ required_error: 'Role is required' }).optional()
   })
 
   .strict()
@@ -193,7 +194,8 @@ export const MeBody = z
     username: z.string().optional(),
     gender: z.string({ required_error: 'gender is required' }),
     bio: z.string().nullable().optional(),
-    role: z.string({ required_error: 'Role is required' }).optional()
+    role: z.string({ required_error: 'Role is required' }).optional(),
+    avatarUrl: z.string().optional()
   })
   .strict()
 

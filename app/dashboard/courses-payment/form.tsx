@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
@@ -9,13 +9,45 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Input } from '@/components/ui/input'
 import { QrCode, CreditCard, RefreshCw, Tag, Clock, User, BanknoteIcon, CopyIcon, AlertCircle } from 'lucide-react'
 import qr from '@/public/assets/images/qr.png'
+import { useCart } from '@/components/ui/cart-context'
+
+interface CartItem {
+  cartId: string
+  course: {
+    id: string
+    description: string
+    instructor: {
+      avatarUrl: string
+      name: string
+    }
+    thumbnailUrl: string
+    title: string
+  }
+  id: string
+  courseId: string
+  createdAt: string
+  updatedAt: string
+  price: number
+  quantity: number
+}
 
 const QRPayment = () => {
+  const { cart, selectedItems } = useCart() as { cart: CartItem[]; selectedItems: string[] }
+
+  const selectedItemsData = useMemo(() => {
+    return cart.filter((item) => selectedItems.includes(item.id))
+  }, [cart, selectedItems])
+
+  useEffect(() => {
+    console.log('cart updated', cart)
+    console.log('selectedItemsData', selectedItemsData)
+  }, [cart])
+
   const [paymentMethod, setPaymentMethod] = useState('qr')
   const [paymentStatus, setPaymentStatus] = useState('pending')
   const [voucher, setVoucher] = useState('')
   const [price, setPrice] = useState(129.99)
-  const [discount, setDiscount] = useState(70.0)
+  const [discount, setDiscount] = useState(0)
   const [timeLeft, setTimeLeft] = useState(900) // 15 minutes in seconds
   const [paymentCode, setPaymentCode] = useState('')
   const [copiedField, setCopiedField] = useState('')
@@ -211,35 +243,49 @@ const QRPayment = () => {
             <CardTitle className='text-2xl font-semibold text-gray-900 dark:text-white'>Order Summary</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className='flex items-center space-x-4 mb-6'>
-              <Image
-                src='https://static.vecteezy.com/system/resources/thumbnails/022/059/000/small/no-image-available-icon-vector.jpg'
-                alt='Course Thumbnail'
-                width={80}
-                height={80}
-                className='rounded-lg shadow-md'
-              />
-              <div>
-                <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>
-                  Mastering Full-Stack Web Development
-                </h3>
-                <p className='text-sm text-gray-700 dark:text-gray-300'>React, Node.js, and Beyond</p>
+            <>
+              {cart.map((cartItem) => (
+                <div key={cartItem.id}>
+                  {/* Thông tin khóa học */}
+                  <div className='flex items-center space-x-4 mb-6'>
+                    <Image
+                      src={cartItem.course.thumbnailUrl}
+                      alt='Course Thumbnail'
+                      width={80}
+                      height={80}
+                      className='rounded-lg shadow-md'
+                    />
+                    <div>
+                      <h3 className='text-lg font-semibold text-gray-900 dark:text-white'>{cartItem.course.title}</h3>
+                      <p className='text-sm text-gray-700 dark:text-gray-300'>{cartItem.course.description}</p>
+                    </div>
+                  </div>
+
+                  {/* Thông tin giá cả */}
+                  <div className='space-y-2 mb-6'>
+                    <div className='flex justify-between'>
+                      <span className='text-gray-700 dark:text-gray-300'>Original Price:</span>
+                      <span className='text-gray-900 dark:text-white'>${cartItem.price.toFixed(2)}</span>
+                    </div>
+                    <div className='flex justify-between'>
+                      <span className='text-gray-700 dark:text-gray-300'>Discount:</span>
+                      {discount > 0 ? <span className='text-green-600'>-${discount.toFixed(2)}</span> : 0}
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Hiển thị tổng giá */}
+              <div className='border-t pt-4 mt-4'>
+                <div className='flex justify-between text-lg font-semibold'>
+                  <span className='text-gray-900 dark:text-white'>Total:</span>
+                  <span className='text-gray-900 dark:text-white'>
+                    ${cart.reduce((total, item) => total + item.price, 0).toFixed(2)}
+                  </span>
+                </div>
               </div>
-            </div>
-            <div className='space-y-2 mb-6'>
-              <div className='flex justify-between'>
-                <span className='text-gray-700 dark:text-gray-300'>Original Price:</span>
-                <span className='text-gray-900 dark:text-white'>$199.99</span>
-              </div>
-              <div className='flex justify-between'>
-                <span className='text-gray-700 dark:text-gray-300'>Discount:</span>
-                <span className='text-green-600'>-${discount.toFixed(2)}</span>
-              </div>
-              <div className='flex justify-between font-semibold text-lg'>
-                <span className='text-gray-900 dark:text-white'>Total:</span>
-                <span className='text-purple-600'>${price.toFixed(2)}</span>
-              </div>
-            </div>
+            </>
+
             <div className='mb-6'>
               <Label htmlFor='voucher' className='text-gray-700 dark:text-gray-300 mb-2 block'>
                 Have a voucher?
