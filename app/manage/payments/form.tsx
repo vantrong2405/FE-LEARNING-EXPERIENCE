@@ -9,7 +9,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Download,
-  RefreshCw,
   Plus,
   DollarSign,
   Calendar,
@@ -60,6 +59,7 @@ import { DatePickerWithRange } from '@/components/ui/date-range-picker'
 import type { DateRange } from 'react-day-picker'
 import { addDays } from 'date-fns'
 import { exportToExcel, formatCurrency, formatPaymentStatus } from '@/lib/excel'
+import { Payment } from '@/models/payment.type'
 
 // Sample payment data
 const payments = [
@@ -275,7 +275,7 @@ export default function PaymentsPage() {
   const [selectedStatus, setSelectedStatus] = useState('all')
   const [isAddPaymentOpen, setIsAddPaymentOpen] = useState(false)
   const [isViewDetailsOpen, setIsViewDetailsOpen] = useState(false)
-  const [currentPayment, setCurrentPayment] = useState<Payment | null>(null)
+  const [currentPayment, setCurrentPayment] = useState<any | null>(null)
   const [selectedPayments, setSelectedPayments] = useState<string[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [date, setDate] = useState<DateRange | undefined>({
@@ -311,45 +311,7 @@ export default function PaymentsPage() {
   const totalPages = Math.ceil(filteredPayments.length / paymentsPerPage)
 
   // Handle view details
-  interface Student {
-    id: number
-    name: string
-    email: string
-    avatar: string
-  }
-
-  interface Course {
-    id: number
-    title: string
-    instructor: string
-    thumbnail: string
-  }
-
-  interface PaymentDetails {
-    cardLast4?: string
-    cardBrand?: string
-    expiryDate?: string
-    bankName?: string
-    accountLast4?: string
-    walletProvider?: string
-    accountEmail?: string
-    errorMessage?: string
-  }
-
-  interface Payment {
-    id: string
-    student: Student
-    course: Course
-    amount: number
-    date: string
-    method: string
-    status: string
-    transactionId: string
-    invoiceNumber: string
-    paymentDetails: PaymentDetails
-  }
-
-  const handleViewDetails = (payment: Payment) => {
+  const handleViewDetails = (payment: any) => {
     setCurrentPayment(payment)
     setIsViewDetailsOpen(true)
   }

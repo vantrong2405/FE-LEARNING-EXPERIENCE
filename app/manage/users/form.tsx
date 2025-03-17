@@ -48,6 +48,7 @@ import { toast } from 'sonner'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
 import { format } from 'date-fns'
+import { User } from '@/models/user.type'
 
 export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -55,7 +56,7 @@ export default function UsersPage() {
   const [selectedStatus, setSelectedStatus] = useState('all')
   const [isAddUserOpen, setIsAddUserOpen] = useState(false)
   const [isEditUserOpen, setIsEditUserOpen] = useState(false)
-  const [currentUser, setCurrentUser] = useState<EditUser | null>(null)
+  const [currentUser, setCurrentUser] = useState<any | null>(null)
   const [selectedUsers, setSelectedUsers] = useState<string[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const usersPerPage = 5
@@ -82,23 +83,6 @@ export default function UsersPage() {
   const totalPages = Math.ceil(filteredUsers.length / usersPerPage)
 
   // Handle edit user
-  interface EditUser {
-    id: string
-    name: string
-    email: string
-    role: string
-    verify: number
-    username: string
-    gender: string
-    avatarUrl: string
-    bio: string
-    courses: {
-      id: string
-      title: string
-      description: string
-    }[]
-  }
-
   const form = useForm<MeBodyType>({
     resolver: zodResolver(MeBody),
     defaultValues: {
@@ -175,23 +159,12 @@ export default function UsersPage() {
     })
   }
 
-  const handleEditUser = (user: EditUser) => {
+  const handleEditUser = (user: any) => {
     setCurrentUser(user)
     setIsEditUserOpen(true)
   }
 
   // Handle checkbox selection
-  interface User {
-    id: string
-    name: string
-    email: string
-    role: string
-    verify: number
-    lastLogin: string
-    courses: number
-    joined: string
-  }
-
   const handleSelectUser = (userId: string) => {
     if (selectedUsers.includes(userId)) {
       setSelectedUsers(selectedUsers.filter((id) => id !== userId))

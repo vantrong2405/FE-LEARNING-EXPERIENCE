@@ -12,7 +12,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Download,
-  RefreshCw,
   Image,
   Upload,
   DollarSign,
@@ -52,6 +51,7 @@ import { useCourseQuery, useDeleteCourseMutation } from '@/queries/useCourse'
 import { pagination } from '@/constants/pagination-config'
 import { formatDate, handleErrorApi } from '@/lib/utils'
 import { toast } from 'sonner'
+import { Course } from '@/models/course.type'
 
 export default function CoursesPage() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -64,7 +64,7 @@ export default function CoursesPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [currentTab, setCurrentTab] = useState('basic')
   const coursesPerPage = 5
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(pagination.PAGE)
   const courseQuery = useCourseQuery(pagination.LIMIT, page)
   const courses = courseQuery.data?.payload.data.data ?? []
 
@@ -86,44 +86,13 @@ export default function CoursesPage() {
   const totalPages = Math.ceil(filteredCourses.length / coursesPerPage)
 
   // Handle edit course
-  interface Course {
-    id: string
-    title: string
-    instructor: {
-      id: string
-      name: string
-      email: string
-      avatarUrl: string | null
-    }
-    price: number
-    isPublished: boolean
-    totalReviews: number
-    rating: number
-    createdAt: string
-    category: {
-      id: string
-      createdAt: string
-      updatedAt: string
-      name: string // 👈 Đây là vấn đề
-    }
-    thumbnailUrl: string
-  }
-
-  interface HandleEditCourse {
-    (course: Course): void
-  }
-
-  const handleEditCourse: HandleEditCourse = (course) => {
+  const handleEditCourse = (course: Course): void => {
     setCurrentCourse(course)
     setIsEditCourseOpen(true)
   }
 
   // Handle checkbox selection
-  interface HandleSelectCourse {
-    (courseId: string): void
-  }
-
-  const handleSelectCourse: HandleSelectCourse = (courseId) => {
+  const handleSelectCourse = (courseId: string): void => {
     if (selectedCourses.includes(String(courseId))) {
       setSelectedCourses(selectedCourses.filter((id) => id !== courseId))
     } else {
@@ -155,11 +124,7 @@ export default function CoursesPage() {
   }
 
   // Format price
-  interface FormatPrice {
-    (price: number): string
-  }
-
-  const formatPrice: FormatPrice = (price) => {
+  const formatPrice: { (price: number): string } = (price) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
   }
 
@@ -811,7 +776,7 @@ export default function CoursesPage() {
                             <DropdownMenuSeparator className='bg-gray-700' />
                             <DropdownMenuItem
                               className='hover:bg-gray-700 cursor-pointer'
-                              onClick={() => handleEditCourse(course)}
+                              onClick={() => handleEditCourse(course as Course)}
                             >
                               <Edit className='h-4 w-4 mr-2' /> Chỉnh sửa
                             </DropdownMenuItem>

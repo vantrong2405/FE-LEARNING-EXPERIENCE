@@ -12,7 +12,7 @@ import { handleErrorApi, weeksAgo } from '@/lib/utils'
 import { useCourseQuery, useGetCourseQuery, useSearchCourseQuery } from '@/queries/useCourse'
 import { useParams, useRouter } from 'next/navigation'
 import { useRef, useState } from 'react'
-import { paginationGeneral } from '@/constants/pagination-config'
+import { pagination } from '@/constants/pagination-config'
 import Link from 'next/link'
 import { pathURL } from '@/constants/path'
 import { useCartMutation } from '@/queries/useCart'
@@ -31,7 +31,7 @@ export default function CoursePage() {
   const getCourse = useGetCourseQuery(courseId)
   const course = getCourse.data?.payload.data
   const cartMutation = useCartMutation()
-  const courseQuery = useCourseQuery(paginationGeneral.LIMIT, paginationGeneral.PAGE)
+  const courseQuery = useCourseQuery(pagination.LIMIT, pagination.PAGE)
   const courses = courseQuery.data?.payload.data.data ?? []
 
   const handleVideoSelect = (videoUrl: string) => {

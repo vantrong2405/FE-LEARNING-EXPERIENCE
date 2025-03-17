@@ -43,6 +43,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Textarea } from '@/components/ui/textarea'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { exportToExcel } from '@/lib/excel'
+import { FAQ } from '@/models/faq.type'
 
 // Sample FAQ data
 const faqs = [
@@ -197,36 +198,13 @@ export default function FAQsPage() {
   const totalPages = Math.ceil(filteredFAQs.length / faqsPerPage)
 
   // Handle edit FAQ
-  interface FAQ {
-    id: number
-    question: string
-    answer: string
-    category: string
-    course: { id: number; title: string } | null
-    isPublished: boolean
-    order: number
-  }
 
-  const handleEditFAQ = (faq: FAQ) => {
+  const handleEditFAQ = (faq: any) => {
     setCurrentFAQ(faq)
     setIsEditFAQOpen(true)
   }
 
   // Handle checkbox selection
-  interface FAQ {
-    id: number
-    question: string
-    answer: string
-    category: string
-    course: { id: number; title: string } | null
-    isPublished: boolean
-    order: number
-  }
-
-  interface Course {
-    id: number
-    title: string
-  }
 
   const handleSelectFAQ = (faqId: number) => {
     if (selectedFAQs.includes(faqId)) {

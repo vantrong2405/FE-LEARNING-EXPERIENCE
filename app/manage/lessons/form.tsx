@@ -42,6 +42,7 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Textarea } from '@/components/ui/textarea'
 import { exportToExcel } from '@/lib/excel'
+import { Lesson } from '@/models/lesson.type'
 
 // Mock data for lessons
 const mockLessons = [
@@ -131,18 +132,6 @@ const mockCourses = [
   { id: '3', name: 'Python for Data Science' },
   { id: '4', name: 'UI/UX Design' }
 ]
-
-interface Lesson {
-  id: string
-  title: string
-  courseId: string
-  courseName: string
-  order: number
-  content: string
-  createdAt: string
-  updatedAt: string
-  status: string
-}
 
 export default function LessonsPage() {
   const [lessons, setLessons] = useState<Lesson[]>(mockLessons)

@@ -44,6 +44,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Textarea } from '@/components/ui/textarea'
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { exportToExcel } from '@/lib/excel'
+import { Review } from '@/models/review.type'
 
 // Sample review data
 const reviews = [
@@ -279,54 +280,12 @@ export default function ReviewsPage() {
   const totalPages = Math.ceil(filteredReviews.length / reviewsPerPage)
 
   // Handle edit review
-  interface Review {
-    id: number
-    student: Student
-    course: Course
-    rating: number
-    title: string
-    content: string
-    date: string
-    status: string
-    helpful: number
-    unhelpful: number
-    reported: boolean
-  }
-
-  const handleEditReview = (review: Review) => {
+  const handleEditReview = (review: any) => {
     setCurrentReview(review)
     setIsEditReviewOpen(true)
   }
 
   // Handle checkbox selection
-  interface Student {
-    id: number
-    name: string
-    email: string
-    avatar: string
-  }
-
-  interface Course {
-    id: number
-    title: string
-    instructor: string
-    thumbnail: string
-  }
-
-  interface Review {
-    id: number
-    student: Student
-    course: Course
-    rating: number
-    title: string
-    content: string
-    date: string
-    status: string
-    helpful: number
-    unhelpful: number
-    reported: boolean
-  }
-
   const handleSelectReview = (reviewId: number) => {
     if (selectedReviews.includes(reviewId)) {
       setSelectedReviews(selectedReviews.filter((id) => id !== reviewId))
@@ -352,15 +311,8 @@ export default function ReviewsPage() {
   // Calculate average rating
   const averageRating = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
 
-  // Colors for charts
-  const COLORS = ['#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe', '#ede9fe']
-
   // Render stars for rating
-  interface RenderStarsProps {
-    rating: number
-  }
-
-  const renderStars = ({ rating }: RenderStarsProps) => {
+  const renderStars = ({ rating }: { rating: number }) => {
     return Array(5)
       .fill(0)
       .map((_, i) => (

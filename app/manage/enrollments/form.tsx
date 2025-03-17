@@ -2,9 +2,7 @@
 
 import { useState } from 'react'
 import {
-  Users,
   Search,
-  Filter,
   Edit,
   Trash2,
   MoreHorizontal,
@@ -13,13 +11,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Download,
-  RefreshCw,
-  BookOpen,
   Calendar,
-  CreditCard,
-  Clock,
-  Eye,
-  FileText
+  Eye
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -38,16 +31,14 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-  DialogTrigger
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { exportToExcel, formatCurrency } from '@/lib/excel'
+import { Enrollment } from '@/models/enrollment.type'
 
 // Sample enrollment data
 const enrollments = [
@@ -256,51 +247,13 @@ export default function EnrollmentsPage() {
   const totalPages = Math.ceil(filteredEnrollments.length / enrollmentsPerPage)
 
   // Handle view details
-  interface Student {
-    id: number
-    name: string
-    email: string
-    avatar: string
-  }
 
-  interface Course {
-    id: number
-    title: string
-    instructor: string
-    thumbnail: string
-  }
-
-  interface Payment {
-    id: number
-    amount: number
-    date: string
-    method: string
-    status: string
-  }
-
-  interface Enrollment {
-    id: number
-    student: Student
-    course: Course
-    enrollmentDate: string
-    expiryDate: string
-    progress: number
-    status: string
-    payments: Payment[]
-    lastAccess: string
-  }
-
-  const handleViewDetails = (enrollment: Enrollment) => {
+  const handleViewDetails = (enrollment: any) => {
     setCurrentEnrollment(enrollment)
     setIsViewDetailsOpen(true)
   }
 
-  // Handle checkbox selection
-  interface EnrollmentSelectionHandler {
-    (enrollmentId: number): void
-  }
-
-  const handleSelectEnrollment: EnrollmentSelectionHandler = (enrollmentId) => {
+  const handleSelectEnrollment = (enrollmentId: number): void => {
     if (selectedEnrollments.includes(enrollmentId)) {
       setSelectedEnrollments(selectedEnrollments.filter((id) => id !== enrollmentId))
     } else {

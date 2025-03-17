@@ -18,15 +18,15 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useCourseQuery } from '@/queries/useCourse'
 import { useCategoryListQuery } from '@/queries/useCategory'
 import { useLevelListQuery } from '@/queries/useLevel'
-import { pagination, paginationGeneral } from '@/constants/pagination-config'
+import { pagination } from '@/constants/pagination-config'
 import { PaginationDemo } from '@/lib/pagination'
 import { useRouter } from 'next/navigation'
 
 export default function CoursesPage() {
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(pagination.PAGE)
   const courseQuery = useCourseQuery(pagination.LIMIT, page)
-  const categoryQuery = useCategoryListQuery(paginationGeneral.LIMIT, pagination.PAGE)
-  const levelQuery = useLevelListQuery(paginationGeneral.LIMIT, pagination.PAGE)
+  const categoryQuery = useCategoryListQuery(pagination.LIMIT, pagination.PAGE)
+  const levelQuery = useLevelListQuery(pagination.LIMIT, pagination.PAGE)
 
   const courses = courseQuery.data?.payload.data.data ?? []
   const data = courseQuery.data?.payload.data.pagination
