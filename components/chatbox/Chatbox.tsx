@@ -8,8 +8,10 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { MessageCircle, Send, X, CircleStop } from 'lucide-react'
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import configProject from '@/config/configService'
+import { Message } from '@/models/chatbox.type'
 
-const apiKey = 'AIzaSyBbPOo7DvtYXLAklSZffneD4ktu9fEcKoI'
+const apiKey = configProject.NEXT_PUBLIC_API_KEY
 const genAI = new GoogleGenerativeAI(apiKey)
 
 const model = genAI.getGenerativeModel({
@@ -22,13 +24,6 @@ const generationConfig = {
   topK: 40,
   maxOutputTokens: 8192,
   responseMimeType: 'text/plain'
-}
-
-interface Message {
-  id: number
-  sender: 'user' | 'bot'
-  text: string
-  data?: Array<{ id: string; title: string; name: string; amout: string; redirectlink: string }>
 }
 
 export default function Chatbox() {
