@@ -26,13 +26,13 @@ import { toast } from 'sonner'
 
 export default function AdminLogin() {
   const router = useRouter()
+  const [showPassword, setShowPassword] = useState(false)
 
   const accessToken = getAccessTokenFromLocalStorage()
   const refreshToken = getRefreshTokenFromLocalStorage()
   if (accessToken && refreshToken) {
     router.back()
   }
-  const [showPassword, setShowPassword] = useState(false)
 
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),

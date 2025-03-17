@@ -1,6 +1,6 @@
 import configProject from '@/config/configService'
 
-export const getOauthGoogleUrl = () => {
+export const getOauthGoogleUrlQuery = () => {
   const rootUrl = 'https://accounts.google.com/o/oauth2/v2/auth'
   const options: Record<string, string> = {
     redirect_uri: configProject.NEXT_PUBLIC_VITE_GOOGLE_AUTHORIZED_REDIRECT_URI || '',

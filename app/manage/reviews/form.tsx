@@ -1,23 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Star,
-  Search,
-  Edit,
-  Trash2,
-  MoreHorizontal,
-  ChevronLeft,
-  ChevronRight,
-  Download,
-  RefreshCw,
-  Flag,
-  CheckCircle,
-  XCircle,
-  ThumbsUp,
-  ThumbsDown,
-  Clock
-} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -44,208 +27,9 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Textarea } from '@/components/ui/textarea'
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { exportToExcel } from '@/lib/excel'
-
-// Sample review data
-const reviews = [
-  {
-    id: 1,
-    student: {
-      id: 101,
-      name: 'Nguyễn Văn A',
-      email: 'nguyenvana@example.com',
-      avatar: '/placeholder.svg?height=40&width=40'
-    },
-    course: {
-      id: 201,
-      title: 'JavaScript Cơ Bản',
-      instructor: 'Nguyễn Văn A',
-      thumbnail: '/placeholder.svg?height=60&width=80'
-    },
-    rating: 5,
-    title: 'Khóa học tuyệt vời!',
-    content:
-      'Tôi đã học được rất nhiều từ khóa học này. Giảng viên giải thích rất rõ ràng và dễ hiểu. Các bài tập thực hành rất hữu ích.',
-    date: '2023-07-10',
-    status: 'approved',
-    helpful: 12,
-    unhelpful: 2,
-    reported: false
-  },
-  {
-    id: 2,
-    student: {
-      id: 102,
-      name: 'Trần Thị B',
-      email: 'tranthib@example.com',
-      avatar: '/placeholder.svg?height=40&width=40'
-    },
-    course: {
-      id: 202,
-      title: 'React Advanced',
-      instructor: 'Trần Thị B',
-      thumbnail: '/placeholder.svg?height=60&width=80'
-    },
-    rating: 4,
-    title: 'Khóa học hay nhưng hơi khó',
-    content:
-      'Nội dung khóa học rất hay và cập nhật. Tuy nhiên, một số phần hơi khó đối với người mới bắt đầu. Cần có thêm giải thích chi tiết hơn.',
-    date: '2023-07-05',
-    status: 'approved',
-    helpful: 8,
-    unhelpful: 1,
-    reported: false
-  },
-  {
-    id: 3,
-    student: {
-      id: 103,
-      name: 'Lê Văn C',
-      email: 'levanc@example.com',
-      avatar: '/placeholder.svg?height=40&width=40'
-    },
-    course: {
-      id: 203,
-      title: 'Python for Data Science',
-      instructor: 'Lê Văn C',
-      thumbnail: '/placeholder.svg?height=60&width=80'
-    },
-    rating: 2,
-    title: 'Không như mong đợi',
-    content:
-      'Khóa học không đi sâu vào phân tích dữ liệu như tôi mong đợi. Nhiều phần quá cơ bản và không có giá trị thực tế.',
-    date: '2023-06-28',
-    status: 'approved',
-    helpful: 3,
-    unhelpful: 7,
-    reported: true
-  },
-  {
-    id: 4,
-    student: {
-      id: 104,
-      name: 'Phạm Thị D',
-      email: 'phamthid@example.com',
-      avatar: '/placeholder.svg?height=40&width=40'
-    },
-    course: {
-      id: 204,
-      title: 'UI/UX Design',
-      instructor: 'Phạm Thị D',
-      thumbnail: '/placeholder.svg?height=60&width=80'
-    },
-    rating: 5,
-    title: 'Tuyệt vời cho người mới bắt đầu',
-    content:
-      'Khóa học này rất phù hợp cho người mới bắt đầu về UI/UX. Các bài giảng rõ ràng và có nhiều ví dụ thực tế. Tôi đã học được rất nhiều kỹ năng mới.',
-    date: '2023-07-02',
-    status: 'approved',
-    helpful: 15,
-    unhelpful: 0,
-    reported: false
-  },
-  {
-    id: 5,
-    student: {
-      id: 105,
-      name: 'Hoàng Văn E',
-      email: 'hoangvane@example.com',
-      avatar: '/placeholder.svg?height=40&width=40'
-    },
-    course: {
-      id: 205,
-      title: 'Mobile App Development with Flutter',
-      instructor: 'Hoàng Văn E',
-      thumbnail: '/placeholder.svg?height=60&width=80'
-    },
-    rating: 3,
-    title: 'Khóa học ở mức trung bình',
-    content:
-      'Khóa học có một số điểm tốt nhưng cũng có nhiều hạn chế. Giảng viên đôi khi giải thích không rõ ràng và thiếu các ví dụ thực tế.',
-    date: '2023-06-25',
-    status: 'approved',
-    helpful: 5,
-    unhelpful: 4,
-    reported: false
-  },
-  {
-    id: 6,
-    student: {
-      id: 106,
-      name: 'Vũ Thị F',
-      email: 'vuthif@example.com',
-      avatar: '/placeholder.svg?height=40&width=40'
-    },
-    course: {
-      id: 206,
-      title: 'Machine Learning Fundamentals',
-      instructor: 'Ngô Thị H',
-      thumbnail: '/placeholder.svg?height=60&width=80'
-    },
-    rating: 1,
-    title: 'Rất thất vọng',
-    content:
-      'Nội dung khóa học không như mô tả. Nhiều phần quá cơ bản và không đi vào thực tế. Tôi không khuyên ai học khóa này cả.',
-    date: '2023-07-08',
-    status: 'pending',
-    helpful: 1,
-    unhelpful: 9,
-    reported: true
-  },
-  {
-    id: 7,
-    student: {
-      id: 107,
-      name: 'Đặng Văn G',
-      email: 'dangvang@example.com',
-      avatar: '/placeholder.svg?height=40&width=40'
-    },
-    course: {
-      id: 201,
-      title: 'JavaScript Cơ Bản',
-      instructor: 'Nguyễn Văn A',
-      thumbnail: '/placeholder.svg?height=60&width=80'
-    },
-    rating: 4,
-    title: 'Khóa học rất hữu ích',
-    content:
-      'Tôi đã học được nhiều kiến thức mới từ khóa học này. Giảng viên giải thích rõ ràng và có nhiều ví dụ thực tế.',
-    date: '2023-07-12',
-    status: 'pending',
-    helpful: 0,
-    unhelpful: 0,
-    reported: false
-  }
-]
-
-// Rating distribution data
-const ratingDistribution = [
-  { rating: 5, count: reviews.filter((r) => r.rating === 5).length },
-  { rating: 4, count: reviews.filter((r) => r.rating === 4).length },
-  { rating: 3, count: reviews.filter((r) => r.rating === 3).length },
-  { rating: 2, count: reviews.filter((r) => r.rating === 2).length },
-  { rating: 1, count: reviews.filter((r) => r.rating === 1).length }
-]
-
-// Course rating data
-const courseRatingData = [
-  { name: 'JavaScript Cơ Bản', rating: 4.5 },
-  { name: 'React Advanced', rating: 4.0 },
-  { name: 'Python for Data Science', rating: 2.0 },
-  { name: 'UI/UX Design', rating: 5.0 },
-  { name: 'Mobile App Development', rating: 3.0 },
-  { name: 'Machine Learning', rating: 1.0 }
-]
-
-// Monthly reviews data
-const monthlyReviewsData = [
-  { month: 'Jan', count: 12 },
-  { month: 'Feb', count: 19 },
-  { month: 'Mar', count: 25 },
-  { month: 'Apr', count: 18 },
-  { month: 'May', count: 22 },
-  { month: 'Jun', count: 30 },
-  { month: 'Jul', count: 15 }
-]
+import { Review } from '@/models/review.type'
+import { Icons } from '@/components/ui/icons'
+import { courseRatingData, monthlyReviewsData, ratingDistribution, reviews } from '@/database_example/review.db'
 
 export default function ReviewsPage() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -279,54 +63,12 @@ export default function ReviewsPage() {
   const totalPages = Math.ceil(filteredReviews.length / reviewsPerPage)
 
   // Handle edit review
-  interface Review {
-    id: number
-    student: Student
-    course: Course
-    rating: number
-    title: string
-    content: string
-    date: string
-    status: string
-    helpful: number
-    unhelpful: number
-    reported: boolean
-  }
-
-  const handleEditReview = (review: Review) => {
+  const handleEditReview = (review: any) => {
     setCurrentReview(review)
     setIsEditReviewOpen(true)
   }
 
   // Handle checkbox selection
-  interface Student {
-    id: number
-    name: string
-    email: string
-    avatar: string
-  }
-
-  interface Course {
-    id: number
-    title: string
-    instructor: string
-    thumbnail: string
-  }
-
-  interface Review {
-    id: number
-    student: Student
-    course: Course
-    rating: number
-    title: string
-    content: string
-    date: string
-    status: string
-    helpful: number
-    unhelpful: number
-    reported: boolean
-  }
-
   const handleSelectReview = (reviewId: number) => {
     if (selectedReviews.includes(reviewId)) {
       setSelectedReviews(selectedReviews.filter((id) => id !== reviewId))
@@ -352,19 +94,12 @@ export default function ReviewsPage() {
   // Calculate average rating
   const averageRating = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length
 
-  // Colors for charts
-  const COLORS = ['#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe', '#ede9fe']
-
   // Render stars for rating
-  interface RenderStarsProps {
-    rating: number
-  }
-
-  const renderStars = ({ rating }: RenderStarsProps) => {
+  const renderStars = ({ rating }: { rating: number }) => {
     return Array(5)
       .fill(0)
       .map((_, i) => (
-        <Star key={i} className={`h-4 w-4 ${i < rating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-500'}`} />
+        <Icons.Star key={i} className={`h-4 w-4 ${i < rating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-500'}`} />
       ))
   }
 
@@ -416,7 +151,7 @@ export default function ReviewsPage() {
               className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto text-xs sm:text-sm'
               onClick={handleExportExcel}
             >
-              <Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+              <Icons.Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
               <span>Xuất Excel</span>
             </Button>
           </div>
@@ -432,7 +167,7 @@ export default function ReviewsPage() {
                   <h3 className='text-2xl font-bold text-white mt-1'>{reviews.length}</h3>
                 </div>
                 <div className='h-12 w-12 bg-purple-900/30 rounded-lg flex items-center justify-center'>
-                  <Star className='h-6 w-6 text-purple-400' />
+                  <Icons.Star className='h-6 w-6 text-purple-400' />
                 </div>
               </div>
             </CardContent>
@@ -447,7 +182,7 @@ export default function ReviewsPage() {
                   <div className='flex mt-1'>{renderStars({ rating: Math.round(averageRating) })}</div>
                 </div>
                 <div className='h-12 w-12 bg-purple-900/30 rounded-lg flex items-center justify-center'>
-                  <Star className='h-6 w-6 text-purple-400 fill-purple-400' />
+                  <Icons.Star className='h-6 w-6 text-purple-400 fill-purple-400' />
                 </div>
               </div>
             </CardContent>
@@ -463,7 +198,7 @@ export default function ReviewsPage() {
                   </h3>
                 </div>
                 <div className='h-12 w-12 bg-purple-900/30 rounded-lg flex items-center justify-center'>
-                  <Clock className='h-6 w-6 text-purple-400' />
+                  <Icons.Clock className='h-6 w-6 text-purple-400' />
                 </div>
               </div>
             </CardContent>
@@ -477,7 +212,7 @@ export default function ReviewsPage() {
                   <h3 className='text-2xl font-bold text-white mt-1'>{reviews.filter((r) => r.reported).length}</h3>
                 </div>
                 <div className='h-12 w-12 bg-purple-900/30 rounded-lg flex items-center justify-center'>
-                  <Flag className='h-6 w-6 text-purple-400' />
+                  <Icons.Flag className='h-6 w-6 text-purple-400' />
                 </div>
               </div>
             </CardContent>
@@ -588,7 +323,7 @@ export default function ReviewsPage() {
                   Tìm kiếm
                 </Label>
                 <div className='relative'>
-                  <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
+                  <Icons.Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
                   <Input
                     id='search'
                     type='search'
@@ -672,17 +407,17 @@ export default function ReviewsPage() {
                     size='sm'
                     className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                   >
-                    <CheckCircle className='h-4 w-4 mr-1' /> Duyệt
+                    <Icons.CheckCircle className='h-4 w-4 mr-1' /> Duyệt
                   </Button>
                   <Button
                     variant='outline'
                     size='sm'
                     className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                   >
-                    <XCircle className='h-4 w-4 mr-1' /> Từ chối
+                    <Icons.XCircle className='h-4 w-4 mr-1' /> Từ chối
                   </Button>
                   <Button variant='destructive' size='sm'>
-                    <Trash2 className='h-4 w-4 mr-1' /> Xóa
+                    <Icons.Trash2 className='h-4 w-4 mr-1' /> Xóa
                   </Button>
                 </div>
               )}
@@ -737,7 +472,7 @@ export default function ReviewsPage() {
                                 size='icon'
                                 className='h-8 w-8 text-gray-400 hover:text-white hover:bg-gray-700'
                               >
-                                <MoreHorizontal className='h-4 w-4' />
+                                <Icons.MoreHorizontal className='h-4 w-4' />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className='bg-gray-800 border-gray-700 text-white'>
@@ -747,21 +482,21 @@ export default function ReviewsPage() {
                                 className='hover:bg-gray-700 cursor-pointer'
                                 onClick={() => handleEditReview(review)}
                               >
-                                <Edit className='h-4 w-4 mr-2' /> Chỉnh sửa
+                                <Icons.Edit className='h-4 w-4 mr-2' /> Chỉnh sửa
                               </DropdownMenuItem>
                               {review.status !== 'approved' && (
                                 <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer'>
-                                  <CheckCircle className='h-4 w-4 mr-2' /> Duyệt
+                                  <Icons.CheckCircle className='h-4 w-4 mr-2' /> Duyệt
                                 </DropdownMenuItem>
                               )}
                               {review.status !== 'rejected' && (
                                 <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer'>
-                                  <XCircle className='h-4 w-4 mr-2' /> Từ chối
+                                  <Icons.XCircle className='h-4 w-4 mr-2' /> Từ chối
                                 </DropdownMenuItem>
                               )}
                               <DropdownMenuSeparator className='bg-gray-700' />
                               <DropdownMenuItem className='text-red-500 hover:bg-gray-700 cursor-pointer'>
-                                <Trash2 className='h-4 w-4 mr-2' /> Xóa
+                                <Icons.Trash2 className='h-4 w-4 mr-2' /> Xóa
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -779,11 +514,11 @@ export default function ReviewsPage() {
                       <div className='mt-3 flex items-center justify-between'>
                         <div className='flex items-center text-sm text-gray-400'>
                           <div className='flex items-center mr-4'>
-                            <ThumbsUp className='h-4 w-4 mr-1' />
+                            <Icons.ThumbsUp className='h-4 w-4 mr-1' />
                             <span>{review.helpful}</span>
                           </div>
                           <div className='flex items-center'>
-                            <ThumbsDown className='h-4 w-4 mr-1' />
+                            <Icons.ThumbsDown className='h-4 w-4 mr-1' />
                             <span>{review.unhelpful}</span>
                           </div>
                         </div>
@@ -809,7 +544,7 @@ export default function ReviewsPage() {
                   disabled={currentPage === 1}
                   className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                 >
-                  <ChevronLeft className='h-4 w-4' />
+                  <Icons.ChevronLeft className='h-4 w-4' />
                 </Button>
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <Button
@@ -833,7 +568,7 @@ export default function ReviewsPage() {
                   disabled={currentPage === totalPages}
                   className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                 >
-                  <ChevronRight className='h-4 w-4' />
+                  <Icons.ChevronRight className='h-4 w-4' />
                 </Button>
               </div>
             </div>

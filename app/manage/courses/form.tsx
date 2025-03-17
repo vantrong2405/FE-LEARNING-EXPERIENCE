@@ -1,25 +1,6 @@
 'use client'
 
-import { useState } from 'react'
-import {
-  Search,
-  Plus,
-  Edit,
-  Trash2,
-  MoreHorizontal,
-  CheckCircle,
-  XCircle,
-  ChevronLeft,
-  ChevronRight,
-  Download,
-  RefreshCw,
-  Image,
-  Upload,
-  DollarSign,
-  Eye,
-  EyeOff,
-  Star
-} from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -52,6 +33,8 @@ import { useCourseQuery, useDeleteCourseMutation } from '@/queries/useCourse'
 import { pagination } from '@/constants/pagination-config'
 import { formatDate, handleErrorApi } from '@/lib/utils'
 import { toast } from 'sonner'
+import { Course } from '@/models/course.type'
+import { Icons } from '@/components/ui/icons'
 
 export default function CoursesPage() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -64,10 +47,9 @@ export default function CoursesPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [currentTab, setCurrentTab] = useState('basic')
   const coursesPerPage = 5
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(pagination.PAGE)
   const courseQuery = useCourseQuery(pagination.LIMIT, page)
   const courses = courseQuery.data?.payload.data.data ?? []
-
   // Filter courses based on search term, category, and status
   const filteredCourses = courses.filter((course) => {
     const matchesSearch =
@@ -86,44 +68,13 @@ export default function CoursesPage() {
   const totalPages = Math.ceil(filteredCourses.length / coursesPerPage)
 
   // Handle edit course
-  interface Course {
-    id: string
-    title: string
-    instructor: {
-      id: string
-      name: string
-      email: string
-      avatarUrl: string | null
-    }
-    price: number
-    isPublished: boolean
-    totalReviews: number
-    rating: number
-    createdAt: string
-    category: {
-      id: string
-      createdAt: string
-      updatedAt: string
-      name: string // 👈 Đây là vấn đề
-    }
-    thumbnailUrl: string
-  }
-
-  interface HandleEditCourse {
-    (course: Course): void
-  }
-
-  const handleEditCourse: HandleEditCourse = (course) => {
+  const handleEditCourse = (course: Course): void => {
     setCurrentCourse(course)
     setIsEditCourseOpen(true)
   }
 
   // Handle checkbox selection
-  interface HandleSelectCourse {
-    (courseId: string): void
-  }
-
-  const handleSelectCourse: HandleSelectCourse = (courseId) => {
+  const handleSelectCourse = (courseId: string): void => {
     if (selectedCourses.includes(String(courseId))) {
       setSelectedCourses(selectedCourses.filter((id) => id !== courseId))
     } else {
@@ -155,11 +106,7 @@ export default function CoursesPage() {
   }
 
   // Format price
-  interface FormatPrice {
-    (price: number): string
-  }
-
-  const formatPrice: FormatPrice = (price) => {
+  const formatPrice: { (price: number): string } = (price) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
   }
 
@@ -202,13 +149,13 @@ export default function CoursesPage() {
               className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto text-xs sm:text-sm'
               onClick={handleExportExcel}
             >
-              <Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+              <Icons.Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
               <span>Xuất Excel</span>
             </Button>
             <Dialog open={isAddCourseOpen} onOpenChange={setIsAddCourseOpen}>
               <DialogTrigger asChild>
                 <Button className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto text-xs sm:text-sm'>
-                  <Plus className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+                  <Icons.Plus className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
                   <span>Thêm Khóa Học</span>
                 </Button>
               </DialogTrigger>
@@ -357,7 +304,7 @@ export default function CoursesPage() {
                               size='icon'
                               className='text-gray-400 hover:text-white hover:bg-gray-800'
                             >
-                              <Trash2 className='h-4 w-4' />
+                              <Icons.Trash2 className='h-4 w-4' />
                             </Button>
                           </div>
                           <div className='flex items-center gap-2'>
@@ -367,7 +314,7 @@ export default function CoursesPage() {
                               size='icon'
                               className='text-gray-400 hover:text-white hover:bg-gray-800'
                             >
-                              <Trash2 className='h-4 w-4' />
+                              <Icons.Trash2 className='h-4 w-4' />
                             </Button>
                           </div>
                           <Button
@@ -375,7 +322,7 @@ export default function CoursesPage() {
                             size='sm'
                             className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                           >
-                            <Plus className='h-4 w-4 mr-2' /> Thêm mục tiêu
+                            <Icons.Plus className='h-4 w-4 mr-2' /> Thêm mục tiêu
                           </Button>
                         </div>
                       </div>
@@ -390,7 +337,7 @@ export default function CoursesPage() {
                               size='icon'
                               className='text-gray-400 hover:text-white hover:bg-gray-800'
                             >
-                              <Trash2 className='h-4 w-4' />
+                              <Icons.Trash2 className='h-4 w-4' />
                             </Button>
                           </div>
                           <Button
@@ -398,7 +345,7 @@ export default function CoursesPage() {
                             size='sm'
                             className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                           >
-                            <Plus className='h-4 w-4 mr-2' /> Thêm yêu cầu
+                            <Icons.Plus className='h-4 w-4 mr-2' /> Thêm yêu cầu
                           </Button>
                         </div>
                       </div>
@@ -414,7 +361,7 @@ export default function CoursesPage() {
                                 size='icon'
                                 className='text-gray-400 hover:text-white hover:bg-gray-700'
                               >
-                                <Trash2 className='h-4 w-4' />
+                                <Icons.Trash2 className='h-4 w-4' />
                               </Button>
                             </div>
                             <div className='space-y-2 pl-4'>
@@ -425,7 +372,7 @@ export default function CoursesPage() {
                                   size='icon'
                                   className='text-gray-400 hover:text-white hover:bg-gray-700'
                                 >
-                                  <Trash2 className='h-4 w-4' />
+                                  <Icons.Trash2 className='h-4 w-4' />
                                 </Button>
                               </div>
                               <Button
@@ -433,7 +380,7 @@ export default function CoursesPage() {
                                 size='sm'
                                 className='bg-gray-700 border-gray-600 hover:bg-gray-600 text-white'
                               >
-                                <Plus className='h-4 w-4 mr-2' /> Thêm bài học
+                                <Icons.Plus className='h-4 w-4 mr-2' /> Thêm bài học
                               </Button>
                             </div>
                           </div>
@@ -442,7 +389,7 @@ export default function CoursesPage() {
                             size='sm'
                             className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                           >
-                            <Plus className='h-4 w-4 mr-2' /> Thêm phần mới
+                            <Icons.Plus className='h-4 w-4 mr-2' /> Thêm phần mới
                           </Button>
                         </div>
                       </div>
@@ -456,7 +403,7 @@ export default function CoursesPage() {
                           Giá khóa học (VND)
                         </Label>
                         <div className='relative'>
-                          <DollarSign className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
+                          <Icons.DollarSign className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
                           <Input
                             id='price'
                             type='number'
@@ -470,7 +417,7 @@ export default function CoursesPage() {
                           Giá khuyến mãi (VND)
                         </Label>
                         <div className='relative'>
-                          <DollarSign className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
+                          <Icons.DollarSign className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
                           <Input
                             id='sale-price'
                             type='number'
@@ -509,12 +456,12 @@ export default function CoursesPage() {
                                 size='icon'
                                 className='text-gray-400 hover:text-white hover:bg-gray-700'
                               >
-                                <Trash2 className='h-4 w-4' />
+                                <Icons.Trash2 className='h-4 w-4' />
                               </Button>
                             </div>
                             <div className='grid grid-cols-1 md:grid-cols-2 gap-2 mt-2'>
                               <div className='relative'>
-                                <DollarSign className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
+                                <Icons.DollarSign className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
                                 <Input
                                   placeholder='Giá gói'
                                   type='number'
@@ -537,7 +484,7 @@ export default function CoursesPage() {
                             size='sm'
                             className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                           >
-                            <Plus className='h-4 w-4 mr-2' /> Thêm gói mới
+                            <Icons.Plus className='h-4 w-4 mr-2' /> Thêm gói mới
                           </Button>
                         </div>
                       </div>
@@ -550,7 +497,7 @@ export default function CoursesPage() {
                         <Label className='text-white'>Ảnh thu nhỏ khóa học</Label>
                         <div className='border-2 border-dashed border-gray-700 rounded-md p-4 text-center'>
                           <div className='flex flex-col items-center'>
-                            <Image className='h-8 w-8 text-gray-400 mb-2' />
+                            <Icons.Image className='h-8 w-8 text-gray-400 mb-2' />
                             <p className='text-sm text-gray-400 mb-2'>Kéo thả hoặc nhấp để tải lên</p>
                             <p className='text-xs text-gray-500'>PNG, JPG hoặc GIF (Tối đa 2MB)</p>
                             <Button
@@ -558,7 +505,7 @@ export default function CoursesPage() {
                               size='sm'
                               className='mt-2 bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                             >
-                              <Upload className='h-4 w-4 mr-2' /> Chọn tệp
+                              <Icons.Upload className='h-4 w-4 mr-2' /> Chọn tệp
                             </Button>
                           </div>
                         </div>
@@ -568,7 +515,7 @@ export default function CoursesPage() {
                         <Label className='text-white'>Ảnh bìa khóa học</Label>
                         <div className='border-2 border-dashed border-gray-700 rounded-md p-4 text-center'>
                           <div className='flex flex-col items-center'>
-                            <Image className='h-8 w-8 text-gray-400 mb-2' />
+                            <Icons.Image className='h-8 w-8 text-gray-400 mb-2' />
                             <p className='text-sm text-gray-400 mb-2'>Kéo thả hoặc nhấp để tải lên</p>
                             <p className='text-xs text-gray-500'>PNG, JPG hoặc GIF (Tối đa 2MB)</p>
                             <Button
@@ -576,7 +523,7 @@ export default function CoursesPage() {
                               size='sm'
                               className='mt-2 bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                             >
-                              <Upload className='h-4 w-4 mr-2' /> Chọn tệp
+                              <Icons.Upload className='h-4 w-4 mr-2' /> Chọn tệp
                             </Button>
                           </div>
                         </div>
@@ -586,7 +533,7 @@ export default function CoursesPage() {
                         <Label className='text-white'>Video giới thiệu</Label>
                         <div className='border-2 border-dashed border-gray-700 rounded-md p-4 text-center'>
                           <div className='flex flex-col items-center'>
-                            <Upload className='h-8 w-8 text-gray-400 mb-2' />
+                            <Icons.Upload className='h-8 w-8 text-gray-400 mb-2' />
                             <p className='text-sm text-gray-400 mb-2'>Tải lên video giới thiệu khóa học</p>
                             <p className='text-xs text-gray-500'>MP4 hoặc WebM (Tối đa 50MB)</p>
                             <Button
@@ -594,7 +541,7 @@ export default function CoursesPage() {
                               size='sm'
                               className='mt-2 bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                             >
-                              <Upload className='h-4 w-4 mr-2' /> Chọn tệp
+                              <Icons.Upload className='h-4 w-4 mr-2' /> Chọn tệp
                             </Button>
                           </div>
                         </div>
@@ -647,7 +594,7 @@ export default function CoursesPage() {
                   Tìm kiếm
                 </Label>
                 <div className='relative'>
-                  <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
+                  <Icons.Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
                   <Input
                     id='search'
                     type='search'
@@ -711,17 +658,17 @@ export default function CoursesPage() {
                     size='sm'
                     className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                   >
-                    <CheckCircle className='h-4 w-4 mr-1' /> Xuất bản
+                    <Icons.CheckCircle className='h-4 w-4 mr-1' /> Xuất bản
                   </Button>
                   <Button
                     variant='outline'
                     size='sm'
                     className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                   >
-                    <XCircle className='h-4 w-4 mr-1' /> Ẩn
+                    <Icons.XCircle className='h-4 w-4 mr-1' /> Ẩn
                   </Button>
                   <Button variant='destructive' size='sm'>
-                    <Trash2 className='h-4 w-4 mr-1' /> Xóa
+                    <Icons.Trash2 className='h-4 w-4 mr-1' /> Xóa
                   </Button>
                 </div>
               )}
@@ -778,7 +725,7 @@ export default function CoursesPage() {
                         {course.rating > 0 ? (
                           <div className='flex items-center'>
                             <span className='mr-1'>{course.rating}</span>
-                            <Star className='h-4 w-4 text-yellow-500 fill-yellow-500' />
+                            <Icons.Star className='h-4 w-4 text-yellow-500 fill-yellow-500' />
                           </div>
                         ) : (
                           <span className='text-gray-500'>N/A</span>
@@ -803,7 +750,7 @@ export default function CoursesPage() {
                               size='icon'
                               className='h-8 w-8 text-gray-400 hover:text-white hover:bg-gray-800'
                             >
-                              <MoreHorizontal className='h-4 w-4' />
+                              <Icons.MoreHorizontal className='h-4 w-4' />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent className='bg-gray-800 border-gray-700 text-white'>
@@ -811,21 +758,21 @@ export default function CoursesPage() {
                             <DropdownMenuSeparator className='bg-gray-700' />
                             <DropdownMenuItem
                               className='hover:bg-gray-700 cursor-pointer'
-                              onClick={() => handleEditCourse(course)}
+                              onClick={() => handleEditCourse(course as Course)}
                             >
-                              <Edit className='h-4 w-4 mr-2' /> Chỉnh sửa
+                              <Icons.Edit className='h-4 w-4 mr-2' /> Chỉnh sửa
                             </DropdownMenuItem>
                             <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer'>
-                              <Eye className='h-4 w-4 mr-2' /> Xem trước
+                              <Icons.Eye className='h-4 w-4 mr-2' /> Xem trước
                             </DropdownMenuItem>
                             <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer'>
                               {course.isPublished === true ? (
                                 <>
-                                  <EyeOff className='h-4 w-4 mr-2' /> Ẩn khóa học
+                                  <Icons.EyeOff className='h-4 w-4 mr-2' /> Ẩn khóa học
                                 </>
                               ) : (
                                 <>
-                                  <CheckCircle className='h-4 w-4 mr-2' /> Xuất bản
+                                  <Icons.CheckCircle className='h-4 w-4 mr-2' /> Xuất bản
                                 </>
                               )}
                             </DropdownMenuItem>
@@ -834,7 +781,7 @@ export default function CoursesPage() {
                               className='text-red-500 hover:bg-gray-700 cursor-pointer'
                               onClick={() => deleteCourse(course.id)}
                             >
-                              <Trash2 className='h-4 w-4 mr-2' /> Xóa
+                              <Icons.Trash2 className='h-4 w-4 mr-2' /> Xóa
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -859,7 +806,7 @@ export default function CoursesPage() {
                   disabled={currentPage === 1}
                   className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                 >
-                  <ChevronLeft className='h-4 w-4' />
+                  <Icons.ChevronLeft className='h-4 w-4' />
                 </Button>
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <Button
@@ -883,7 +830,7 @@ export default function CoursesPage() {
                   disabled={currentPage === totalPages}
                   className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                 >
-                  <ChevronRight className='h-4 w-4' />
+                  <Icons.ChevronRight className='h-4 w-4' />
                 </Button>
               </div>
             </div>
@@ -964,7 +911,7 @@ export default function CoursesPage() {
                         Giá khóa học (VND)
                       </Label>
                       <div className='relative'>
-                        <DollarSign className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
+                        <Icons.DollarSign className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
                         <Input
                           id='edit-price'
                           type='number'

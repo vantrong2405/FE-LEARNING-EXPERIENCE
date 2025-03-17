@@ -20,10 +20,11 @@ import {
 import { useForm } from 'react-hook-form'
 import { LoginBody, LoginBodyType } from '@/schemaValidator/auth.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import envConfig from '@/config'
+import { getOauthGoogleUrlQuery } from '@/queries/useLoginOathGoogle'
 
 export default function FormLogin() {
   const router = useRouter()
+  const [showPassword, setShowPassword] = useState(false)
 
   const accessToken = getAccessTokenFromLocalStorage()
   const refreshToken = getRefreshTokenFromLocalStorage()
@@ -31,7 +32,6 @@ export default function FormLogin() {
     router.back()
   }
 
-  const [showPassword, setShowPassword] = useState(false)
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),
     defaultValues: {
@@ -71,24 +71,7 @@ export default function FormLogin() {
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword)
 
-  // URL đăng nhập với Google OAuth
-  const getOauthGoogleUrl = () => {
-    const rootUrl = 'https://accounts.google.com/o/oauth2/v2/auth'
-    const options = {
-      redirect_uri: envConfig.NEXT_PUBLIC_VITE_GOOGLE_AUTHORIZED_REDIRECT_URI,
-      client_id: envConfig.NEXT_PUBLIC_VITE_GOOGLE_CLIENT_ID,
-      access_type: 'offline',
-      response_type: 'code',
-      prompt: 'consent',
-      scope: [
-        'https://www.googleapis.com/auth/userinfo.profile',
-        'https://www.googleapis.com/auth/userinfo.email'
-      ].join(' ')
-    }
-    const qs = new URLSearchParams(options)
-    return `${rootUrl}?${qs.toString()}`
-  }
-  const gogleOauthUrl = getOauthGoogleUrl()
+  const gogleOauthUrl = getOauthGoogleUrlQuery()
 
   return (
     <div className='min-h-screen flex items-center justify-center dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden'>

@@ -1,26 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Users,
-  Search,
-  Filter,
-  Edit,
-  Trash2,
-  MoreHorizontal,
-  CheckCircle,
-  XCircle,
-  ChevronLeft,
-  ChevronRight,
-  Download,
-  RefreshCw,
-  BookOpen,
-  Calendar,
-  CreditCard,
-  Clock,
-  Eye,
-  FileText
-} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -38,194 +18,18 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-  DialogTrigger
+  DialogTitle
 } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { exportToExcel, formatCurrency } from '@/lib/excel'
+import { Enrollment } from '@/models/enrollment.type'
+import { Icons } from '@/components/ui/icons'
+import { enrollments } from '@/database_example/enrollments.db'
 
 // Sample enrollment data
-const enrollments = [
-  {
-    id: 1,
-    student: {
-      id: 101,
-      name: 'Nguyễn Văn A',
-      email: 'nguyenvana@example.com',
-      avatar: '/placeholder.svg?height=40&width=40'
-    },
-    course: {
-      id: 201,
-      title: 'JavaScript Cơ Bản',
-      instructor: 'Nguyễn Văn A',
-      thumbnail: '/placeholder.svg?height=60&width=80'
-    },
-    enrollmentDate: '2023-05-15',
-    expiryDate: '2024-05-15',
-    progress: 65,
-    status: 'active',
-    payments: [
-      {
-        id: 1001,
-        amount: 599000,
-        date: '2023-05-15',
-        method: 'Credit Card',
-        status: 'completed'
-      }
-    ],
-    lastAccess: '2023-07-14'
-  },
-  {
-    id: 2,
-    student: {
-      id: 102,
-      name: 'Trần Thị B',
-      email: 'tranthib@example.com',
-      avatar: '/placeholder.svg?height=40&width=40'
-    },
-    course: {
-      id: 202,
-      title: 'React Advanced',
-      instructor: 'Trần Thị B',
-      thumbnail: '/placeholder.svg?height=60&width=80'
-    },
-    enrollmentDate: '2023-04-20',
-    expiryDate: '2024-04-20',
-    progress: 42,
-    status: 'active',
-    payments: [
-      {
-        id: 1002,
-        amount: 799000,
-        date: '2023-04-20',
-        method: 'Bank Transfer',
-        status: 'completed'
-      }
-    ],
-    lastAccess: '2023-07-13'
-  },
-  {
-    id: 3,
-    student: {
-      id: 103,
-      name: 'Lê Văn C',
-      email: 'levanc@example.com',
-      avatar: '/placeholder.svg?height=40&width=40'
-    },
-    course: {
-      id: 203,
-      title: 'Python for Data Science',
-      instructor: 'Lê Văn C',
-      thumbnail: '/placeholder.svg?height=60&width=80'
-    },
-    enrollmentDate: '2023-06-10',
-    expiryDate: '2024-06-10',
-    progress: 15,
-    status: 'inactive',
-    payments: [
-      {
-        id: 1003,
-        amount: 899000,
-        date: '2023-06-10',
-        method: 'E-wallet',
-        status: 'completed'
-      }
-    ],
-    lastAccess: '2023-06-25'
-  },
-  {
-    id: 4,
-    student: {
-      id: 104,
-      name: 'Phạm Thị D',
-      email: 'phamthid@example.com',
-      avatar: '/placeholder.svg?height=40&width=40'
-    },
-    course: {
-      id: 204,
-      title: 'UI/UX Design',
-      instructor: 'Phạm Thị D',
-      thumbnail: '/placeholder.svg?height=60&width=80'
-    },
-    enrollmentDate: '2023-03-05',
-    expiryDate: '2024-03-05',
-    progress: 88,
-    status: 'active',
-    payments: [
-      {
-        id: 1004,
-        amount: 699000,
-        date: '2023-03-05',
-        method: 'Credit Card',
-        status: 'completed'
-      }
-    ],
-    lastAccess: '2023-07-12'
-  },
-  {
-    id: 5,
-    student: {
-      id: 105,
-      name: 'Hoàng Văn E',
-      email: 'hoangvane@example.com',
-      avatar: '/placeholder.svg?height=40&width=40'
-    },
-    course: {
-      id: 205,
-      title: 'Mobile App Development with Flutter',
-      instructor: 'Hoàng Văn E',
-      thumbnail: '/placeholder.svg?height=60&width=80'
-    },
-    enrollmentDate: '2023-02-15',
-    expiryDate: '2024-02-15',
-    progress: 75,
-    status: 'active',
-    payments: [
-      {
-        id: 1005,
-        amount: 899000,
-        date: '2023-02-15',
-        method: 'Bank Transfer',
-        status: 'completed'
-      }
-    ],
-    lastAccess: '2023-07-10'
-  },
-  {
-    id: 6,
-    student: {
-      id: 106,
-      name: 'Vũ Thị F',
-      email: 'vuthif@example.com',
-      avatar: '/placeholder.svg?height=40&width=40'
-    },
-    course: {
-      id: 206,
-      title: 'Machine Learning Fundamentals',
-      instructor: 'Ngô Thị H',
-      thumbnail: '/placeholder.svg?height=60&width=80'
-    },
-    enrollmentDate: '2023-07-01',
-    expiryDate: '2024-07-01',
-    progress: 5,
-    status: 'pending',
-    payments: [
-      {
-        id: 1006,
-        amount: 999000,
-        date: '2023-07-01',
-        method: 'E-wallet',
-        status: 'pending'
-      }
-    ],
-    lastAccess: 'Never'
-  }
-]
 
 export default function EnrollmentsPage() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -256,51 +60,13 @@ export default function EnrollmentsPage() {
   const totalPages = Math.ceil(filteredEnrollments.length / enrollmentsPerPage)
 
   // Handle view details
-  interface Student {
-    id: number
-    name: string
-    email: string
-    avatar: string
-  }
 
-  interface Course {
-    id: number
-    title: string
-    instructor: string
-    thumbnail: string
-  }
-
-  interface Payment {
-    id: number
-    amount: number
-    date: string
-    method: string
-    status: string
-  }
-
-  interface Enrollment {
-    id: number
-    student: Student
-    course: Course
-    enrollmentDate: string
-    expiryDate: string
-    progress: number
-    status: string
-    payments: Payment[]
-    lastAccess: string
-  }
-
-  const handleViewDetails = (enrollment: Enrollment) => {
+  const handleViewDetails = (enrollment: any) => {
     setCurrentEnrollment(enrollment)
     setIsViewDetailsOpen(true)
   }
 
-  // Handle checkbox selection
-  interface EnrollmentSelectionHandler {
-    (enrollmentId: number): void
-  }
-
-  const handleSelectEnrollment: EnrollmentSelectionHandler = (enrollmentId) => {
+  const handleSelectEnrollment = (enrollmentId: number): void => {
     if (selectedEnrollments.includes(enrollmentId)) {
       setSelectedEnrollments(selectedEnrollments.filter((id) => id !== enrollmentId))
     } else {
@@ -371,7 +137,7 @@ export default function EnrollmentsPage() {
               className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto text-xs sm:text-sm'
               onClick={handleExportExcel}
             >
-              <Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+              <Icons.Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
               <span>Xuất Excel</span>
             </Button>
           </div>
@@ -389,7 +155,7 @@ export default function EnrollmentsPage() {
                   Tìm kiếm
                 </Label>
                 <div className='relative'>
-                  <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
+                  <Icons.Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
                   <Input
                     id='search'
                     type='search'
@@ -456,17 +222,17 @@ export default function EnrollmentsPage() {
                     size='sm'
                     className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                   >
-                    <CheckCircle className='h-4 w-4 mr-1' /> Kích hoạt
+                    <Icons.CheckCircle className='h-4 w-4 mr-1' /> Kích hoạt
                   </Button>
                   <Button
                     variant='outline'
                     size='sm'
                     className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                   >
-                    <XCircle className='h-4 w-4 mr-1' /> Tạm dừng
+                    <Icons.XCircle className='h-4 w-4 mr-1' /> Tạm dừng
                   </Button>
                   <Button variant='destructive' size='sm'>
-                    <Trash2 className='h-4 w-4 mr-1' /> Xóa
+                    <Icons.Trash2 className='h-4 w-4 mr-1' /> Xóa
                   </Button>
                 </div>
               )}
@@ -574,7 +340,7 @@ export default function EnrollmentsPage() {
                               size='icon'
                               className='h-8 w-8 text-gray-400 hover:text-white hover:bg-gray-800'
                             >
-                              <MoreHorizontal className='h-4 w-4' />
+                              <Icons.MoreHorizontal className='h-4 w-4' />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent className='bg-gray-800 border-gray-700 text-white'>
@@ -584,25 +350,25 @@ export default function EnrollmentsPage() {
                               className='hover:bg-gray-700 cursor-pointer'
                               onClick={() => handleViewDetails(enrollment)}
                             >
-                              <Eye className='h-4 w-4 mr-2' /> Xem chi tiết
+                              <Icons.Eye className='h-4 w-4 mr-2' /> Xem chi tiết
                             </DropdownMenuItem>
                             <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer'>
-                              <Edit className='h-4 w-4 mr-2' /> Chỉnh sửa
+                              <Icons.Edit className='h-4 w-4 mr-2' /> Chỉnh sửa
                             </DropdownMenuItem>
                             <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer'>
                               {enrollment.status === 'active' ? (
                                 <>
-                                  <XCircle className='h-4 w-4 mr-2' /> Tạm dừng
+                                  <Icons.XCircle className='h-4 w-4 mr-2' /> Tạm dừng
                                 </>
                               ) : (
                                 <>
-                                  <CheckCircle className='h-4 w-4 mr-2' /> Kích hoạt
+                                  <Icons.CheckCircle className='h-4 w-4 mr-2' /> Kích hoạt
                                 </>
                               )}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className='bg-gray-700' />
                             <DropdownMenuItem className='text-red-500 hover:bg-gray-700 cursor-pointer'>
-                              <Trash2 className='h-4 w-4 mr-2' /> Xóa
+                              <Icons.Trash2 className='h-4 w-4 mr-2' /> Xóa
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -627,7 +393,7 @@ export default function EnrollmentsPage() {
                   disabled={currentPage === 1}
                   className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                 >
-                  <ChevronLeft className='h-4 w-4' />
+                  <Icons.ChevronLeft className='h-4 w-4' />
                 </Button>
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <Button
@@ -651,7 +417,7 @@ export default function EnrollmentsPage() {
                   disabled={currentPage === totalPages}
                   className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                 >
-                  <ChevronRight className='h-4 w-4' />
+                  <Icons.ChevronRight className='h-4 w-4' />
                 </Button>
               </div>
             </div>
@@ -731,14 +497,14 @@ export default function EnrollmentsPage() {
                       <div>
                         <h4 className='text-sm text-gray-400 mb-1'>Ngày đăng ký</h4>
                         <div className='flex items-center'>
-                          <Calendar className='h-4 w-4 mr-2 text-purple-400' />
+                          <Icons.Calendar className='h-4 w-4 mr-2 text-purple-400' />
                           <span>{currentEnrollment.enrollmentDate}</span>
                         </div>
                       </div>
                       <div>
                         <h4 className='text-sm text-gray-400 mb-1'>Ngày hết hạn</h4>
                         <div className='flex items-center'>
-                          <Calendar className='h-4 w-4 mr-2 text-purple-400' />
+                          <Icons.Calendar className='h-4 w-4 mr-2 text-purple-400' />
                           <span>{currentEnrollment.expiryDate}</span>
                         </div>
                       </div>
@@ -822,7 +588,7 @@ export default function EnrollmentsPage() {
                   Đóng
                 </Button>
                 <Button className='bg-purple-600 hover:bg-purple-700'>
-                  <Edit className='h-4 w-4 mr-2' /> Chỉnh sửa
+                  <Icons.Edit className='h-4 w-4 mr-2' /> Chỉnh sửa
                 </Button>
               </DialogFooter>
             </DialogContent>

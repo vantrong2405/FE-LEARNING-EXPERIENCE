@@ -7,7 +7,6 @@ import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { User, Lock, ShoppingCart, AlertCircle, Eye, EyeOff } from 'lucide-react'
 import { useChangePasswordMutation, useGetMeQuery, useUpdateMeMutation } from '@/queries/useAuth'
 import { toast } from 'sonner'
 import { ChangePasswordBody, ChangePasswordBodyType, MeBody, MeBodyType } from '@/schemaValidator/auth.schema'
@@ -23,14 +22,15 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
+import { Icons } from '@/components/ui/icons'
 
 export default function FormProfile() {
+  const [email, setEmail] = useState('')
   const [marketingEmails, setMarketingEmails] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const getMeQuery = useGetMeQuery()
   const updateMeMutation = useUpdateMeMutation()
   const changePasswordMutation = useChangePasswordMutation()
-  const [email, setEmail] = useState('')
 
   const formU = useForm<MeBodyType>({
     resolver: zodResolver(MeBody),
@@ -107,21 +107,21 @@ export default function FormProfile() {
               value='account'
               className='dark:text-white data-[state=active]:dark:bg-purple-600 transition-all duration-200'
             >
-              <User className='w-5 h-5 mr-2' />
+              <Icons.User className='w-5 h-5 mr-2' />
               Tài khoản
             </TabsTrigger>
             <TabsTrigger
               value='password'
               className='dark:text-white data-[state=active]:dark:bg-purple-600 transition-all duration-200'
             >
-              <Lock className='w-5 h-5 mr-2' />
+              <Icons.Lock className='w-5 h-5 mr-2' />
               Đổi mật khẩu
             </TabsTrigger>
             <TabsTrigger
               value='cart'
               className='dark:text-white data-[state=active]:dark:bg-purple-600 transition-all duration-200'
             >
-              <ShoppingCart className='w-5 h-5 mr-2' />
+              <Icons.ShoppingCart className='w-5 h-5 mr-2' />
               Giỏ hàng
             </TabsTrigger>
           </TabsList>
@@ -165,7 +165,7 @@ export default function FormProfile() {
                       size='icon'
                       className='dark:bg-gray-800 border-purple-500 hover:dark:bg-purple-700'
                     >
-                      <AlertCircle className='h-4 w-4 dark:text-purple-400' />
+                      <Icons.AlertCircle className='h-4 w-4 dark:text-purple-400' />
                     </Button>
                   </div>
                   <p className='text-sm text-gray-400'>Liên hệ quản trị viên để thay đổi email.</p>
@@ -248,9 +248,9 @@ export default function FormProfile() {
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
-                        <EyeOff className='h-4 w-4 dark:text-purple-400' />
+                        <Icons.EyeOff className='h-4 w-4 dark:text-purple-400' />
                       ) : (
-                        <Eye className='h-4 w-4 dark:text-purple-400' />
+                        <Icons.Eye className='h-4 w-4 dark:text-purple-400' />
                       )}
                     </Button>
                   </div>
@@ -309,7 +309,7 @@ export default function FormProfile() {
               </CardHeader>
               <CardContent>
                 <div className='text-center py-8'>
-                  <ShoppingCart className='w-16 h-16 mx-auto dark:text-purple-400 mb-4' />
+                  <Icons.ShoppingCart className='w-16 h-16 mx-auto dark:text-purple-400 mb-4' />
                   <p className='text-xl font-semibold mb-2 dark:text-purple-300'>Giỏ hàng trống</p>
                   <p className='text-gray-400 mb-4'>Bạn chưa thêm sản phẩm nào vào giỏ hàng.</p>
                   <Button

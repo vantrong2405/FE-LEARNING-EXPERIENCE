@@ -1,24 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Search,
-  Edit,
-  Trash2,
-  MoreHorizontal,
-  ChevronLeft,
-  ChevronRight,
-  Download,
-  RefreshCw,
-  Plus,
-  DollarSign,
-  Calendar,
-  CheckCircle,
-  FileText,
-  Receipt,
-  RotateCcw,
-  Eye
-} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -60,214 +42,8 @@ import { DatePickerWithRange } from '@/components/ui/date-range-picker'
 import type { DateRange } from 'react-day-picker'
 import { addDays } from 'date-fns'
 import { exportToExcel, formatCurrency, formatPaymentStatus } from '@/lib/excel'
-
-// Sample payment data
-const payments = [
-  {
-    id: 'PAY-001',
-    student: {
-      id: 101,
-      name: 'Nguyễn Văn A',
-      email: 'nguyenvana@example.com',
-      avatar: '/placeholder.svg?height=40&width=40'
-    },
-    course: {
-      id: 201,
-      title: 'JavaScript Cơ Bản',
-      instructor: 'Nguyễn Văn A',
-      thumbnail: '/placeholder.svg?height=60&width=80'
-    },
-    amount: 599000,
-    date: '2023-07-15',
-    method: 'Credit Card',
-    status: 'completed',
-    transactionId: 'TXN123456789',
-    invoiceNumber: 'INV-2023-001',
-    paymentDetails: {
-      cardLast4: '4242',
-      cardBrand: 'Visa',
-      expiryDate: '05/25'
-    }
-  },
-  {
-    id: 'PAY-002',
-    student: {
-      id: 102,
-      name: 'Trần Thị B',
-      email: 'tranthib@example.com',
-      avatar: '/placeholder.svg?height=40&width=40'
-    },
-    course: {
-      id: 202,
-      title: 'React Advanced',
-      instructor: 'Trần Thị B',
-      thumbnail: '/placeholder.svg?height=60&width=80'
-    },
-    amount: 799000,
-    date: '2023-07-14',
-    method: 'Bank Transfer',
-    status: 'completed',
-    transactionId: 'TXN987654321',
-    invoiceNumber: 'INV-2023-002',
-    paymentDetails: {
-      bankName: 'VietcomBank',
-      accountLast4: '6789'
-    }
-  },
-  {
-    id: 'PAY-003',
-    student: {
-      id: 103,
-      name: 'Lê Văn C',
-      email: 'levanc@example.com',
-      avatar: '/placeholder.svg?height=40&width=40'
-    },
-    course: {
-      id: 203,
-      title: 'Python for Data Science',
-      instructor: 'Lê Văn C',
-      thumbnail: '/placeholder.svg?height=60&width=80'
-    },
-    amount: 899000,
-    date: '2023-07-13',
-    method: 'E-wallet',
-    status: 'completed',
-    transactionId: 'TXN456789123',
-    invoiceNumber: 'INV-2023-003',
-    paymentDetails: {
-      walletProvider: 'MoMo',
-      accountEmail: 'levanc@example.com'
-    }
-  },
-  {
-    id: 'PAY-004',
-    student: {
-      id: 104,
-      name: 'Phạm Thị D',
-      email: 'phamthid@example.com',
-      avatar: '/placeholder.svg?height=40&width=40'
-    },
-    course: {
-      id: 204,
-      title: 'UI/UX Design',
-      instructor: 'Phạm Thị D',
-      thumbnail: '/placeholder.svg?height=60&width=80'
-    },
-    amount: 699000,
-    date: '2023-07-12',
-    method: 'Credit Card',
-    status: 'completed',
-    transactionId: 'TXN789123456',
-    invoiceNumber: 'INV-2023-004',
-    paymentDetails: {
-      cardLast4: '1234',
-      cardBrand: 'Mastercard',
-      expiryDate: '09/24'
-    }
-  },
-  {
-    id: 'PAY-005',
-    student: {
-      id: 105,
-      name: 'Hoàng Văn E',
-      email: 'hoangvane@example.com',
-      avatar: '/placeholder.svg?height=40&width=40'
-    },
-    course: {
-      id: 205,
-      title: 'Mobile App Development with Flutter',
-      instructor: 'Hoàng Văn E',
-      thumbnail: '/placeholder.svg?height=60&width=80'
-    },
-    amount: 899000,
-    date: '2023-07-10',
-    method: 'Bank Transfer',
-    status: 'completed',
-    transactionId: 'TXN321654987',
-    invoiceNumber: 'INV-2023-005',
-    paymentDetails: {
-      bankName: 'BIDV',
-      accountLast4: '4321'
-    }
-  },
-  {
-    id: 'PAY-006',
-    student: {
-      id: 106,
-      name: 'Vũ Thị F',
-      email: 'vuthif@example.com',
-      avatar: '/placeholder.svg?height=40&width=40'
-    },
-    course: {
-      id: 206,
-      title: 'Machine Learning Fundamentals',
-      instructor: 'Ngô Thị H',
-      thumbnail: '/placeholder.svg?height=60&width=80'
-    },
-    amount: 999000,
-    date: '2023-07-08',
-    method: 'E-wallet',
-    status: 'pending',
-    transactionId: 'TXN654987321',
-    invoiceNumber: 'INV-2023-006',
-    paymentDetails: {
-      walletProvider: 'ZaloPay',
-      accountEmail: 'vuthif@example.com'
-    }
-  },
-  {
-    id: 'PAY-007',
-    student: {
-      id: 107,
-      name: 'Đặng Văn G',
-      email: 'dangvang@example.com',
-      avatar: '/placeholder.svg?height=40&width=40'
-    },
-    course: {
-      id: 201,
-      title: 'JavaScript Cơ Bản',
-      instructor: 'Nguyễn Văn A',
-      thumbnail: '/placeholder.svg?height=60&width=80'
-    },
-    amount: 599000,
-    date: '2023-07-05',
-    method: 'Credit Card',
-    status: 'failed',
-    transactionId: 'TXN987321654',
-    invoiceNumber: 'INV-2023-007',
-    paymentDetails: {
-      cardLast4: '5678',
-      cardBrand: 'Visa',
-      expiryDate: '12/23',
-      errorMessage: 'Insufficient funds'
-    }
-  }
-]
-
-// Payment method distribution data
-const paymentMethodData = [
-  { name: 'Credit Card', value: payments.filter((p) => p.method === 'Credit Card').length },
-  { name: 'Bank Transfer', value: payments.filter((p) => p.method === 'Bank Transfer').length },
-  { name: 'E-wallet', value: payments.filter((p) => p.method === 'E-wallet').length }
-]
-
-// Payment status distribution data
-const paymentStatusData = [
-  { name: 'Completed', value: payments.filter((p) => p.status === 'completed').length },
-  { name: 'Pending', value: payments.filter((p) => p.status === 'pending').length },
-  { name: 'Failed', value: payments.filter((p) => p.status === 'failed').length }
-]
-
-// Daily revenue data
-const dailyRevenueData = [
-  { date: '2023-07-05', revenue: 599000 },
-  { date: '2023-07-08', revenue: 999000 },
-  { date: '2023-07-10', revenue: 899000 },
-  { date: '2023-07-12', revenue: 699000 },
-  { date: '2023-07-13', revenue: 899000 },
-  { date: '2023-07-14', revenue: 799000 },
-  { date: '2023-07-15', revenue: 599000 }
-]
+import { Icons } from '@/components/ui/icons'
+import { dailyRevenueData, paymentMethodData, payments, paymentStatusData } from '@/database_example/paymen.db'
 
 export default function PaymentsPage() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -275,7 +51,7 @@ export default function PaymentsPage() {
   const [selectedStatus, setSelectedStatus] = useState('all')
   const [isAddPaymentOpen, setIsAddPaymentOpen] = useState(false)
   const [isViewDetailsOpen, setIsViewDetailsOpen] = useState(false)
-  const [currentPayment, setCurrentPayment] = useState<Payment | null>(null)
+  const [currentPayment, setCurrentPayment] = useState<any | null>(null)
   const [selectedPayments, setSelectedPayments] = useState<string[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [date, setDate] = useState<DateRange | undefined>({
@@ -310,51 +86,11 @@ export default function PaymentsPage() {
   const currentPayments = filteredPayments.slice(indexOfFirstPayment, indexOfLastPayment)
   const totalPages = Math.ceil(filteredPayments.length / paymentsPerPage)
 
-  // Handle view details
-  interface Student {
-    id: number
-    name: string
-    email: string
-    avatar: string
-  }
-
-  interface Course {
-    id: number
-    title: string
-    instructor: string
-    thumbnail: string
-  }
-
-  interface PaymentDetails {
-    cardLast4?: string
-    cardBrand?: string
-    expiryDate?: string
-    bankName?: string
-    accountLast4?: string
-    walletProvider?: string
-    accountEmail?: string
-    errorMessage?: string
-  }
-
-  interface Payment {
-    id: string
-    student: Student
-    course: Course
-    amount: number
-    date: string
-    method: string
-    status: string
-    transactionId: string
-    invoiceNumber: string
-    paymentDetails: PaymentDetails
-  }
-
-  const handleViewDetails = (payment: Payment) => {
+  const handleViewDetails = (payment: any) => {
     setCurrentPayment(payment)
     setIsViewDetailsOpen(true)
   }
 
-  // Handle checkbox selection
   const handleSelectPayment = (paymentId: string) => {
     if (selectedPayments.includes(paymentId)) {
       setSelectedPayments(selectedPayments.filter((id) => id !== paymentId))
@@ -371,20 +107,16 @@ export default function PaymentsPage() {
     }
   }
 
-  // Format price
   const formatPrice = (price: number): string => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
   }
 
-  // Calculate total revenue
   const totalRevenue = payments
     .filter((p) => p.status === 'completed')
     .reduce((sum, payment) => sum + payment.amount, 0)
 
-  // Colors for charts
   const COLORS = ['#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe', '#ede9fe']
 
-  // Handle export to Excel
   const handleExportExcel = () => {
     const columns = [
       { key: 'id', header: 'Mã thanh toán' },
@@ -433,13 +165,13 @@ export default function PaymentsPage() {
               className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto text-xs sm:text-sm'
               onClick={handleExportExcel}
             >
-              <Download className='h-3 h-3 sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+              <Icons.Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
               <span>Xuất Excel</span>
             </Button>
             <Dialog open={isAddPaymentOpen} onOpenChange={setIsAddPaymentOpen}>
               <DialogTrigger asChild>
                 <Button className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto text-xs sm:text-sm'>
-                  <Plus className='h-3 h-3 sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+                  <Icons.Plus className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
                   <span>Tạo Thanh Toán</span>
                 </Button>
               </DialogTrigger>
@@ -493,7 +225,7 @@ export default function PaymentsPage() {
                       Số tiền (VND)
                     </Label>
                     <div className='relative'>
-                      <DollarSign className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
+                      <Icons.DollarSign className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
                       <Input
                         id='amount'
                         type='number'
@@ -508,7 +240,7 @@ export default function PaymentsPage() {
                       Ngày thanh toán
                     </Label>
                     <div className='relative'>
-                      <Calendar className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
+                      <Icons.Calendar className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
                       <Input id='payment-date' type='date' className='pl-8 bg-gray-800 border-gray-700 text-white' />
                     </div>
                   </div>
@@ -594,7 +326,7 @@ export default function PaymentsPage() {
                   <h3 className='text-2xl font-bold text-white mt-1'>{formatPrice(totalRevenue)}</h3>
                 </div>
                 <div className='h-12 w-12 bg-purple-900/30 rounded-lg flex items-center justify-center'>
-                  <DollarSign className='h-6 w-6 text-purple-400' />
+                  <Icons.DollarSign className='h-6 w-6 text-purple-400' />
                 </div>
               </div>
             </CardContent>
@@ -608,7 +340,7 @@ export default function PaymentsPage() {
                   <h3 className='text-2xl font-bold text-white mt-1'>{payments.length}</h3>
                 </div>
                 <div className='h-12 w-12 bg-purple-900/30 rounded-lg flex items-center justify-center'>
-                  <Receipt className='h-6 w-6 text-purple-400' />
+                  <Icons.Receipt className='h-6 w-6 text-purple-400' />
                 </div>
               </div>
             </CardContent>
@@ -624,7 +356,7 @@ export default function PaymentsPage() {
                   </h3>
                 </div>
                 <div className='h-12 w-12 bg-purple-900/30 rounded-lg flex items-center justify-center'>
-                  <CheckCircle className='h-6 w-6 text-purple-400' />
+                  <Icons.CheckCircle className='h-6 w-6 text-purple-400' />
                 </div>
               </div>
             </CardContent>
@@ -640,7 +372,7 @@ export default function PaymentsPage() {
                   </h3>
                 </div>
                 <div className='h-12 w-12 bg-purple-900/30 rounded-lg flex items-center justify-center'>
-                  <RotateCcw className='h-6 w-6 text-purple-400' />
+                  <Icons.RotateCcw className='h-6 w-6 text-purple-400' />
                 </div>
               </div>
             </CardContent>
@@ -766,7 +498,7 @@ export default function PaymentsPage() {
                   Tìm kiếm
                 </Label>
                 <div className='relative'>
-                  <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
+                  <Icons.Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
                   <Input
                     id='search'
                     type='search'
@@ -834,10 +566,10 @@ export default function PaymentsPage() {
                     size='sm'
                     className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                   >
-                    <FileText className='h-4 w-4 mr-1' /> Xuất hóa đơn
+                    <Icons.FileText className='h-4 w-4 mr-1' /> Xuất hóa đơn
                   </Button>
                   <Button variant='destructive' size='sm'>
-                    <Trash2 className='h-4 w-4 mr-1' /> Xóa
+                    <Icons.Trash2 className='h-4 w-4 mr-1' /> Xóa
                   </Button>
                 </div>
               )}
@@ -929,7 +661,7 @@ export default function PaymentsPage() {
                               size='icon'
                               className='h-8 w-8 text-gray-400 hover:text-white hover:bg-gray-800'
                             >
-                              <MoreHorizontal className='h-4 w-4' />
+                              <Icons.MoreHorizontal className='h-4 w-4' />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent className='bg-gray-800 border-gray-700 text-white'>
@@ -939,17 +671,17 @@ export default function PaymentsPage() {
                               className='hover:bg-gray-700 cursor-pointer'
                               onClick={() => handleViewDetails(payment)}
                             >
-                              <Eye className='h-4 w-4 mr-2' /> Xem chi tiết
+                              <Icons.Eye className='h-4 w-4 mr-2' /> Xem chi tiết
                             </DropdownMenuItem>
                             <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer'>
-                              <FileText className='h-4 w-4 mr-2' /> Xuất hóa đơn
+                              <Icons.FileText className='h-4 w-4 mr-2' /> Xuất hóa đơn
                             </DropdownMenuItem>
                             <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer'>
-                              <Edit className='h-4 w-4 mr-2' /> Chỉnh sửa
+                              <Icons.Edit className='h-4 w-4 mr-2' /> Chỉnh sửa
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className='bg-gray-700' />
                             <DropdownMenuItem className='text-red-500 hover:bg-gray-700 cursor-pointer'>
-                              <Trash2 className='h-4 w-4 mr-2' /> Xóa
+                              <Icons.Trash2 className='h-4 w-4 mr-2' /> Xóa
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -974,7 +706,7 @@ export default function PaymentsPage() {
                   disabled={currentPage === 1}
                   className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                 >
-                  <ChevronLeft className='h-4 w-4' />
+                  <Icons.ChevronLeft className='h-4 w-4' />
                 </Button>
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <Button
@@ -998,7 +730,7 @@ export default function PaymentsPage() {
                   disabled={currentPage === totalPages}
                   className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                 >
-                  <ChevronRight className='h-4 w-4' />
+                  <Icons.ChevronRight className='h-4 w-4' />
                 </Button>
               </div>
             </div>
@@ -1159,7 +891,7 @@ export default function PaymentsPage() {
                   Đóng
                 </Button>
                 <Button className='bg-purple-600 hover:bg-purple-700'>
-                  <FileText className='h-4 w-4 mr-2' /> Xuất hóa đơn
+                  <Icons.FileText className='h-4 w-4 mr-2' /> Xuất hóa đơn
                 </Button>
               </DialogFooter>
             </DialogContent>
