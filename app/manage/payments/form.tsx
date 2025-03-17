@@ -1,23 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Search,
-  Edit,
-  Trash2,
-  MoreHorizontal,
-  ChevronLeft,
-  ChevronRight,
-  Download,
-  Plus,
-  DollarSign,
-  Calendar,
-  CheckCircle,
-  FileText,
-  Receipt,
-  RotateCcw,
-  Eye
-} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -60,6 +43,7 @@ import type { DateRange } from 'react-day-picker'
 import { addDays } from 'date-fns'
 import { exportToExcel, formatCurrency, formatPaymentStatus } from '@/lib/excel'
 import { Payment } from '@/models/payment.type'
+import { Icons } from '@/components/ui/icons'
 
 // Sample payment data
 const payments = [
@@ -395,13 +379,13 @@ export default function PaymentsPage() {
               className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto text-xs sm:text-sm'
               onClick={handleExportExcel}
             >
-              <Download className='h-3 h-3 sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+              <Icons.Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
               <span>Xuất Excel</span>
             </Button>
             <Dialog open={isAddPaymentOpen} onOpenChange={setIsAddPaymentOpen}>
               <DialogTrigger asChild>
                 <Button className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto text-xs sm:text-sm'>
-                  <Plus className='h-3 h-3 sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+                  <Icons.Plus className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
                   <span>Tạo Thanh Toán</span>
                 </Button>
               </DialogTrigger>
@@ -455,7 +439,7 @@ export default function PaymentsPage() {
                       Số tiền (VND)
                     </Label>
                     <div className='relative'>
-                      <DollarSign className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
+                      <Icons.DollarSign className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
                       <Input
                         id='amount'
                         type='number'
@@ -470,7 +454,7 @@ export default function PaymentsPage() {
                       Ngày thanh toán
                     </Label>
                     <div className='relative'>
-                      <Calendar className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
+                      <Icons.Calendar className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
                       <Input id='payment-date' type='date' className='pl-8 bg-gray-800 border-gray-700 text-white' />
                     </div>
                   </div>
@@ -556,7 +540,7 @@ export default function PaymentsPage() {
                   <h3 className='text-2xl font-bold text-white mt-1'>{formatPrice(totalRevenue)}</h3>
                 </div>
                 <div className='h-12 w-12 bg-purple-900/30 rounded-lg flex items-center justify-center'>
-                  <DollarSign className='h-6 w-6 text-purple-400' />
+                  <Icons.DollarSign className='h-6 w-6 text-purple-400' />
                 </div>
               </div>
             </CardContent>
@@ -570,7 +554,7 @@ export default function PaymentsPage() {
                   <h3 className='text-2xl font-bold text-white mt-1'>{payments.length}</h3>
                 </div>
                 <div className='h-12 w-12 bg-purple-900/30 rounded-lg flex items-center justify-center'>
-                  <Receipt className='h-6 w-6 text-purple-400' />
+                  <Icons.Receipt className='h-6 w-6 text-purple-400' />
                 </div>
               </div>
             </CardContent>
@@ -586,7 +570,7 @@ export default function PaymentsPage() {
                   </h3>
                 </div>
                 <div className='h-12 w-12 bg-purple-900/30 rounded-lg flex items-center justify-center'>
-                  <CheckCircle className='h-6 w-6 text-purple-400' />
+                  <Icons.CheckCircle className='h-6 w-6 text-purple-400' />
                 </div>
               </div>
             </CardContent>
@@ -602,7 +586,7 @@ export default function PaymentsPage() {
                   </h3>
                 </div>
                 <div className='h-12 w-12 bg-purple-900/30 rounded-lg flex items-center justify-center'>
-                  <RotateCcw className='h-6 w-6 text-purple-400' />
+                  <Icons.RotateCcw className='h-6 w-6 text-purple-400' />
                 </div>
               </div>
             </CardContent>
@@ -728,7 +712,7 @@ export default function PaymentsPage() {
                   Tìm kiếm
                 </Label>
                 <div className='relative'>
-                  <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
+                  <Icons.Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
                   <Input
                     id='search'
                     type='search'
@@ -796,10 +780,10 @@ export default function PaymentsPage() {
                     size='sm'
                     className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                   >
-                    <FileText className='h-4 w-4 mr-1' /> Xuất hóa đơn
+                    <Icons.FileText className='h-4 w-4 mr-1' /> Xuất hóa đơn
                   </Button>
                   <Button variant='destructive' size='sm'>
-                    <Trash2 className='h-4 w-4 mr-1' /> Xóa
+                    <Icons.Trash2 className='h-4 w-4 mr-1' /> Xóa
                   </Button>
                 </div>
               )}
@@ -891,7 +875,7 @@ export default function PaymentsPage() {
                               size='icon'
                               className='h-8 w-8 text-gray-400 hover:text-white hover:bg-gray-800'
                             >
-                              <MoreHorizontal className='h-4 w-4' />
+                              <Icons.MoreHorizontal className='h-4 w-4' />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent className='bg-gray-800 border-gray-700 text-white'>
@@ -901,17 +885,17 @@ export default function PaymentsPage() {
                               className='hover:bg-gray-700 cursor-pointer'
                               onClick={() => handleViewDetails(payment)}
                             >
-                              <Eye className='h-4 w-4 mr-2' /> Xem chi tiết
+                              <Icons.Eye className='h-4 w-4 mr-2' /> Xem chi tiết
                             </DropdownMenuItem>
                             <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer'>
-                              <FileText className='h-4 w-4 mr-2' /> Xuất hóa đơn
+                              <Icons.FileText className='h-4 w-4 mr-2' /> Xuất hóa đơn
                             </DropdownMenuItem>
                             <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer'>
-                              <Edit className='h-4 w-4 mr-2' /> Chỉnh sửa
+                              <Icons.Edit className='h-4 w-4 mr-2' /> Chỉnh sửa
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className='bg-gray-700' />
                             <DropdownMenuItem className='text-red-500 hover:bg-gray-700 cursor-pointer'>
-                              <Trash2 className='h-4 w-4 mr-2' /> Xóa
+                              <Icons.Trash2 className='h-4 w-4 mr-2' /> Xóa
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -936,7 +920,7 @@ export default function PaymentsPage() {
                   disabled={currentPage === 1}
                   className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                 >
-                  <ChevronLeft className='h-4 w-4' />
+                  <Icons.ChevronLeft className='h-4 w-4' />
                 </Button>
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <Button
@@ -960,7 +944,7 @@ export default function PaymentsPage() {
                   disabled={currentPage === totalPages}
                   className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                 >
-                  <ChevronRight className='h-4 w-4' />
+                  <Icons.ChevronRight className='h-4 w-4' />
                 </Button>
               </div>
             </div>
@@ -1121,7 +1105,7 @@ export default function PaymentsPage() {
                   Đóng
                 </Button>
                 <Button className='bg-purple-600 hover:bg-purple-700'>
-                  <FileText className='h-4 w-4 mr-2' /> Xuất hóa đơn
+                  <Icons.FileText className='h-4 w-4 mr-2' /> Xuất hóa đơn
                 </Button>
               </DialogFooter>
             </DialogContent>

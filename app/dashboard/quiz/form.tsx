@@ -9,14 +9,13 @@ import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ChevronLeft, ChevronRight, CheckCircle, XCircle } from 'lucide-react'
-import { Code, BookOpen, Coffee, Hash } from 'lucide-react'
+import { Icons } from '@/components/ui/icons'
 
 const languages = [
-  { value: 'javascript', label: 'JavaScript', icon: Code },
-  { value: 'python', label: 'Python', icon: BookOpen },
-  { value: 'java', label: 'Java', icon: Coffee },
-  { value: 'csharp', label: 'C#', icon: Hash }
+  { value: 'javascript', label: 'JavaScript', icon: Icons.Code },
+  { value: 'python', label: 'Python', icon: Icons.BookOpen },
+  { value: 'java', label: 'Java', icon: Icons.Coffee },
+  { value: 'csharp', label: 'C#', icon: Icons.Hash }
 ]
 
 const questions = {
@@ -338,12 +337,12 @@ const QuizTest = () => {
                     <div key={optionIndex} className='flex items-center space-x-2 mb-2'>
                       {answers[index] === optionIndex ? (
                         answers[index] === q.correctAnswer ? (
-                          <CheckCircle className='text-green-500' />
+                          <Icons.CheckCircle className='text-green-500' />
                         ) : (
-                          <XCircle className='text-red-500' />
+                          <Icons.XCircle className='text-red-500' />
                         )
                       ) : optionIndex === q.correctAnswer ? (
-                        <CheckCircle className='text-green-500' />
+                        <Icons.CheckCircle className='text-green-500' />
                       ) : null}
                       <span
                         className={`${
@@ -432,14 +431,14 @@ const QuizTest = () => {
           </ScrollArea>
           <div className='flex justify-between mt-6'>
             <Button onClick={handlePreviousPage} disabled={currentPage === 0} className='bg-gray-700 hover:bg-gray-600'>
-              <ChevronLeft className='mr-2 h-4 w-4' /> Previous
+              <Icons.ChevronLeft className='mr-2 h-4 w-4' /> Previous
             </Button>
             <Button onClick={handleNextPage} className='bg-purple-600 hover:bg-purple-700'>
               {currentPage === Math.ceil(questions[selectedLanguage as keyof typeof questions].length / 10) - 1
                 ? 'Finish'
                 : 'Next'}
               {currentPage !== Math.ceil(questions[selectedLanguage as keyof typeof questions].length / 10) - 1 && (
-                <ChevronRight className='ml-2 h-4 w-4' />
+                <Icons.ChevronRight className='ml-2 h-4 w-4' />
               )}
             </Button>
           </div>

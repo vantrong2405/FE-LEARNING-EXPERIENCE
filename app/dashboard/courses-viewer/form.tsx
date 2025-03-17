@@ -7,10 +7,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
-import { PlayCircle, CheckCircle, ChevronLeft, BookOpen, Clock, Users, Star, Github, Menu } from 'lucide-react'
 import { useLessonByIdQuery } from '@/queries/useLesson'
 import { pagination } from '@/constants/pagination-config'
 import { useCourseQuery } from '@/queries/useCourse'
+import { Icons } from '@/components/ui/icons'
 
 const CourseViewer = () => {
   const [currentLesson, setCurrentLesson] = useState(0)
@@ -64,7 +64,7 @@ const CourseViewer = () => {
       <div className='flex-1 p-4 lg:p-8 overflow-y-auto'>
         <div className='flex items-center justify-between mb-6'>
           <Button variant='ghost' className='text-gray-300 hover:text-white'>
-            <ChevronLeft className='mr-2 h-5 w-5' />
+            <Icons.ChevronLeft className='mr-2 h-5 w-5' />
             Back to Course Details
           </Button>
         </div>
@@ -163,9 +163,9 @@ const CourseViewer = () => {
                     >
                       <div className='flex items-center'>
                         {lesson.completed ? (
-                          <CheckCircle className='w-5 h-5 mr-3 text-green-400 flex-shrink-0' />
+                          <Icons.CheckCircle className='w-5 h-5 mr-3 text-green-400 flex-shrink-0' />
                         ) : (
-                          <PlayCircle className='w-5 h-5 mr-3 text-gray-400 flex-shrink-0' />
+                          <Icons.PlayCircle className='w-5 h-5 mr-3 text-gray-400 flex-shrink-0' />
                         )}
                         <span>{lesson.title}</span>
                       </div>

@@ -7,7 +7,6 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
 import { Slider } from '@/components/ui/slider'
-import { Book, Clock, Filter, Search, Star, TrendingUp, Users, X } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { pathURL } from '@/constants/path'
@@ -21,6 +20,7 @@ import { useLevelListQuery } from '@/queries/useLevel'
 import { pagination } from '@/constants/pagination-config'
 import { PaginationDemo } from '@/lib/pagination'
 import { useRouter } from 'next/navigation'
+import { Icons } from '@/components/ui/icons'
 
 export default function CoursesPage() {
   const [page, setPage] = useState(pagination.PAGE)
@@ -79,7 +79,7 @@ export default function CoursesPage() {
         <div className='flex flex-col md:flex-row gap-4 items-start md:items-center justify-between'>
           <div className='w-full md:w-auto flex flex-col sm:flex-row gap-4 items-center'>
             <div className='relative w-full sm:w-96'>
-              <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400' />
+              <Icons.Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-400' />
               <Input
                 type='search'
                 placeholder='Search for courses...'
@@ -91,7 +91,7 @@ export default function CoursesPage() {
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant='outline' className='w-full sm:w-auto'>
-                  <Filter className='mr-2 h-4 w-4' /> Advanced Filters
+                  <Icons.Filter className='mr-2 h-4 w-4' /> Advanced Filters
                 </Button>
               </DialogTrigger>
               <DialogContent className='sm:max-w-[425px]'>
@@ -162,23 +162,23 @@ export default function CoursesPage() {
               <span className='text-sm text-gray-600 dark:text-gray-400 mx-2'>Active filters:</span>
               {searchQuery && (
                 <Button variant='secondary' size='sm' onClick={() => setSearchQuery('')}>
-                  Search: {searchQuery} <X className='ml-2 h-3 w-3 mx-2' />
+                  Search: {searchQuery} <Icons.X className='ml-2 h-3 w-3 mx-2' />
                 </Button>
               )}
               {(priceRange[0] > 0 || priceRange[1] < 1000000) && (
                 <Button variant='secondary' size='sm' onClick={() => setPriceRange([0, 1000000])}>
                   Price: {priceRange[0].toLocaleString()}đ - {priceRange[1].toLocaleString()}đ{' '}
-                  <X className='ml-2 h-3 w-3' />
+                  <Icons.X className='ml-2 h-3 w-3' />
                 </Button>
               )}
               {category && (
                 <Button variant='secondary' size='sm' className='m-2' onClick={() => setCategory('')}>
-                  Category: {category} <X className='ml-2 h-3 w-3' />
+                  Category: {category} <Icons.X className='ml-2 h-3 w-3' />
                 </Button>
               )}
               {level && (
                 <Button variant='secondary' size='sm' onClick={() => setLevel('')}>
-                  Level: {level} <X className='ml-2 h-3 w-3' />
+                  Level: {level} <Icons.X className='ml-2 h-3 w-3' />
                 </Button>
               )}
             </div>
@@ -244,18 +244,18 @@ export default function CoursesPage() {
                   {course.category?.name ?? 'No Category'}
                 </p>
                 <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2'>
-                  <Users className='h-4 w-4' />
+                  <Icons.Users className='h-4 w-4' />
                   <span>{course.instructor?.name ?? 'Unknown Instructor'}</span>
                 </div>
                 <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2'>
-                  <Book className='h-4 w-4' />
+                  <Icons.Book className='h-4 w-4' />
                   <span>{course.articlesCount ?? 0} lessons</span>
                   <span>•</span>
-                  <Clock className='h-4 w-4' />
+                  <Icons.Clock className='h-4 w-4' />
                   <span>{course.videoHours ?? 'Unknown duration'}</span>
                 </div>
                 <div className='flex items-center gap-2 text-sm text-yellow-500 mb-2'>
-                  <Star className='h-4 w-4 fill-current' />
+                  <Icons.Star className='h-4 w-4 fill-current' />
                   <span>{course.rating ?? 'N/A'}</span>
                   <span className='text-gray-600 dark:text-gray-400'>
                     ({course.totalReviews?.toLocaleString() ?? 0} students)
@@ -312,18 +312,18 @@ export default function CoursesPage() {
                 </h3>
                 <p className='text-sm text-gray-600 dark:text-gray-400 mb-2'>{course.category.name}</p>
                 <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2'>
-                  <Users className='h-4 w-4' />
+                  <Icons.Users className='h-4 w-4' />
                   <span>{course.instructor.name}</span>
                 </div>
                 <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2'>
-                  <Book className='h-4 w-4' />
+                  <Icons.Book className='h-4 w-4' />
                   <span>{course.articlesCount}</span>
                   <span>•</span>
-                  <Clock className='h-4 w-4' />
+                  <Icons.Clock className='h-4 w-4' />
                   <span>{course.videoHours}</span>
                 </div>
                 <div className='flex items-center gap-2 text-sm text-yellow-500 mb-2'>
-                  <Star className='h-4 w-4 fill-current' />
+                  <Icons.Star className='h-4 w-4 fill-current' />
                   <span>{course.rating}</span>
                   <span className='text-gray-600 dark:text-gray-400'>
                     ({course.totalReviews.toLocaleString()} students)
@@ -370,7 +370,7 @@ export default function CoursesPage() {
                 variant='outline'
                 className='text-purple-600 border-purple-600 hover:bg-purple-600/10 dark:text-purple-400 dark:border-purple-400 dark:hover:bg-purple-400/10'
               >
-                <TrendingUp className='mr-2 h-4 w-4' />
+                <Icons.TrendingUp className='mr-2 h-4 w-4' />
                 View Detailed Report
               </Button>
             </div>

@@ -5,7 +5,6 @@ import type React from 'react'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Home, Users, BookOpen, Star, Settings, LogOut, Bell, Search, Menu, X, HelpCircle, Receipt } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog'
@@ -13,6 +12,7 @@ import { DialogTitle } from '@radix-ui/react-dialog'
 import { useGetMeQuery, useLogoutMutation } from '@/queries/useAuth'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { getRefreshTokenFromLocalStorage } from '@/lib/utils'
+import { Icons } from '@/components/ui/icons'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -28,15 +28,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   // Define navigation items
   const navItems = [
-    { href: '/manage', label: 'Dashboard', icon: Home },
-    { href: '/manage/users', label: 'Người dùng', icon: Users },
-    { href: '/manage/courses', label: 'Khóa học', icon: BookOpen },
-    { href: '/manage/enrollments', label: 'Đăng ký', icon: BookOpen },
-    { href: '/manage/lessons', label: 'Lesson', icon: BookOpen },
-    { href: '/manage/videos', label: 'Videos', icon: BookOpen },
-    { href: '/manage/reviews', label: 'Đánh giá', icon: Star },
-    { href: '/manage/payments', label: 'Thanh toán', icon: Receipt },
-    { href: '/manage/faqs', label: 'FAQs', icon: HelpCircle }
+    { href: '/manage', label: 'Dashboard', icon: Icons.Home },
+    { href: '/manage/users', label: 'Người dùng', icon: Icons.Users },
+    { href: '/manage/courses', label: 'Khóa học', icon: Icons.BookOpen },
+    { href: '/manage/enrollments', label: 'Đăng ký', icon: Icons.BookOpen },
+    { href: '/manage/lessons', label: 'Lesson', icon: Icons.BookOpen },
+    { href: '/manage/videos', label: 'Videos', icon: Icons.BookOpen },
+    { href: '/manage/reviews', label: 'Đánh giá', icon: Icons.Star },
+    { href: '/manage/payments', label: 'Thanh toán', icon: Icons.Receipt },
+    { href: '/manage/faqs', label: 'FAQs', icon: Icons.HelpCircle }
   ]
 
   // Check if current path is active
@@ -127,7 +127,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className='text-gray-400 hover:text-white hover:bg-gray-800'
           >
-            {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+            {sidebarOpen ? <Icons.X size={20} /> : <Icons.Menu size={20} />}
           </Button>
         </div>
         <nav className='mt-6 px-4'>
@@ -154,7 +154,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               variant='ghost'
               className='w-full justify-start text-gray-400 hover:bg-gray-800 hover:text-white'
             >
-              <LogOut className='mr-2 h-5 w-5' />
+              <Icons.LogOut className='mr-2 h-5 w-5' />
               {sidebarOpen && 'Đăng xuất'}
             </Button>
           </div>
@@ -177,7 +177,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             <div className='flex items-center ml-auto gap-3 sm:gap-4'>
               <div className='relative order-1 sm:order-none flex-grow max-w-md'>
-                <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
+                <Icons.Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
                 <Input
                   type='search'
                   placeholder='Tìm kiếm... (Ctrl+K)'
@@ -193,7 +193,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   size='icon'
                   className='relative bg-gray-800 border-gray-700 hover:bg-gray-700'
                 >
-                  <Bell className='h-5 w-5 text-gray-400' />
+                  <Icons.Bell className='h-5 w-5 text-gray-400' />
                   <span className='absolute -top-1 -right-1 bg-purple-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center'>
                     3
                   </span>
@@ -204,7 +204,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   size='sm'
                   className='hidden md:flex items-center gap-2 bg-gray-800 border-gray-700 hover:bg-gray-700'
                 >
-                  <Settings className='h-4 w-4 text-gray-400' />
+                  <Icons.Settings className='h-4 w-4 text-gray-400' />
                   <span>Cài đặt</span>
                 </Button>
 
@@ -237,7 +237,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {/* Search Input */}
           <div className='p-4 border-b border-gray-800'>
             <div className='relative'>
-              <Search className='absolute left-3 top-2 h-5 w-5 text-gray-400' />
+              <Icons.Search className='absolute left-3 top-2 h-5 w-5 text-gray-400' />
               <Input
                 ref={searchInputRef}
                 type='search'
@@ -257,7 +257,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   key={index}
                   className='flex items-center p-2 hover:bg-gray-800 rounded-md cursor-pointer transition'
                 >
-                  <Search className='h-4 w-4 text-gray-500 mr-2' />
+                  <Icons.Search className='h-4 w-4 text-gray-500 mr-2' />
                   <span>{item}</span>
                 </div>
               ))}

@@ -1,18 +1,17 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { Search, Trash2, CreditCard, Plus, Minus, ShoppingCart, ChevronLeft, Info, ArrowRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { useCartQuery, useDeleteCartItemMutation, useTotalCartMutation } from '@/queries/useCart'
+import { useDeleteCartItemMutation, useTotalCartMutation } from '@/queries/useCart'
 import { pathURL } from '@/constants/path'
 import { handleErrorApi } from '@/lib/utils'
 import { TotalCartBodyType } from '@/schemaValidator/cart.schema'
 import { useCart } from '@/components/ui/cart-context'
+import { Icons } from '@/components/ui/icons'
 
 export default function CartPage() {
   const { cart, setCart, selectedItems, setSelectedItems } = useCart()
@@ -69,7 +68,7 @@ export default function CartPage() {
         {/* Header */}
         <div className='flex items-center justify-between mb-8'>
           <div className='flex items-center gap-3'>
-            <ShoppingCart className='h-8 w-8 text-purple-400' />
+            <Icons.ShoppingCart className='h-8 w-8 text-purple-400' />
             <h1 className='text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600'>
               Giỏ Hàng Của Tôi
             </h1>
@@ -81,7 +80,7 @@ export default function CartPage() {
             asChild
           >
             <Link href={pathURL.dashboard_courses}>
-              <ChevronLeft className='h-5 w-5 mr-2' />
+              <Icons.ChevronLeft className='h-5 w-5 mr-2' />
               Tiếp tục mua sắm
             </Link>
           </Button>
@@ -116,7 +115,7 @@ export default function CartPage() {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
-                        <Info className='h-5 w-5 text-gray-400' />
+                        <Icons.Info className='h-5 w-5 text-gray-400' />
                       </TooltipTrigger>
                       <TooltipContent className='bg-gray-800 border-gray-700 text-white'>
                         <p>Chọn khóa học để thanh toán</p>
@@ -179,7 +178,7 @@ export default function CartPage() {
                             asChild
                           >
                             <Link href={pathURL.courses_detail(item.course.id)}>
-                              <Search className='h-4 w-4 mr-2' />
+                              <Icons.Search className='h-4 w-4 mr-2' />
                               Chi tiết
                             </Link>
                           </Button>
@@ -189,7 +188,7 @@ export default function CartPage() {
                             className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                             onClick={() => deleteCartItem(item.id)}
                           >
-                            <Trash2 className='h-4 w-4 mr-2' />
+                            <Icons.Trash2 className='h-4 w-4 mr-2' />
                             Xóa
                           </Button>
                         </div>
@@ -209,7 +208,7 @@ export default function CartPage() {
                             asChild
                           >
                             <Link href={pathURL.courses_detail(item.course.id)}>
-                              <Search className='h-4 w-4 mr-2' />
+                              <Icons.Search className='h-4 w-4 mr-2' />
                               Chi tiết
                             </Link>
                           </Button>
@@ -219,7 +218,7 @@ export default function CartPage() {
                             className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                             onClick={() => deleteCartItem(item.id)}
                           >
-                            <Trash2 className='h-4 w-4 mr-2' />
+                            <Icons.Trash2 className='h-4 w-4 mr-2' />
                             Xóa
                           </Button>
                         </div>
@@ -302,7 +301,7 @@ export default function CartPage() {
                         <ul className='space-y-3'>
                           <li className='flex items-start gap-3'>
                             <div className='rounded-full bg-purple-900/30 p-1 mt-0.5'>
-                              <ArrowRight className='h-3 w-3 text-purple-400' />
+                              <Icons.ArrowRight className='h-3 w-3 text-purple-400' />
                             </div>
                             <span className='text-sm text-gray-300'>
                               Thanh toán an toàn qua các cổng thanh toán uy tín
@@ -310,7 +309,7 @@ export default function CartPage() {
                           </li>
                           <li className='flex items-start gap-3'>
                             <div className='rounded-full bg-purple-900/30 p-1 mt-0.5'>
-                              <ArrowRight className='h-3 w-3 text-purple-400' />
+                              <Icons.ArrowRight className='h-3 w-3 text-purple-400' />
                             </div>
                             <span className='text-sm text-gray-300'>
                               Truy cập khóa học ngay sau khi thanh toán thành công
@@ -318,7 +317,7 @@ export default function CartPage() {
                           </li>
                           <li className='flex items-start gap-3'>
                             <div className='rounded-full bg-purple-900/30 p-1 mt-0.5'>
-                              <ArrowRight className='h-3 w-3 text-purple-400' />
+                              <Icons.ArrowRight className='h-3 w-3 text-purple-400' />
                             </div>
                             <span className='text-sm text-gray-300'>Hỗ trợ kỹ thuật 24/7 khi gặp vấn đề</span>
                           </li>
@@ -334,7 +333,7 @@ export default function CartPage() {
                     className='w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-7 text-lg'
                     disabled={selectedItems.length === 0}
                   >
-                    <CreditCard className='h-6 w-6 mr-3' />
+                    <Icons.CreditCard className='h-6 w-6 mr-3' />
                     Thanh Toán Ngay
                   </Button>
                 </CardFooter>
@@ -349,7 +348,7 @@ export default function CartPage() {
                 asChild
               >
                 <Link href={pathURL.dashboard_courses}>
-                  <ChevronLeft className='h-4 w-4 mr-2' />
+                  <Icons.ChevronLeft className='h-4 w-4 mr-2' />
                   Tiếp tục mua sắm
                 </Link>
               </Button>
@@ -358,7 +357,7 @@ export default function CartPage() {
         ) : (
           <Card className='bg-gray-900 border-gray-700 shadow-lg p-10 text-center'>
             <div className='flex flex-col items-center gap-6'>
-              <ShoppingCart className='h-20 w-20 text-gray-600' />
+              <Icons.ShoppingCart className='h-20 w-20 text-gray-600' />
               <h2 className='text-2xl font-semibold'>Giỏ hàng của bạn đang trống</h2>
               <p className='text-gray-400 text-lg'>Hãy thêm khóa học vào giỏ hàng để tiến hành thanh toán</p>
               <Button

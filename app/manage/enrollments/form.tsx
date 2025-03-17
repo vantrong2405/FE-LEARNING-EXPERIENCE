@@ -1,19 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Search,
-  Edit,
-  Trash2,
-  MoreHorizontal,
-  CheckCircle,
-  XCircle,
-  ChevronLeft,
-  ChevronRight,
-  Download,
-  Calendar,
-  Eye
-} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -39,6 +26,7 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { exportToExcel, formatCurrency } from '@/lib/excel'
 import { Enrollment } from '@/models/enrollment.type'
+import { Icons } from '@/components/ui/icons'
 
 // Sample enrollment data
 const enrollments = [
@@ -324,7 +312,7 @@ export default function EnrollmentsPage() {
               className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto text-xs sm:text-sm'
               onClick={handleExportExcel}
             >
-              <Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+              <Icons.Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
               <span>Xuất Excel</span>
             </Button>
           </div>
@@ -342,7 +330,7 @@ export default function EnrollmentsPage() {
                   Tìm kiếm
                 </Label>
                 <div className='relative'>
-                  <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
+                  <Icons.Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
                   <Input
                     id='search'
                     type='search'
@@ -409,17 +397,17 @@ export default function EnrollmentsPage() {
                     size='sm'
                     className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                   >
-                    <CheckCircle className='h-4 w-4 mr-1' /> Kích hoạt
+                    <Icons.CheckCircle className='h-4 w-4 mr-1' /> Kích hoạt
                   </Button>
                   <Button
                     variant='outline'
                     size='sm'
                     className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                   >
-                    <XCircle className='h-4 w-4 mr-1' /> Tạm dừng
+                    <Icons.XCircle className='h-4 w-4 mr-1' /> Tạm dừng
                   </Button>
                   <Button variant='destructive' size='sm'>
-                    <Trash2 className='h-4 w-4 mr-1' /> Xóa
+                    <Icons.Trash2 className='h-4 w-4 mr-1' /> Xóa
                   </Button>
                 </div>
               )}
@@ -527,7 +515,7 @@ export default function EnrollmentsPage() {
                               size='icon'
                               className='h-8 w-8 text-gray-400 hover:text-white hover:bg-gray-800'
                             >
-                              <MoreHorizontal className='h-4 w-4' />
+                              <Icons.MoreHorizontal className='h-4 w-4' />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent className='bg-gray-800 border-gray-700 text-white'>
@@ -537,25 +525,25 @@ export default function EnrollmentsPage() {
                               className='hover:bg-gray-700 cursor-pointer'
                               onClick={() => handleViewDetails(enrollment)}
                             >
-                              <Eye className='h-4 w-4 mr-2' /> Xem chi tiết
+                              <Icons.Eye className='h-4 w-4 mr-2' /> Xem chi tiết
                             </DropdownMenuItem>
                             <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer'>
-                              <Edit className='h-4 w-4 mr-2' /> Chỉnh sửa
+                              <Icons.Edit className='h-4 w-4 mr-2' /> Chỉnh sửa
                             </DropdownMenuItem>
                             <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer'>
                               {enrollment.status === 'active' ? (
                                 <>
-                                  <XCircle className='h-4 w-4 mr-2' /> Tạm dừng
+                                  <Icons.XCircle className='h-4 w-4 mr-2' /> Tạm dừng
                                 </>
                               ) : (
                                 <>
-                                  <CheckCircle className='h-4 w-4 mr-2' /> Kích hoạt
+                                  <Icons.CheckCircle className='h-4 w-4 mr-2' /> Kích hoạt
                                 </>
                               )}
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className='bg-gray-700' />
                             <DropdownMenuItem className='text-red-500 hover:bg-gray-700 cursor-pointer'>
-                              <Trash2 className='h-4 w-4 mr-2' /> Xóa
+                              <Icons.Trash2 className='h-4 w-4 mr-2' /> Xóa
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -580,7 +568,7 @@ export default function EnrollmentsPage() {
                   disabled={currentPage === 1}
                   className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                 >
-                  <ChevronLeft className='h-4 w-4' />
+                  <Icons.ChevronLeft className='h-4 w-4' />
                 </Button>
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <Button
@@ -604,7 +592,7 @@ export default function EnrollmentsPage() {
                   disabled={currentPage === totalPages}
                   className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                 >
-                  <ChevronRight className='h-4 w-4' />
+                  <Icons.ChevronRight className='h-4 w-4' />
                 </Button>
               </div>
             </div>
@@ -684,14 +672,14 @@ export default function EnrollmentsPage() {
                       <div>
                         <h4 className='text-sm text-gray-400 mb-1'>Ngày đăng ký</h4>
                         <div className='flex items-center'>
-                          <Calendar className='h-4 w-4 mr-2 text-purple-400' />
+                          <Icons.Calendar className='h-4 w-4 mr-2 text-purple-400' />
                           <span>{currentEnrollment.enrollmentDate}</span>
                         </div>
                       </div>
                       <div>
                         <h4 className='text-sm text-gray-400 mb-1'>Ngày hết hạn</h4>
                         <div className='flex items-center'>
-                          <Calendar className='h-4 w-4 mr-2 text-purple-400' />
+                          <Icons.Calendar className='h-4 w-4 mr-2 text-purple-400' />
                           <span>{currentEnrollment.expiryDate}</span>
                         </div>
                       </div>
@@ -775,7 +763,7 @@ export default function EnrollmentsPage() {
                   Đóng
                 </Button>
                 <Button className='bg-purple-600 hover:bg-purple-700'>
-                  <Edit className='h-4 w-4 mr-2' /> Chỉnh sửa
+                  <Icons.Edit className='h-4 w-4 mr-2' /> Chỉnh sửa
                 </Button>
               </DialogFooter>
             </DialogContent>

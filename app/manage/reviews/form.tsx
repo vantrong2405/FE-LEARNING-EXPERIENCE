@@ -1,23 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Star,
-  Search,
-  Edit,
-  Trash2,
-  MoreHorizontal,
-  ChevronLeft,
-  ChevronRight,
-  Download,
-  RefreshCw,
-  Flag,
-  CheckCircle,
-  XCircle,
-  ThumbsUp,
-  ThumbsDown,
-  Clock
-} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -45,6 +28,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { exportToExcel } from '@/lib/excel'
 import { Review } from '@/models/review.type'
+import { Icons } from '@/components/ui/icons'
 
 // Sample review data
 const reviews = [
@@ -316,7 +300,7 @@ export default function ReviewsPage() {
     return Array(5)
       .fill(0)
       .map((_, i) => (
-        <Star key={i} className={`h-4 w-4 ${i < rating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-500'}`} />
+        <Icons.Star key={i} className={`h-4 w-4 ${i < rating ? 'text-yellow-500 fill-yellow-500' : 'text-gray-500'}`} />
       ))
   }
 
@@ -368,7 +352,7 @@ export default function ReviewsPage() {
               className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto text-xs sm:text-sm'
               onClick={handleExportExcel}
             >
-              <Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+              <Icons.Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
               <span>Xuất Excel</span>
             </Button>
           </div>
@@ -384,7 +368,7 @@ export default function ReviewsPage() {
                   <h3 className='text-2xl font-bold text-white mt-1'>{reviews.length}</h3>
                 </div>
                 <div className='h-12 w-12 bg-purple-900/30 rounded-lg flex items-center justify-center'>
-                  <Star className='h-6 w-6 text-purple-400' />
+                  <Icons.Star className='h-6 w-6 text-purple-400' />
                 </div>
               </div>
             </CardContent>
@@ -399,7 +383,7 @@ export default function ReviewsPage() {
                   <div className='flex mt-1'>{renderStars({ rating: Math.round(averageRating) })}</div>
                 </div>
                 <div className='h-12 w-12 bg-purple-900/30 rounded-lg flex items-center justify-center'>
-                  <Star className='h-6 w-6 text-purple-400 fill-purple-400' />
+                  <Icons.Star className='h-6 w-6 text-purple-400 fill-purple-400' />
                 </div>
               </div>
             </CardContent>
@@ -415,7 +399,7 @@ export default function ReviewsPage() {
                   </h3>
                 </div>
                 <div className='h-12 w-12 bg-purple-900/30 rounded-lg flex items-center justify-center'>
-                  <Clock className='h-6 w-6 text-purple-400' />
+                  <Icons.Clock className='h-6 w-6 text-purple-400' />
                 </div>
               </div>
             </CardContent>
@@ -429,7 +413,7 @@ export default function ReviewsPage() {
                   <h3 className='text-2xl font-bold text-white mt-1'>{reviews.filter((r) => r.reported).length}</h3>
                 </div>
                 <div className='h-12 w-12 bg-purple-900/30 rounded-lg flex items-center justify-center'>
-                  <Flag className='h-6 w-6 text-purple-400' />
+                  <Icons.Flag className='h-6 w-6 text-purple-400' />
                 </div>
               </div>
             </CardContent>
@@ -540,7 +524,7 @@ export default function ReviewsPage() {
                   Tìm kiếm
                 </Label>
                 <div className='relative'>
-                  <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
+                  <Icons.Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
                   <Input
                     id='search'
                     type='search'
@@ -624,17 +608,17 @@ export default function ReviewsPage() {
                     size='sm'
                     className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                   >
-                    <CheckCircle className='h-4 w-4 mr-1' /> Duyệt
+                    <Icons.CheckCircle className='h-4 w-4 mr-1' /> Duyệt
                   </Button>
                   <Button
                     variant='outline'
                     size='sm'
                     className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                   >
-                    <XCircle className='h-4 w-4 mr-1' /> Từ chối
+                    <Icons.XCircle className='h-4 w-4 mr-1' /> Từ chối
                   </Button>
                   <Button variant='destructive' size='sm'>
-                    <Trash2 className='h-4 w-4 mr-1' /> Xóa
+                    <Icons.Trash2 className='h-4 w-4 mr-1' /> Xóa
                   </Button>
                 </div>
               )}
@@ -689,7 +673,7 @@ export default function ReviewsPage() {
                                 size='icon'
                                 className='h-8 w-8 text-gray-400 hover:text-white hover:bg-gray-700'
                               >
-                                <MoreHorizontal className='h-4 w-4' />
+                                <Icons.MoreHorizontal className='h-4 w-4' />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className='bg-gray-800 border-gray-700 text-white'>
@@ -699,21 +683,21 @@ export default function ReviewsPage() {
                                 className='hover:bg-gray-700 cursor-pointer'
                                 onClick={() => handleEditReview(review)}
                               >
-                                <Edit className='h-4 w-4 mr-2' /> Chỉnh sửa
+                                <Icons.Edit className='h-4 w-4 mr-2' /> Chỉnh sửa
                               </DropdownMenuItem>
                               {review.status !== 'approved' && (
                                 <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer'>
-                                  <CheckCircle className='h-4 w-4 mr-2' /> Duyệt
+                                  <Icons.CheckCircle className='h-4 w-4 mr-2' /> Duyệt
                                 </DropdownMenuItem>
                               )}
                               {review.status !== 'rejected' && (
                                 <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer'>
-                                  <XCircle className='h-4 w-4 mr-2' /> Từ chối
+                                  <Icons.XCircle className='h-4 w-4 mr-2' /> Từ chối
                                 </DropdownMenuItem>
                               )}
                               <DropdownMenuSeparator className='bg-gray-700' />
                               <DropdownMenuItem className='text-red-500 hover:bg-gray-700 cursor-pointer'>
-                                <Trash2 className='h-4 w-4 mr-2' /> Xóa
+                                <Icons.Trash2 className='h-4 w-4 mr-2' /> Xóa
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -731,11 +715,11 @@ export default function ReviewsPage() {
                       <div className='mt-3 flex items-center justify-between'>
                         <div className='flex items-center text-sm text-gray-400'>
                           <div className='flex items-center mr-4'>
-                            <ThumbsUp className='h-4 w-4 mr-1' />
+                            <Icons.ThumbsUp className='h-4 w-4 mr-1' />
                             <span>{review.helpful}</span>
                           </div>
                           <div className='flex items-center'>
-                            <ThumbsDown className='h-4 w-4 mr-1' />
+                            <Icons.ThumbsDown className='h-4 w-4 mr-1' />
                             <span>{review.unhelpful}</span>
                           </div>
                         </div>
@@ -761,7 +745,7 @@ export default function ReviewsPage() {
                   disabled={currentPage === 1}
                   className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                 >
-                  <ChevronLeft className='h-4 w-4' />
+                  <Icons.ChevronLeft className='h-4 w-4' />
                 </Button>
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <Button
@@ -785,7 +769,7 @@ export default function ReviewsPage() {
                   disabled={currentPage === totalPages}
                   className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                 >
-                  <ChevronRight className='h-4 w-4' />
+                  <Icons.ChevronRight className='h-4 w-4' />
                 </Button>
               </div>
             </div>

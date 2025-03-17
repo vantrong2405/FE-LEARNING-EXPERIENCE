@@ -1,19 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import {
-  Search,
-  Plus,
-  Edit,
-  Trash2,
-  MoreHorizontal,
-  CheckCircle,
-  XCircle,
-  ChevronLeft,
-  ChevronRight,
-  Download,
-  CalendarIcon
-} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -48,7 +35,7 @@ import { toast } from 'sonner'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
 import { format } from 'date-fns'
-import { User } from '@/models/user.type'
+import { Icons } from '@/components/ui/icons'
 
 export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -235,13 +222,13 @@ export default function UsersPage() {
               className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto text-xs sm:text-sm'
               onClick={handleExportExcel}
             >
-              <Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+              <Icons.Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
               <span>Xuất Excel</span>
             </Button>
             <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
               <DialogTrigger asChild>
                 <Button className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto text-xs sm:text-sm'>
-                  <Plus className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+                  <Icons.Plus className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
                   <span>Thêm Người Dùng</span>
                 </Button>
               </DialogTrigger>
@@ -332,7 +319,7 @@ export default function UsersPage() {
                           ) : (
                             <span>Pick a date</span>
                           )}
-                          <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
+                          <Icons.CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className='w-auto p-0' align='start'>
@@ -405,7 +392,7 @@ export default function UsersPage() {
                   Tìm kiếm
                 </Label>
                 <div className='relative'>
-                  <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
+                  <Icons.Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
                   <Input
                     id='search'
                     type='search'
@@ -471,17 +458,17 @@ export default function UsersPage() {
                       size='sm'
                       className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white text-xs'
                     >
-                      <CheckCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-1' /> Kích hoạt
+                      <Icons.CheckCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-1' /> Kích hoạt
                     </Button>
                     <Button
                       variant='outline'
                       size='sm'
                       className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white text-xs'
                     >
-                      <XCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-1' /> Tạm khóa
+                      <Icons.XCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-1' /> Tạm khóa
                     </Button>
                     <Button variant='destructive' size='sm' className='text-xs'>
-                      <Trash2 className='h-3 w-3 sm:h-4 sm:w-4 mr-1' /> Xóa
+                      <Icons.Trash2 className='h-3 w-3 sm:h-4 sm:w-4 mr-1' /> Xóa
                     </Button>
                   </div>
                 </div>
@@ -580,7 +567,7 @@ export default function UsersPage() {
                               size='icon'
                               className='h-7 w-7 sm:h-8 sm:w-8 text-gray-400 hover:text-white hover:bg-gray-800'
                             >
-                              <MoreHorizontal className='h-4 w-4' />
+                              <Icons.MoreHorizontal className='h-4 w-4' />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent className='bg-gray-800 border-gray-700 text-white'>
@@ -590,16 +577,16 @@ export default function UsersPage() {
                               className='hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'
                               onClick={() => handleEditUser(user)}
                             >
-                              <Edit className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Chỉnh sửa
+                              <Icons.Edit className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Chỉnh sửa
                             </DropdownMenuItem>
                             <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'>
                               {user.verify === 1 ? (
                                 <>
-                                  <XCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Tạm khóa
+                                  <Icons.XCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Tạm khóa
                                 </>
                               ) : (
                                 <>
-                                  <CheckCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Kích hoạt
+                                  <Icons.CheckCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Kích hoạt
                                 </>
                               )}
                             </DropdownMenuItem>
@@ -608,7 +595,7 @@ export default function UsersPage() {
                               className='text-red-500 hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'
                               onClick={() => deleteAccount(user.id)}
                             >
-                              <Trash2 className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Xóa
+                              <Icons.Trash2 className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Xóa
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -633,7 +620,7 @@ export default function UsersPage() {
                   disabled={currentPage === 1}
                   className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white h-8 w-8 sm:h-9 sm:w-9'
                 >
-                  <ChevronLeft className='h-4 w-4' />
+                  <Icons.ChevronLeft className='h-4 w-4' />
                 </Button>
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <Button
@@ -657,7 +644,7 @@ export default function UsersPage() {
                   disabled={currentPage === totalPages}
                   className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white h-8 w-8 sm:h-9 sm:w-9'
                 >
-                  <ChevronRight className='h-4 w-4' />
+                  <Icons.ChevronRight className='h-4 w-4' />
                 </Button>
               </div>
             </div>
