@@ -20,12 +20,11 @@ import { useCategoryListQuery } from '@/queries/useCategory'
 import { useLevelListQuery } from '@/queries/useLevel'
 import { pagination } from '@/constants/pagination-config'
 import { PaginationDemo } from '@/lib/pagination'
-import { useRouter } from 'next/navigation'
 
 export default function CoursesPage() {
   const [page, setPage] = useState(pagination.PAGE)
   const [selectedCategory, setSelectedCategory] = useState('All')
-  const [priceRange, setPriceRange] = useState([0, 1000000])
+  const [priceRange, setPriceRange] = useState([0, 500000])
   const [searchQuery, setSearchQuery] = useState('')
 
   const courseQuery = useCourseQuery(pagination.LIMIT, page)
