@@ -46,6 +46,7 @@ export default function UsersPage() {
   const [currentUser, setCurrentUser] = useState<any | null>(null)
   const [selectedUsers, setSelectedUsers] = useState<string[]>([])
   const [currentPage, setCurrentPage] = useState(1)
+
   const usersPerPage = 5
   const getListQuery = useGetListQuery()
   const updateMeMutation = useUpdateMeMutation()

@@ -182,9 +182,7 @@ const questions = {
       options: ['func', 'define', 'def', 'function'],
       correctAnswer: 2
     }
-    // Add 18 more questions for Python here
   ]
-  // Add questions for Java and C# similarly
 }
 
 const LanguageSelector = ({ onLanguageSelect }: { onLanguageSelect: (lang: string) => void }) => {

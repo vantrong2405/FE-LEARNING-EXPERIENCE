@@ -131,6 +131,17 @@ export default function LessonsPage() {
   const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null)
   const [selectedLessons, setSelectedLessons] = useState<string[]>([])
   const [currentPage, setCurrentPage] = useState(1)
+  // Form state
+  const [formData, setFormData] = useState({
+    id: '',
+    title: '',
+    courseId: '',
+    order: 1,
+    content: '',
+    status: 'draft',
+    file: null as File | null
+  })
+
   const lessonsPerPage = 5
 
   // Filter lessons based on search, course, and status
@@ -149,17 +160,6 @@ export default function LessonsPage() {
   const indexOfFirstLesson = indexOfLastLesson - lessonsPerPage
   const currentLessons = filteredLessons.slice(indexOfFirstLesson, indexOfLastLesson)
   const totalPages = Math.ceil(filteredLessons.length / lessonsPerPage)
-
-  // Form state
-  const [formData, setFormData] = useState({
-    id: '',
-    title: '',
-    courseId: '',
-    order: 1,
-    content: '',
-    status: 'draft',
-    file: null as File | null
-  })
 
   // Handle edit lesson
   const handleEditLesson = (lesson: Lesson) => {

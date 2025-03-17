@@ -42,10 +42,8 @@ import { DatePickerWithRange } from '@/components/ui/date-range-picker'
 import type { DateRange } from 'react-day-picker'
 import { addDays } from 'date-fns'
 import { exportToExcel, formatCurrency, formatPaymentStatus } from '@/lib/excel'
-import { Payment } from '@/models/payment.type'
 import { Icons } from '@/components/ui/icons'
 
-// Sample payment data
 const payments = [
   {
     id: 'PAY-001',
@@ -294,13 +292,11 @@ export default function PaymentsPage() {
   const currentPayments = filteredPayments.slice(indexOfFirstPayment, indexOfLastPayment)
   const totalPages = Math.ceil(filteredPayments.length / paymentsPerPage)
 
-  // Handle view details
   const handleViewDetails = (payment: any) => {
     setCurrentPayment(payment)
     setIsViewDetailsOpen(true)
   }
 
-  // Handle checkbox selection
   const handleSelectPayment = (paymentId: string) => {
     if (selectedPayments.includes(paymentId)) {
       setSelectedPayments(selectedPayments.filter((id) => id !== paymentId))
@@ -317,20 +313,16 @@ export default function PaymentsPage() {
     }
   }
 
-  // Format price
   const formatPrice = (price: number): string => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
   }
 
-  // Calculate total revenue
   const totalRevenue = payments
     .filter((p) => p.status === 'completed')
     .reduce((sum, payment) => sum + payment.amount, 0)
 
-  // Colors for charts
   const COLORS = ['#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe', '#ede9fe']
 
-  // Handle export to Excel
   const handleExportExcel = () => {
     const columns = [
       { key: 'id', header: 'Mã thanh toán' },

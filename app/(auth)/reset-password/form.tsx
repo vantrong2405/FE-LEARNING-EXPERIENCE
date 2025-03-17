@@ -18,11 +18,12 @@ import { toast } from 'sonner'
 import { handleErrorApi } from '@/lib/utils'
 
 export default function FormResetPassword() {
+  const router = useRouter()
+
   const [showNewPassword, setShowNewPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [token, setToken] = useState<string | null>(null)
-  const router = useRouter()
-
+  const resetPaswordMutation = useResetMutation()
   const form = useForm<ResetPasswordBodyType>({
     resolver: zodResolver(ResetPasswordBody),
     defaultValues: {
@@ -33,13 +34,6 @@ export default function FormResetPassword() {
   })
   const toggleNewPasswordVisibility = () => setShowNewPassword(!showNewPassword)
   const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword)
-  const resetPaswordMutation = useResetMutation()
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const urlToken = new URLSearchParams(window.location.search).get('token')
-      setToken(urlToken)
-    }
-  }, [])
 
   const handleSubmit = async (body: ResetPasswordBodyType) => {
     if (!token) {
@@ -73,6 +67,13 @@ export default function FormResetPassword() {
       }
     )
   }
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlToken = new URLSearchParams(window.location.search).get('token')
+      setToken(urlToken)
+    }
+  }, [])
 
   return (
     <div className='min-h-screen flex items-center justify-center dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden'>

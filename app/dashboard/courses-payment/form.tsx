@@ -10,28 +10,18 @@ import { Input } from '@/components/ui/input'
 import qr from '@/public/assets/images/qr.png'
 import { useCart } from '@/components/ui/cart-context'
 import { Icons } from '@/components/ui/icons'
-
-interface CartItem {
-  cartId: string
-  course: {
-    id: string
-    description: string
-    instructor: {
-      avatarUrl: string
-      name: string
-    }
-    thumbnailUrl: string
-    title: string
-  }
-  id: string
-  courseId: string
-  createdAt: string
-  updatedAt: string
-  price: number
-  quantity: number
-}
+import { CartItem } from '@/models/cart.type'
 
 const QRPayment = () => {
+  const [paymentMethod, setPaymentMethod] = useState('qr')
+  const [paymentStatus, setPaymentStatus] = useState('pending')
+  const [voucher, setVoucher] = useState('')
+  const [price, setPrice] = useState(129.99)
+  const [discount, setDiscount] = useState(0)
+  const [timeLeft, setTimeLeft] = useState(900) // 15 minutes in seconds
+  const [paymentCode, setPaymentCode] = useState('')
+  const [copiedField, setCopiedField] = useState('')
+
   const { cart, selectedItems } = useCart() as { cart: CartItem[]; selectedItems: string[] }
 
   const selectedItemsData = useMemo(() => {
@@ -42,15 +32,6 @@ const QRPayment = () => {
     console.log('cart updated', cart)
     console.log('selectedItemsData', selectedItemsData)
   }, [cart])
-
-  const [paymentMethod, setPaymentMethod] = useState('qr')
-  const [paymentStatus, setPaymentStatus] = useState('pending')
-  const [voucher, setVoucher] = useState('')
-  const [price, setPrice] = useState(129.99)
-  const [discount, setDiscount] = useState(0)
-  const [timeLeft, setTimeLeft] = useState(900) // 15 minutes in seconds
-  const [paymentCode, setPaymentCode] = useState('')
-  const [copiedField, setCopiedField] = useState('')
 
   useEffect(() => {
     const timer = setInterval(() => {

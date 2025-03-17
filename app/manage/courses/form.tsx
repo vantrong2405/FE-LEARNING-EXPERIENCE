@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -50,7 +50,6 @@ export default function CoursesPage() {
   const [page, setPage] = useState(pagination.PAGE)
   const courseQuery = useCourseQuery(pagination.LIMIT, page)
   const courses = courseQuery.data?.payload.data.data ?? []
-
   // Filter courses based on search term, category, and status
   const filteredCourses = courses.filter((course) => {
     const matchesSearch =

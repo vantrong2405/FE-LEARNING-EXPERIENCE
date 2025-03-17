@@ -23,9 +23,10 @@ const placeholderImage =
 
 export default function CoursePage() {
   const router = useRouter()
-  const [selectedVideo, setSelectedVideo] = useState<string | null>(null)
-  const videoRef = useRef<HTMLVideoElement>(null)
   const { id } = useParams()
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null)
+
+  const videoRef = useRef<HTMLVideoElement>(null)
   const courseId = id as string
 
   const getCourse = useGetCourseQuery(courseId)

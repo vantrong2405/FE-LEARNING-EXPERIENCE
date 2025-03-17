@@ -4,9 +4,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 export const useCartMutation = () => {
   return useMutation({ mutationFn: cartApiRequest.addCart })
 }
+
 export const useCartQuery = () => {
   return useQuery({ queryKey: ['cart'], queryFn: () => cartApiRequest.list() })
 }
+
 export const useDeleteCartItemMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({

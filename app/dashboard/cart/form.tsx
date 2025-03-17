@@ -35,10 +35,6 @@ export default function CartPage() {
     })
   }
 
-  const handleQuantityChange = (id: string, quantity: number) => {
-    setCart(cart.map((item) => (item.id === id ? { ...item, quantity } : item)))
-  }
-
   const handleSelectItem = (id: string, checked: boolean) => {
     if (checked) {
       setSelectedItems([...selectedItems, id])
@@ -56,7 +52,6 @@ export default function CartPage() {
   }
 
   const isAllSelected = cart.length > 0 && selectedItems.length === cart.length
-
   const selectedItemsData = cart.filter((item) => selectedItems.includes(item.id))
   const totalAmount = selectedItemsData.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const totalOriginalAmount = selectedItemsData.reduce((sum, item) => sum + item.price * item.quantity, 0)

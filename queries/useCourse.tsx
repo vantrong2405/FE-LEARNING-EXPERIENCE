@@ -1,7 +1,7 @@
 import courseApiRequest from '@/apiRequest/course'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-export const useCourseQuery = (page: number, limit: number) => {
+export const useCourseQuery = (page: number, limit: number, p0?: { enabled: boolean }) => {
   return useQuery({
     queryKey: ['course', page, limit],
     queryFn: () => courseApiRequest.list(page, limit)

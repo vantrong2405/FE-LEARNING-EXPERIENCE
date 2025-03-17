@@ -18,6 +18,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchDialogOpen, setSearchDialogOpen] = useState(false)
+
   const searchInputRef = useRef<HTMLInputElement>(null)
   const pathname = usePathname()
   const router = useRouter()

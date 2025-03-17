@@ -25,12 +25,12 @@ import {
 import { Icons } from '@/components/ui/icons'
 
 export default function FormProfile() {
+  const [email, setEmail] = useState('')
   const [marketingEmails, setMarketingEmails] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const getMeQuery = useGetMeQuery()
   const updateMeMutation = useUpdateMeMutation()
   const changePasswordMutation = useChangePasswordMutation()
-  const [email, setEmail] = useState('')
 
   const formU = useForm<MeBodyType>({
     resolver: zodResolver(MeBody),

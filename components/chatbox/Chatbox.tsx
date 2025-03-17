@@ -10,6 +10,7 @@ import { MessageCircle, Send, X, CircleStop } from 'lucide-react'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import configProject from '@/config/configService'
 import { Message } from '@/models/chatbox.type'
+import { useCourseQuery } from '@/queries/useCourse'
 
 const apiKey = configProject.NEXT_PUBLIC_API_KEY
 const genAI = new GoogleGenerativeAI(apiKey)
@@ -27,6 +28,22 @@ const generationConfig = {
 }
 
 export default function Chatbox() {
+  //  // Gọi API với enabled: false để tránh gọi tự động khi component mount
+  //  const courseQuery = useCourseQuery(1000, 1, { enabled: false })
+  //  const [courses, setCourses] = useState([])
+
+  //  useEffect(() => {
+  //    // Khi component mount, gọi refetch() để lấy dữ liệu
+  //    courseQuery.refetch()
+  //  }, [])
+
+  //  // Cập nhật state khi có dữ liệu mới từ API
+  //  useEffect(() => {
+  //    if (courseQuery.data?.payload?.data?.data) {
+  //      setCourses((courseQuery.data?.payload?.data?.data as any) || [])
+  //    }
+  //  }, [courseQuery.data])
+
   const [isOpen, setIsOpen] = useState(false)
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState<Message[]>([
@@ -70,7 +87,19 @@ export default function Chatbox() {
         history: [
           {
             role: 'user',
-            parts: [{ text: userMessage }]
+            parts: [
+              {
+                text: 'bạn là một người tư vấn giỏi . với dữ liệu dc lấy từ databse của tôi. người dùng sẽ hỏi những câu như ví dụ.. tôi muốn học lập trình từ con số 0 thì có khóa nào phù hợp ko ? bạn sẽ tư vấn họ theo kiểu dễ thương kèm nghiêm túc 1 chút ..và đưa lại đường link của khóa học cho họ.. đường link sẽ là: http://localhost:3000/dashboard/courses/{id} ( với id được lấy từ trong databse ) ... nhưng câu hỏi ko liên quan bạn sẽ nói xin lỗi ngoại phạm vi trả lời của tôi rồi tôi rất tiết hoặc mấy câu nhỏ thì vẫn trả lời được.  nói chung liên quan đến giáo dục thì bạn trả lời dùm tôi bạn hiểu ko ?  tôi sẽ đưa bạn đọc databse của tôi khi vào code .. nên bạn chỉ cần getId của khóa học.. và người dùng nào hỏi thì bạn đọc name của khóa học đó và lấy đúng id khóa học người dùng đó muốn và tư vấn họ. nói tránh lan man, dữ liệu sẽ trả về json. ( chỉ json) gồm các field như .. messge , url lưu ý url này l;à array nhé... ví dụ người dùng nói cảm ơn bạn thì bạn hãy trả lời. ko có gì được giúp bạn học là niếm vui của tôi. đừng ngần ngại hỏi thêm nhé .. ( chỉ trả đúng json ko có text khác)\n'
+              }
+            ]
+          },
+          {
+            role: 'model',
+            parts: [
+              {
+                text: 'Tuyệt vời! Tôi hiểu rõ yêu cầu của bạn. Tôi sẽ đóng vai một tư vấn viên giáo dục "dễ thương nhưng nghiêm túc", sử dụng dữ liệu từ database của bạn để đưa ra lời khuyên và cung cấp đường link khóa học phù hợp. Khi người dùng hỏi các câu hỏi không liên quan đến giáo dục, tôi sẽ lịch sự từ chối. Và quan trọng nhất, **tất cả các phản hồi của tôi sẽ ở định dạng JSON, không có thêm bất kỳ text nào khác**.\n\nDưới đây là cấu trúc JSON tôi sẽ sử dụng:\n\n```json\n{\n  "message": "Nội dung tư vấn/phản hồi",\n  "url": ["http://localhost:3000/dashboard/courses/{id1}", "http://localhost:3000/dashboard/courses/{id2}", ...]\n}\n```\n\n**Lưu ý:**\n\n*   `message`:  Nội dung tư vấn, giải thích, hoặc lời cảm ơn.\n*   `url`: Một mảng chứa các URL của khóa học liên quan đến câu hỏi của người dùng. Nếu không có khóa học phù hợp, mảng này có thể rỗng (`[]`). Nếu có nhiều khóa học phù hợp, sẽ có nhiều URL trong mảng.\n\n**Ví dụ:**\n\n**Người dùng:** "Tôi muốn học lập trình từ con số 0 thì có khóa nào phù hợp không?"\n\n**Dữ liệu từ database (ví dụ):**\n\n```json\n[\n  {\n    "id": 1,\n    "name": "Nhập môn lập trình Python cho người mới bắt đầu",\n    "description": "Khóa học lý tưởng cho những ai chưa từng có kinh nghiệm lập trình, giúp bạn làm quen với Python và các khái niệm cơ bản.",\n    "level": "Beginner"\n  },\n  {\n    "id": 2,\n    "name": "Lập trình web cơ bản với HTML, CSS, JavaScript",\n    "description": "Dành cho người mới bắt đầu muốn xây dựng trang web đơn giản.",\n    "level": "Beginner"\n  }\n]\n```\n\n**Phản hồi JSON:**\n\n```json\n{\n  "message": "Chào bạn! Tuyệt vời khi bạn muốn bắt đầu hành trình lập trình. Với người mới bắt đầu, mình gợi ý bạn khóa \'Nhập môn lập trình Python cho người mới bắt đầu\' sẽ rất phù hợp đó. Python là một ngôn ngữ dễ học và rất phổ biến. Ngoài ra khóa \'Lập trình web cơ bản với HTML, CSS, JavaScript\' cũng là một lựa chọn tuyệt vời nếu bạn thích làm web nhé! Chúc bạn học thật tốt!",\n  "url": ["http://localhost:3000/dashboard/courses/1", "http://localhost:3000/dashboard/courses/2"]\n}\n```\n\n**Người dùng:** "Cảm ơn bạn!"\n\n**Phản hồi JSON:**\n\n```json\n{\n  "message": "Không có gì ạ! Được giúp bạn học là niềm vui của mình. Đừng ngần ngại hỏi thêm nếu bạn có bất kỳ thắc mắc nào nhé!",\n  "url": []\n}\n```\n\n**Người dùng:** "Hôm nay thời tiết thế nào?"\n\n**Phản hồi JSON:**\n\n```json\n{\n  "message": "Xin lỗi, câu hỏi này nằm ngoài phạm vi kiến thức của mình. Mình chuyên về tư vấn các khóa học thôi ạ. :(",\n  "url": []\n}\n```\n\n**Tóm lại:**\n\n1.  Tôi sẽ nhận câu hỏi từ người dùng.\n2.  Tôi sẽ sử dụng dữ liệu bạn cung cấp (dữ liệu khóa học) để tìm khóa học phù hợp nhất.\n3.  Tôi sẽ tạo một JSON response theo cấu trúc đã định.\n4.  Tôi sẽ trả về JSON response đó.\n\nBạn có thể cung cấp một ví dụ về cách bạn sẽ cung cấp dữ liệu khóa học cho tôi không? Điều này sẽ giúp tôi hiểu rõ hơn về cấu trúc dữ liệu và cách tôi sẽ truy cập nó.\n'
+              }
+            ]
           }
         ]
       })
