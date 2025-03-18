@@ -2,7 +2,7 @@
 
 import type React from 'react'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -32,18 +32,75 @@ import { exportToExcel } from '@/lib/excel'
 import { Lesson } from '@/models/lesson.type'
 import { Icons } from '@/components/ui/icons'
 import { mockCourses, mockLessons } from '@/database_example/lesson.db'
+import { useLessonByIdQuery } from '@/queries/useLesson'
+import { pagination } from '@/constants/pagination-config'
+import { useCourseQuery } from '@/queries/useCourse'
+
+type LessonType = {
+  course: {
+    id: string
+    title: string
+    description: string
+    price: number
+    thumbnailUrl: string
+    bannerUrl: string
+    isPublished: boolean
+    createdAt: string
+    updatedAt: string
+    instructor: {
+      id: string
+      name: string
+      gender: string
+    }
+    category: {
+      id: string
+      name: string
+    }
+  }
+  id: string
+  title: string
+  createdAt: string
+  updatedAt: string
+  order: number
+  videos: { id: string }[]
+}
 
 export default function LessonsPage() {
-  const [lessons, setLessons] = useState<Lesson[]>(mockLessons)
-  const [searchTerm, setSearchTerm] = useState('')
+  const courseQuery = useCourseQuery(pagination.LIMIT, pagination.PAGE)
+  const courseList = useMemo(() => {
+    return (
+      courseQuery.data?.payload.data.data.map((course) => ({
+        id: course.id,
+        title: course.title
+      })) || []
+    )
+  }, [courseQuery.data])
+
   const [selectedCourse, setSelectedCourse] = useState('all')
+  const lessonByIdQuery = useLessonByIdQuery(pagination.PAGE, pagination.LIMIT, selectedCourse)
+  const data = lessonByIdQuery.data?.payload.data.data || []
+  console.log('data', data)
+  const [lessons, setLessons] = useState<LessonType[]>([])
+
+  useEffect(() => {
+    if (data && Array.isArray(data)) {
+      setLessons((prevLessons) => {
+        return JSON.stringify(prevLessons) !== JSON.stringify(data) ? data : prevLessons
+      })
+    }
+  }, [data])
+
+  const [searchTerm, setSearchTerm] = useState('')
+
   const [selectedStatus, setSelectedStatus] = useState('all')
   const [isAddLessonOpen, setIsAddLessonOpen] = useState(false)
   const [isEditLessonOpen, setIsEditLessonOpen] = useState(false)
   const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null)
   const [selectedLessons, setSelectedLessons] = useState<string[]>([])
   const [currentPage, setCurrentPage] = useState(1)
+
   // Form state
+
   const [formData, setFormData] = useState({
     id: '',
     title: '',
@@ -57,12 +114,12 @@ export default function LessonsPage() {
   const lessonsPerPage = 5
 
   // Filter lessons based on search, course, and status
-  const filteredLessons = lessons.filter((lesson) => {
+  const filteredLessons = lessons?.filter((lesson) => {
     const matchesSearch =
       lesson.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lesson.courseName.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCourse = selectedCourse === 'all' || lesson.courseId === selectedCourse
-    const matchesStatus = selectedStatus === 'all' || lesson.status === selectedStatus
+      lesson.title.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesCourse = selectedCourse === 'all' || lesson.course.id === selectedCourse
+    const matchesStatus = selectedStatus === 'all' || lesson.id === selectedStatus
 
     return matchesSearch && matchesCourse && matchesStatus
   })
@@ -70,23 +127,23 @@ export default function LessonsPage() {
   // Pagination
   const indexOfLastLesson = currentPage * lessonsPerPage
   const indexOfFirstLesson = indexOfLastLesson - lessonsPerPage
-  const currentLessons = filteredLessons.slice(indexOfFirstLesson, indexOfLastLesson)
+  const currentLessons = filteredLessons?.slice(indexOfFirstLesson, indexOfLastLesson)
   const totalPages = Math.ceil(filteredLessons.length / lessonsPerPage)
 
   // Handle edit lesson
-  const handleEditLesson = (lesson: Lesson) => {
-    setCurrentLesson(lesson)
-    setFormData({
-      id: lesson.id,
-      title: lesson.title,
-      courseId: lesson.courseId,
-      order: lesson.order,
-      content: lesson.content,
-      status: lesson.status,
-      file: null
-    })
-    setIsEditLessonOpen(true)
-  }
+  // const handleEditLesson = (lesson: Lesson) => {
+  //   setCurrentLesson(lesson)
+  //   setFormData({
+  //     id: lesson.id,
+  //     title: lesson.title,
+  //     courseId: lesson.courseId,
+  //     order: lesson.order,
+  //     content: lesson.content,
+  //     status: lesson.status,
+  //     file: null
+  //   })
+  //   setIsEditLessonOpen(true)
+  // }
 
   // Handle add new lesson
   const handleAddLesson = () => {
@@ -147,19 +204,19 @@ export default function LessonsPage() {
       setIsEditLessonOpen(false)
     } else {
       // Add new lesson
-      const newLesson: Lesson = {
-        id: Date.now().toString(),
-        title: formData.title,
-        courseId: formData.courseId,
-        courseName: mockCourses.find((c) => c.id === formData.courseId)?.name || '',
-        order: Number(formData.order),
-        content: formData.content,
-        status: formData.status,
-        createdAt: now,
-        updatedAt: now
-      }
-      setLessons([...lessons, newLesson])
-      setIsAddLessonOpen(false)
+      // const newLesson: Lesson = {
+      //   id: Date.now().toString(),
+      //   title: formData.title,
+      //   courseId: formData.courseId,
+      //   courseName: mockCourses.find((c) => c.id === formData.courseId)?.name || '',
+      //   order: Number(formData.order),
+      //   content: formData.content,
+      //   status: formData.status,
+      //   createdAt: now,
+      //   updatedAt: now
+      // }
+      // setLessons([...lessons, newLesson])
+      // setIsAddLessonOpen(false)
     }
   }
 
@@ -240,7 +297,7 @@ export default function LessonsPage() {
 
     const exportData = filteredLessons.map((lesson) => ({
       ...lesson,
-      status: lesson.status === 'published' ? 'Đã xuất bản' : 'Bản nháp',
+      status: lesson.course.isPublished === true ? 'Đã xuất bản' : 'Bản nháp',
       createdAt: formatDate(lesson.createdAt),
       updatedAt: formatDate(lesson.updatedAt)
     }))
@@ -446,11 +503,18 @@ export default function LessonsPage() {
                   </SelectTrigger>
                   <SelectContent className='bg-gray-800 border-gray-700 text-white'>
                     <SelectItem value='all'>Tất cả khóa học</SelectItem>
-                    {mockCourses.map((course) => (
-                      <SelectItem key={course.id} value={course.id}>
-                        {course.name}
+                    {courseList.length > 0 ? (
+                      courseList.map((course) => (
+                        <SelectItem key={course.id} value={String(course.id)}>
+                          {' '}
+                          {course.title}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value='loading' disabled>
+                        Đang tải...
                       </SelectItem>
-                    ))}
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -567,18 +631,18 @@ export default function LessonsPage() {
                           </div>
                         </td>
                         <td className='py-2 sm:py-3 px-2 sm:px-4 text-gray-300 text-xs sm:text-sm'>
-                          {lesson.courseName}
+                          {lesson.course.title}
                         </td>
                         <td className='py-2 sm:py-3 px-2 sm:px-4 text-gray-300 text-xs sm:text-sm'>{lesson.order}</td>
                         <td className='py-2 sm:py-3 px-2 sm:px-4'>
                           <Badge
                             className={`text-xs ${
-                              lesson.status === 'published'
+                              lesson.course.isPublished === true
                                 ? 'bg-green-900/30 text-green-500 hover:bg-green-900/40'
                                 : 'bg-yellow-900/30 text-yellow-500 hover:bg-yellow-900/40'
                             }`}
                           >
-                            {lesson.status === 'published' ? 'Đã xuất bản' : 'Bản nháp'}
+                            {lesson.course.isPublished === true ? 'Đã xuất bản' : 'Bản nháp'}
                           </Badge>
                         </td>
                         <td className='py-2 sm:py-3 px-2 sm:px-4 text-gray-300 text-xs sm:text-sm'>
@@ -600,12 +664,12 @@ export default function LessonsPage() {
                               <DropdownMenuSeparator className='bg-gray-700' />
                               <DropdownMenuItem
                                 className='hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'
-                                onClick={() => handleEditLesson(lesson)}
+                                // onClick={() => handleEditLesson(lesson)}
                               >
                                 <Icons.Edit className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Chỉnh sửa
                               </DropdownMenuItem>
                               <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'>
-                                {lesson.status === 'published' ? (
+                                {lesson.course.isPublished === true ? (
                                   <>
                                     <Icons.XCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Chuyển bản nháp
                                   </>

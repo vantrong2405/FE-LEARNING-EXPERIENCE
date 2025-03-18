@@ -36,6 +36,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar'
 import { format } from 'date-fns'
 import { Icons } from '@/components/ui/icons'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -521,9 +522,10 @@ export default function UsersPage() {
                       </td>
                       <td className='py-2 sm:py-3 px-2 sm:px-4'>
                         <div className='flex items-center'>
-                          <div className='w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-purple-600 flex items-center justify-center mr-2 sm:mr-3'>
-                            <span className='font-semibold text-xs sm:text-sm'>{user.name.charAt(0)}</span>
-                          </div>
+                          <Avatar className='mr-2'>
+                            <AvatarImage src={user.avatarUrl} alt='@shadcn' />
+                            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                          </Avatar>
                           <div>
                             <div className='font-medium text-xs sm:text-sm'>{user.name}</div>
                             <div className='text-xs text-gray-400'>Tham gia: {formatDate(user.dateOfBirth)}</div>

@@ -28,6 +28,7 @@ export default function CoursesPage() {
   const [searchQuery, setSearchQuery] = useState('')
 
   const courseQuery = useCourseQuery(pagination.LIMIT, page)
+
   const categoryQuery = useCategoryListQuery(pagination.LIMIT, pagination.PAGE)
   const levelQuery = useLevelListQuery(pagination.LIMIT, pagination.PAGE)
 

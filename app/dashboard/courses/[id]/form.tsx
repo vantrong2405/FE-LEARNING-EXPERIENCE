@@ -9,7 +9,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Star, Clock, Users, PlayCircle, FileText, Download, Globe, CheckCircle, Coffee, Award } from 'lucide-react'
 import Carousel from '@/components/courses/related-courses'
 import { handleErrorApi, weeksAgo } from '@/lib/utils'
-import { useCourseQuery, useGetCourseQuery, useSearchCourseQuery } from '@/queries/useCourse'
+import { useCourseQuery, useGetCourseQuery } from '@/queries/useCourse'
 import { useParams, useRouter } from 'next/navigation'
 import { useRef, useState } from 'react'
 import { pagination } from '@/constants/pagination-config'
