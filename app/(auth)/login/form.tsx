@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -26,11 +26,14 @@ export default function FormLogin() {
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
 
-  const accessToken = getAccessTokenFromLocalStorage()
-  const refreshToken = getRefreshTokenFromLocalStorage()
-  if (accessToken && refreshToken) {
-    router.back()
-  }
+  useEffect(() => {
+    const accessToken = getAccessTokenFromLocalStorage()
+    const refreshToken = getRefreshTokenFromLocalStorage()
+
+    if (accessToken && refreshToken) {
+      router.replace(pathURL.home)
+    }
+  }, [router])
 
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),

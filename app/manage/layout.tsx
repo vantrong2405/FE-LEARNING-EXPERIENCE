@@ -8,7 +8,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { useGetMeQuery, useLogoutMutation } from '@/queries/useAuth'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { getRefreshTokenFromLocalStorage } from '@/lib/utils'
+import { decodeToken, getRefreshTokenFromLocalStorage } from '@/lib/utils'
 import { Icons } from '@/components/ui/icons'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -19,6 +19,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const searchInputRef = useRef<HTMLInputElement>(null)
   const pathname = usePathname()
   const router = useRouter()
+
+  useEffect(() => {
+    const token = localStorage.getItem('access_token')
+    const decode = decodeToken(token as string)
+    const role = decode.role === 'User'
+
+    if (token && role && pathname.startsWith('/manage')) {
+      router.replace('/')
+    }
+  }, [pathname, router])
 
   const getMeQuery = useGetMeQuery()
   const logoutMutation = useLogoutMutation()
