@@ -12,7 +12,7 @@ import { pathURL } from '@/constants/path'
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const router = useRouter() // Sử dụng useRouter để thực hiện redirect
+  const router = useRouter()
 
   useEffect(() => {
     const access_token = searchParams?.get('access_token')

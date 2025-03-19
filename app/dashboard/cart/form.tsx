@@ -21,6 +21,8 @@ export default function CartPage() {
   const deleteCartItem = async (id: string) => {
     try {
       deleteCartItemMutation.mutateAsync(id)
+      const updatedCart = cart.filter((item) => item.id !== id)
+      setCart(updatedCart)
     } catch (error) {
       handleErrorApi({ error })
     }
@@ -49,6 +51,9 @@ export default function CartPage() {
     } else {
       setSelectedItems([])
     }
+  }
+  const handlePayment = () => {
+    localStorage.setItem('selectedItems', JSON.stringify(selectedItems))
   }
 
   const isAllSelected = cart.length > 0 && selectedItems.length === cart.length
@@ -211,7 +216,7 @@ export default function CartPage() {
                             variant='outline'
                             size='sm'
                             className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
-                            onClick={() => deleteCartItem(item.id)}
+                            onClick={() => deleteCartItem(item.course.id)}
                           >
                             <Icons.Trash2 className='h-4 w-4 mr-2' />
                             Xóa
@@ -322,7 +327,7 @@ export default function CartPage() {
                   </div>
                 </div>
               </CardContent>
-              <Link href={pathURL.payment}>
+              <Link href={pathURL.payment} onClick={handlePayment}>
                 <CardFooter className='p-6 pt-0'>
                   <Button
                     className='w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-7 text-lg'

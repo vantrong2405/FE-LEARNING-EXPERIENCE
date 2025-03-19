@@ -18,20 +18,32 @@ const QRPayment = () => {
   const [voucher, setVoucher] = useState('')
   const [price, setPrice] = useState(129.99)
   const [discount, setDiscount] = useState(0)
-  const [timeLeft, setTimeLeft] = useState(900) // 15 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(900)
   const [paymentCode, setPaymentCode] = useState('')
   const [copiedField, setCopiedField] = useState('')
 
-  const { cart, selectedItems } = useCart() as { cart: CartItem[]; selectedItems: string[] }
+  const { cart, selectedItems, setSelectedItems } = useCart() as {
+    cart: CartItem[]
+    selectedItems: string[]
+    setSelectedItems: (items: string[]) => void
+  }
+
+  useEffect(() => {
+    if (selectedItems.length > 0) {
+      localStorage.setItem('selectedItems', JSON.stringify(selectedItems))
+    }
+  }, [selectedItems])
+
+  useEffect(() => {
+    const savedItems = localStorage.getItem('selectedItems')
+    if (savedItems && selectedItems.length === 0) {
+      setSelectedItems(JSON.parse(savedItems))
+    }
+  }, [])
 
   const selectedItemsData = useMemo(() => {
     return cart.filter((item) => selectedItems.includes(item.id))
   }, [cart, selectedItems])
-
-  useEffect(() => {
-    console.log('cart updated', cart)
-    console.log('selectedItemsData', selectedItemsData)
-  }, [cart])
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -225,7 +237,7 @@ const QRPayment = () => {
           </CardHeader>
           <CardContent>
             <>
-              {cart.map((cartItem) => (
+              {selectedItemsData.map((cartItem) => (
                 <div key={cartItem.id}>
                   {/* Thông tin khóa học */}
                   <div className='flex items-center space-x-4 mb-6'>
@@ -246,11 +258,11 @@ const QRPayment = () => {
                   <div className='space-y-2 mb-6'>
                     <div className='flex justify-between'>
                       <span className='text-gray-700 dark:text-gray-300'>Original Price:</span>
-                      <span className='text-gray-900 dark:text-white'>${cartItem.price.toFixed(2)}</span>
+                      <span className='text-gray-900 dark:text-white'>{cartItem.price.toFixed(2)}đ</span>
                     </div>
                     <div className='flex justify-between'>
                       <span className='text-gray-700 dark:text-gray-300'>Discount:</span>
-                      {discount > 0 ? <span className='text-green-600'>-${discount.toFixed(2)}</span> : 0}
+                      {discount > 0 ? <span className='text-green-600'>{discount.toFixed(2)}</span> : 0}đ
                     </div>
                   </div>
                 </div>
@@ -261,7 +273,7 @@ const QRPayment = () => {
                 <div className='flex justify-between text-lg font-semibold'>
                   <span className='text-gray-900 dark:text-white'>Total:</span>
                   <span className='text-gray-900 dark:text-white'>
-                    ${cart.reduce((total, item) => total + item.price, 0).toFixed(2)}
+                    {selectedItemsData.reduce((total, item) => total + item.price, 0).toFixed(2)}đ
                   </span>
                 </div>
               </div>

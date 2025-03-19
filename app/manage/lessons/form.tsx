@@ -79,7 +79,6 @@ export default function LessonsPage() {
   const [selectedCourse, setSelectedCourse] = useState('all')
   const lessonByIdQuery = useLessonByIdQuery(pagination.PAGE, pagination.LIMIT, selectedCourse)
   const data = lessonByIdQuery.data?.payload.data.data || []
-  console.log('data', data)
   const [lessons, setLessons] = useState<LessonType[]>([])
 
   useEffect(() => {
@@ -91,7 +90,6 @@ export default function LessonsPage() {
   }, [data])
 
   const [searchTerm, setSearchTerm] = useState('')
-
   const [selectedStatus, setSelectedStatus] = useState('all')
   const [isAddLessonOpen, setIsAddLessonOpen] = useState(false)
   const [isEditLessonOpen, setIsEditLessonOpen] = useState(false)
@@ -512,7 +510,7 @@ export default function LessonsPage() {
                       ))
                     ) : (
                       <SelectItem value='loading' disabled>
-                        Đang tải...
+                        Không có khóa học
                       </SelectItem>
                     )}
                   </SelectContent>
