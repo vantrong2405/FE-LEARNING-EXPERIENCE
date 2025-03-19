@@ -11,6 +11,9 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 import configProject from '@/config/configService'
 import { Message } from '@/models/chatbox.type'
 import { useCourseQuery } from '@/queries/useCourse'
+import { pagination } from '@/constants/pagination-config'
+import { useCategoryListQuery } from '@/queries/useCategory'
+import { useLevelListQuery } from '@/queries/useLevel'
 
 const apiKey = configProject.NEXT_PUBLIC_API_KEY
 const genAI = new GoogleGenerativeAI(apiKey)
@@ -28,6 +31,17 @@ const generationConfig = {
 }
 
 export default function Chatbox() {
+  const courseQuery = useCourseQuery(100, pagination.PAGE)
+  const course = courseQuery.data?.payload.data.data
+  const categoryQuery = useCategoryListQuery(100, pagination.PAGE)
+  const category = categoryQuery.data?.payload.data.data
+  const levelQuery = useLevelListQuery(100, pagination.PAGE)
+  const level = levelQuery.data?.payload.data.data
+
+  console.log('courseQuery', courseQuery)
+  console.log('categoryQuery', category)
+  console.log('levelQuery', level)
+
   //  // Gọi API với enabled: false để tránh gọi tự động khi component mount
   //  const courseQuery = useCourseQuery(1000, 1, { enabled: false })
   //  const [courses, setCourses] = useState([])
