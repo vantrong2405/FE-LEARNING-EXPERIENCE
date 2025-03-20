@@ -14,6 +14,8 @@ import { useCourseQuery } from '@/queries/useCourse'
 import { pagination } from '@/constants/pagination-config'
 import { useCategoryListQuery } from '@/queries/useCategory'
 import { useLevelListQuery } from '@/queries/useLevel'
+import { randomUUID } from 'crypto'
+import Link from 'next/link'
 
 const apiKey = configProject.NEXT_PUBLIC_API_KEY
 const genAI = new GoogleGenerativeAI(apiKey)
@@ -32,42 +34,28 @@ const generationConfig = {
 
 export default function Chatbox() {
   const courseQuery = useCourseQuery(100, pagination.PAGE)
-  const course = courseQuery.data?.payload.data.data
   const categoryQuery = useCategoryListQuery(100, pagination.PAGE)
-  const category = categoryQuery.data?.payload.data.data
   const levelQuery = useLevelListQuery(100, pagination.PAGE)
-  const level = levelQuery.data?.payload.data.data
 
-  console.log('courseQuery', courseQuery)
-  console.log('categoryQuery', category)
-  console.log('levelQuery', level)
+  const [category, setCategory] = useState<any[]>([])
+  const [course, setCourse] = useState<any[]>([])
+  const [level, setLevel] = useState<any[]>([])
 
-  //  // Gọi API với enabled: false để tránh gọi tự động khi component mount
-  //  const courseQuery = useCourseQuery(1000, 1, { enabled: false })
-  //  const [courses, setCourses] = useState([])
-
-  //  useEffect(() => {
-  //    // Khi component mount, gọi refetch() để lấy dữ liệu
-  //    courseQuery.refetch()
-  //  }, [])
-
-  //  // Cập nhật state khi có dữ liệu mới từ API
-  //  useEffect(() => {
-  //    if (courseQuery.data?.payload?.data?.data) {
-  //      setCourses((courseQuery.data?.payload?.data?.data as any) || [])
-  //    }
-  //  }, [courseQuery.data])
+  useEffect(() => {
+    if (categoryQuery.data) {
+      setCategory(categoryQuery.data.payload.data.data)
+    }
+    if (courseQuery.data) {
+      setCourse(courseQuery.data.payload.data.data)
+    }
+    if (levelQuery.data) {
+      setLevel(levelQuery.data.payload.data.data)
+    }
+  }, [categoryQuery.data, courseQuery.data, levelQuery.data])
 
   const [isOpen, setIsOpen] = useState(false)
   const [input, setInput] = useState('')
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: Date.now(),
-      sender: 'bot',
-      text: 'Chào bạn! Bạn có gì muốn hỏi về các khóa học của chúng tôi không?',
-      data: []
-    }
-  ])
+  const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [displayText, setDisplayText] = useState('')
   const scrollRef = useRef<HTMLDivElement | null>(null)
@@ -80,21 +68,24 @@ export default function Chatbox() {
     for (let i = 0; i < text.length; i++) {
       currentText += text[i]
       setDisplayText(currentText)
-      await new Promise((resolve) => setTimeout(resolve, 30)) // Adjust speed here
+      await new Promise((resolve) => setTimeout(resolve, 30))
     }
     return currentText
   }
 
   // Function to call the Gemini API and get a response
   const fetchAIResponse = async (userMessage: string) => {
+    if (isLoading) return // Ngăn chặn gọi API nếu đang trong quá trình gọi
+
     try {
       setIsLoading(true)
       setIsRendering(true)
-      setMessages((prev) => [
-        ...prev,
-        { id: Date.now(), sender: 'user', text: userMessage },
-        { id: Date.now() + 1, sender: 'bot', text: 'Đợi tôi chút...', data: [] }
-      ])
+
+      // Thêm tin nhắn từ người dùng
+      setMessages((prev) => [...prev, { id: Date.now(), sender: 'user', text: userMessage }])
+
+      // Thêm tin nhắn "Đợi tôi chút..." chỉ khi có tin nhắn từ người dùng
+      setMessages((prev) => [...prev, { id: Date.now() + 1, sender: 'bot', text: 'Đợi tôi chút...', data: [] }])
 
       const chatSession = model.startChat({
         generationConfig,
@@ -103,7 +94,7 @@ export default function Chatbox() {
             role: 'user',
             parts: [
               {
-                text: 'bạn là một người tư vấn giỏi . với dữ liệu dc lấy từ databse của tôi. người dùng sẽ hỏi những câu như ví dụ.. tôi muốn học lập trình từ con số 0 thì có khóa nào phù hợp ko ? bạn sẽ tư vấn họ theo kiểu dễ thương kèm nghiêm túc 1 chút ..và đưa lại đường link của khóa học cho họ.. đường link sẽ là: http://localhost:3000/dashboard/courses/{id} ( với id được lấy từ trong databse ) ... nhưng câu hỏi ko liên quan bạn sẽ nói xin lỗi ngoại phạm vi trả lời của tôi rồi tôi rất tiết hoặc mấy câu nhỏ thì vẫn trả lời được.  nói chung liên quan đến giáo dục thì bạn trả lời dùm tôi bạn hiểu ko ?  tôi sẽ đưa bạn đọc databse của tôi khi vào code .. nên bạn chỉ cần getId của khóa học.. và người dùng nào hỏi thì bạn đọc name của khóa học đó và lấy đúng id khóa học người dùng đó muốn và tư vấn họ. nói tránh lan man, dữ liệu sẽ trả về json. ( chỉ json) gồm các field như .. messge , url lưu ý url này l;à array nhé... ví dụ người dùng nói cảm ơn bạn thì bạn hãy trả lời. ko có gì được giúp bạn học là niếm vui của tôi. đừng ngần ngại hỏi thêm nhé .. ( chỉ trả đúng json ko có text khác)\n'
+                text: `bạn là một người tư vấn giỏi. với dữ liệu được lấy từ database của tôi: ${JSON.stringify({ course, category, level })}. người dùng sẽ hỏi những câu như ví dụ.. tôi muốn học lập trình từ con số 0 thì có khóa nào phù hợp không? bạn sẽ tư vấn họ theo kiểu dễ thương kèm nghiêm túc một chút .. và đưa lại đường link của khóa học cho họ.. đường link sẽ là: http://localhost:3000/dashboard/courses/{id} ( với id được lấy từ trong database ) ... nhưng câu hỏi không liên quan bạn sẽ nói xin lỗi ngoại phạm vi trả lời của tôi rồi tôi rất tiếc hoặc mấy câu nhỏ thì vẫn trả lời được. nói chung liên quan đến giáo dục thì bạn trả lời giúp tôi bạn hiểu không?`
               }
             ]
           },
@@ -121,24 +112,36 @@ export default function Chatbox() {
       const result = await chatSession.sendMessage(userMessage)
       const responseText = result.response.text()
 
+      // Log the raw response for debugging
+      console.log('🚀 ~ fetchAIResponse ~ responseText:', responseText)
+
+      // Clean the response to remove unwanted characters and the closing ```
+      const cleanedResponseText = responseText
+        .replace(/.*?```json/, '') // Remove everything before the JSON
+        .replace(/```.*$/, '') // Remove the closing ```
+        .replace(/```/g, '') // Remove any remaining ```
+        .trim() // Trim whitespace
+
+      console.log('🚀 ~ fetchAIResponse ~ cleanedResponseText:', cleanedResponseText)
+
       // Check if the response is JSON
       let botReply
       try {
-        botReply = JSON.parse(responseText)
+        botReply = JSON.parse(cleanedResponseText)
       } catch (e) {
-        botReply = { messages: responseText, data: [] }
+        botReply = { message: cleanedResponseText, url: [] }
       }
 
+      console.log('botReply:', botReply)
+
+      // Cập nhật tin nhắn với URL từ phản hồi
+      setMessages((prev) => [...prev.slice(0, -1), { id: Date.now() + 1, sender: 'bot', text: '', data: botReply.url }])
+
+      await typeMessage(botReply.message)
+
       setMessages((prev) => [
         ...prev.slice(0, -1),
-        { id: Date.now() + 1, sender: 'bot', text: '', data: botReply.data }
-      ])
-
-      await typeMessage(botReply.messages)
-
-      setMessages((prev) => [
-        ...prev.slice(0, -1),
-        { id: Date.now() + 1, sender: 'bot', text: botReply.messages, data: botReply.data }
+        { id: Date.now() + 1, sender: 'bot', text: botReply.message, data: botReply.url }
       ])
     } catch (error) {
       console.error('Error calling Gemini API:', error)
@@ -159,6 +162,26 @@ export default function Chatbox() {
     fetchAIResponse(input)
     setInput('')
   }
+
+  // Add the provided JSON response to the messages
+  const addProvidedResponse = () => {
+    const providedResponse = {
+      message: 'Bạn cần giúp gì?',
+      data: []
+    }
+
+    setMessages((prev) => [
+      ...prev,
+      { id: Date.now() + 2, sender: 'bot', text: providedResponse.message, data: providedResponse.data }
+    ])
+  }
+
+  // Call this function to add the provided response
+  useEffect(() => {
+    if (isOpen) {
+      addProvidedResponse()
+    }
+  }, [isOpen]) // Chỉ gọi khi isOpen thay đổi
 
   // Scroll to bottom when new message is added
   useEffect(() => {
@@ -261,16 +284,19 @@ export default function Chatbox() {
                         {message.sender === 'bot' && message.data && message.data.length > 0 && (
                           <div className='mt-3 space-y-2'>
                             <h3 className='text-sm font-semibold text-gray-700 dark:text-gray-300'>Gợi ý khóa học:</h3>
-                            {message.data.map((course) => (
-                              <a
-                                key={course.id}
-                                href={course.redirectlink}
-                                target='_blank'
-                                className='block rounded-md border p-2 text-sm transition hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800'
-                              >
-                                <strong>{course.title}</strong> - {course.name} ({course.amout} VND)
-                              </a>
-                            ))}
+                            {message.data.map((course) => {
+                              console.log('🚀 ~ {message.data.map ~ course:', course)
+                              return (
+                                <a
+                                  key={(course as any) + randomUUID}
+                                  href={course as any}
+                                  target='_blank'
+                                  className='block rounded-md border p-2 text-sm transition hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800'
+                                >
+                                  <strong>Link khóa học</strong>)
+                                </a>
+                              )
+                            })}
                           </div>
                         )}
                       </motion.div>
