@@ -13,14 +13,6 @@ import Footer from '@/components/homepage/Footer'
 import Newsletter from '@/components/homepage/NewsLetter'
 
 export default function HomePage() {
-  const [scrollY, setScrollY] = useState(0)
-
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY)
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
   return (
     <div className='min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white'>
       <div className="fixed inset-0 bg-[url('/bg-pattern.svg')] opacity-5 z-0"></div>

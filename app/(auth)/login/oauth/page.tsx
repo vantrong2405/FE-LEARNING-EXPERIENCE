@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, Suspense } from 'react'
 import { toast } from 'sonner'
 
 export default function OauthPage() {
@@ -28,5 +28,5 @@ export default function OauthPage() {
     }
   }, [accessToken, refreshToken, router, message])
 
-  return null
+  return <Suspense fallback={<div>Loading...</div>}>{/* Nội dung khác nếu cần */}</Suspense>
 }

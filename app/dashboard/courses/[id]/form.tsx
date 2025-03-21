@@ -7,27 +7,29 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Star, Clock, Users, PlayCircle, FileText, Download, Globe, CheckCircle, Coffee, Award } from 'lucide-react'
-import Carousel from '@/components/courses/related-courses'
 import { handleErrorApi, weeksAgo } from '@/lib/utils'
-import { useCourseQuery, useGetCourseQuery, useSearchCourseQuery } from '@/queries/useCourse'
+import { useCourseQuery, useGetCourseQuery } from '@/queries/useCourse'
 import { useParams, useRouter } from 'next/navigation'
-import { useRef, useState } from 'react'
 import { pagination } from '@/constants/pagination-config'
 import Link from 'next/link'
 import { pathURL } from '@/constants/path'
 import { useCartMutation } from '@/queries/useCart'
 import { CartBodyType } from '@/schemaValidator/cart.schema'
-
+import { useQueryClient } from '@tanstack/react-query'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import 'swiper/css'
+import 'swiper/css/autoplay'
+import { Autoplay } from 'swiper/modules'
 const placeholderImage =
   'https://img.freepik.com/free-vector/students-using-e-learning-platform-video-laptop-graduation-cap-online-education-platform-e-learning-platform-online-teaching-concept_335657-795.jpg'
 
 export default function CoursePage() {
+  const queryClient = useQueryClient()
   const router = useRouter()
   const { id } = useParams()
-  const [selectedVideo, setSelectedVideo] = useState<string | null>(null)
 
-  const videoRef = useRef<HTMLVideoElement>(null)
   const courseId = id as string
+  localStorage.setItem('courseId', courseId)
 
   const getCourse = useGetCourseQuery(courseId)
   const course = getCourse.data?.payload.data
@@ -35,19 +37,11 @@ export default function CoursePage() {
   const courseQuery = useCourseQuery(pagination.LIMIT, pagination.PAGE)
   const courses = courseQuery.data?.payload.data.data ?? []
 
-  const handleVideoSelect = (videoUrl: string) => {
-    setSelectedVideo(videoUrl)
-    if (videoRef.current) {
-      videoRef.current.src = videoUrl
-      videoRef.current.load()
-      videoRef.current.play()
-    }
-  }
-
   const handleAddCart = (body: CartBodyType) => {
     cartMutation.mutate(body, {
       onSuccess: (data) => {
         router.push(pathURL.cart)
+        queryClient.invalidateQueries({ queryKey: ['cart'] })
       },
       onError: (error) => {
         handleErrorApi({ error })
@@ -83,6 +77,7 @@ export default function CoursePage() {
               width={60}
               height={60}
               className='rounded-full h-11 w-11'
+              unoptimized
             />
             <div>
               <span className='font-semibold text-xl text-gray-900 dark:text-white'>
@@ -93,8 +88,8 @@ export default function CoursePage() {
           </div>
           {/* create video ... demo */}
           <div className='rounded-xl overflow-hidden border border-gray-400 mb-6'>
-            <video ref={videoRef} className='w-full aspect-video' controls poster={course?.bannerUrl}>
-              <source src={selectedVideo as string} type='video/mp4' />
+            <video className='w-full aspect-video' controls poster={course?.bannerUrl}>
+              <source src='/assets/videos/video.mp4' type='video/mp4' />
               Your browser does not support the video tag.
             </video>
           </div>
@@ -108,12 +103,18 @@ export default function CoursePage() {
               height={225}
               className='rounded-lg mb-6 mx-auto'
             />
-            <div className='text-4xl font-bold mb-6 text-purple-400'>${course?.price}</div>
+            <div className='text-4xl font-bold mb-6 text-purple-400'>{course?.price}đ</div>
             <Button
               onClick={() => handleAddCart({ courseId: course?.id as string })}
               className='w-full text-lg py-6 mb-6 bg-purple-400 hover:bg-purple-700 text-white'
             >
               Add Cart
+            </Button>
+            <Button
+              onClick={() => router.push(`${pathURL.viewer}?id=${courseId}`)}
+              className='w-full text-lg py-6 mb-6 bg-purple-400 hover:bg-purple-700 text-white'
+            >
+              See Now
             </Button>
 
             <div className='text-center text-gray-700 dark:text-gray-300 mb-6'>30-Day Money-Back Guarantee</div>
@@ -146,7 +147,6 @@ export default function CoursePage() {
           </CardContent>
         </Card>
       </div>
-
       {/* Course Content */}
       <Tabs defaultValue='overview' className='mb-12'>
         <TabsList className='grid w-full grid-cols-5 bg-gray-800 dark:bg-gray-900'>
@@ -253,7 +253,6 @@ export default function CoursePage() {
                           <li key={video.id} className='flex items-center'>
                             <PlayCircle className='w-5 h-5 mr-2 text-purple-400' />
                             <button
-                              onClick={() => handleVideoSelect(video.videoUrl)}
                               rel='noopener noreferrer'
                               className='text-lg text-gray-700 dark:text-gray-300 hover:text-purple-400'
                             >
@@ -424,31 +423,39 @@ export default function CoursePage() {
           </Card>
         </TabsContent>
       </Tabs>
-
       {/* Related Courses */}
       <h2 className='text-3xl font-semibold mb-6 text-gray-900 dark:text-white'>Related Courses</h2>
-      <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-12'>
+      <Swiper
+        autoplay={{ delay: 3000, disableOnInteraction: false }} // Tự động chạy sau 3 giây
+        spaceBetween={20} // Khoảng cách giữa các slide
+        slidesPerView={3} // Hiển thị 3 khóa học trên 1 slide
+        modules={[Autoplay]} // Kích hoạt module Autoplay
+        className='w-full'
+      >
         {courses.map((course, index) => (
-          <Card key={index} className='dark:bg-gray-800 border-gray-300 dark:border-gray-700'>
-            <CardContent className='p-4'>
-              <Carousel images={[course.bannerUrl]} />
-              <Link href={pathURL.courses_detail(course.id)}>
-                <h3 className='text-xl font-semibold mt-4 mb-2 text-gray-900 dark:text-white'>{course.title}</h3>
-              </Link>
-
-              <p className='text-sm text-gray-700 dark:text-gray-300 mb-2'>{course.description}</p>
-              <div className='flex items-center justify-between'>
-                <div className='flex items-center'>
-                  <Star className='w-4 h-4 text-yellow-400' />
-                  <span className='ml-1 text-sm font-semibold text-gray-900 dark:text-white'>{course.rating}</span>
-                  <span className='ml-1 text-sm text-gray-400'>({course.totalReviews.toLocaleString()} students)</span>
+          <SwiperSlide key={index}>
+            <Card className='dark:bg-gray-800 border-gray-300 dark:border-gray-700'>
+              <CardContent className='p-4'>
+                <img src={course.bannerUrl} alt={course.title} className='w-full h-48 object-cover rounded-lg' />
+                <Link href={pathURL.courses_detail(course.id)}>
+                  <h3 className='text-xl font-semibold mt-4 mb-2 text-gray-900 dark:text-white'>{course.title}</h3>
+                </Link>
+                <p className='text-sm text-gray-700 dark:text-gray-300 mb-2'>{course.description}</p>
+                <div className='flex items-center justify-between'>
+                  <div className='flex items-center'>
+                    <Star className='w-4 h-4 text-yellow-400' />
+                    <span className='ml-1 text-sm font-semibold text-gray-900 dark:text-white'>{course.rating}</span>
+                    <span className='ml-1 text-sm text-gray-400'>
+                      ({course.totalReviews.toLocaleString()} students)
+                    </span>
+                  </div>
+                  <span className='text-lg font-bold text-purple-400'>{course.price}đ</span>
                 </div>
-                <span className='text-lg font-bold text-purple-400'>${course.price}</span>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </SwiperSlide>
         ))}
-      </div>
+      </Swiper>
     </div>
   )
 }

@@ -241,7 +241,7 @@ export default function FormRegister() {
                 <SelectGroup>
                   <SelectLabel>Role</SelectLabel>
                   <SelectItem value='User'>User</SelectItem>
-                  <SelectItem value='Instructor'>Intructer</SelectItem>
+                  <SelectItem value='Instructor'>Instructor</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>

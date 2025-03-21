@@ -46,7 +46,7 @@ export default function Hero() {
             achieve your goals with expert-led courses tailored to your needs.
           </p>
           <div className='flex flex-col sm:flex-row gap-4'>
-            <Link href={pathURL.login}>
+            <Link href='#'>
               <Button
                 size='lg'
                 className='bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 font-semibold w-full sm:w-auto text-white'

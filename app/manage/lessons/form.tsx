@@ -2,7 +2,7 @@
 
 import type React from 'react'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -32,18 +32,85 @@ import { exportToExcel } from '@/lib/excel'
 import { Lesson } from '@/models/lesson.type'
 import { Icons } from '@/components/ui/icons'
 import { mockCourses, mockLessons } from '@/database_example/lesson.db'
+import { useAddLessonMutation, useDeleteLessonMutation, useLessonByIdQuery } from '@/queries/useLesson'
+import { pagination } from '@/constants/pagination-config'
+import { useCourseQuery } from '@/queries/useCourse'
+import { useForm } from 'react-hook-form'
+import { lessonBody, LessonBodyType } from '@/schemaValidator/lesson.schema'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
+import { handleErrorApi } from '@/lib/utils'
+import { Switch } from '@/components/ui/switch'
+
+export type LessonType = {
+  course: {
+    id: string
+    title: string
+    description: string
+    price: number
+    thumbnailUrl: string
+    bannerUrl: string
+    isPublished: boolean
+    createdAt: string
+    updatedAt: string
+    instructor: {
+      id: string
+      name: string
+      gender: string
+    }
+    category: {
+      id: string
+      name: string
+    }
+  }
+  id: string
+  title: string
+  createdAt: string
+  updatedAt: string
+  order: number
+  videos: { id: string }[]
+}
 
 export default function LessonsPage() {
-  const [lessons, setLessons] = useState<Lesson[]>(mockLessons)
+  const addLessonMutation = useAddLessonMutation()
+  const courseQuery = useCourseQuery(pagination.LIMIT, pagination.PAGE)
+  const courseList = useMemo(() => {
+    return (
+      courseQuery.data?.payload.data.data.map((course) => ({
+        id: course.id,
+        title: course.title
+      })) || []
+    )
+  }, [courseQuery.data])
+
+  const [selectedCourse, setSelectedCourse] = useState<string | undefined>(undefined)
+  useEffect(() => {
+    if (courseList.length > 0) {
+      setSelectedCourse(String(courseList[0].id))
+    }
+  }, [courseList])
+  const lessonByIdQuery = useLessonByIdQuery(pagination.PAGE, pagination.LIMIT, selectedCourse as string)
+  const data = lessonByIdQuery.data?.payload.data.data || []
+  const [lessons, setLessons] = useState<LessonType[]>([])
+
+  useEffect(() => {
+    if (data && Array.isArray(data)) {
+      setLessons((prevLessons) => {
+        return JSON.stringify(prevLessons) !== JSON.stringify(data) ? data : prevLessons
+      })
+    }
+  }, [data])
+
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCourse, setSelectedCourse] = useState('all')
   const [selectedStatus, setSelectedStatus] = useState('all')
   const [isAddLessonOpen, setIsAddLessonOpen] = useState(false)
   const [isEditLessonOpen, setIsEditLessonOpen] = useState(false)
   const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null)
   const [selectedLessons, setSelectedLessons] = useState<string[]>([])
   const [currentPage, setCurrentPage] = useState(1)
+
   // Form state
+
   const [formData, setFormData] = useState({
     id: '',
     title: '',
@@ -57,12 +124,12 @@ export default function LessonsPage() {
   const lessonsPerPage = 5
 
   // Filter lessons based on search, course, and status
-  const filteredLessons = lessons.filter((lesson) => {
+  const filteredLessons = lessons?.filter((lesson) => {
     const matchesSearch =
       lesson.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lesson.courseName.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCourse = selectedCourse === 'all' || lesson.courseId === selectedCourse
-    const matchesStatus = selectedStatus === 'all' || lesson.status === selectedStatus
+      lesson.title.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesCourse = selectedCourse === 'all' || lesson.course.id === selectedCourse
+    const matchesStatus = selectedStatus === 'all' || lesson.id === selectedStatus
 
     return matchesSearch && matchesCourse && matchesStatus
   })
@@ -70,37 +137,66 @@ export default function LessonsPage() {
   // Pagination
   const indexOfLastLesson = currentPage * lessonsPerPage
   const indexOfFirstLesson = indexOfLastLesson - lessonsPerPage
-  const currentLessons = filteredLessons.slice(indexOfFirstLesson, indexOfLastLesson)
+  const currentLessons = filteredLessons?.slice(indexOfFirstLesson, indexOfLastLesson)
   const totalPages = Math.ceil(filteredLessons.length / lessonsPerPage)
 
   // Handle edit lesson
-  const handleEditLesson = (lesson: Lesson) => {
-    setCurrentLesson(lesson)
-    setFormData({
-      id: lesson.id,
-      title: lesson.title,
-      courseId: lesson.courseId,
-      order: lesson.order,
-      content: lesson.content,
-      status: lesson.status,
-      file: null
-    })
-    setIsEditLessonOpen(true)
-  }
+  // const handleEditLesson = (lesson: Lesson) => {
+  //   setCurrentLesson(lesson)
+  //   setFormData({
+  //     id: lesson.id,
+  //     title: lesson.title,
+  //     courseId: lesson.courseId,
+  //     order: lesson.order,
+  //     content: lesson.content,
+  //     status: lesson.status,
+  //     file: null
+  //   })
+  //   setIsEditLessonOpen(true)
+  // }
 
   // Handle add new lesson
-  const handleAddLesson = () => {
-    setCurrentLesson(null)
-    setFormData({
-      id: '',
-      title: '',
+
+  const form = useForm<LessonBodyType>({
+    resolver: zodResolver(lessonBody),
+    defaultValues: {
       courseId: '',
-      order: 1,
-      content: '',
-      status: 'draft',
-      file: null
+      description: '',
+      isPublished: false,
+      order: undefined,
+      title: ''
+    }
+  })
+
+  const handleCreateSubmit = (body: LessonBodyType) => {
+    addLessonMutation.mutate(body, {
+      onSuccess: (data) => {
+        form.reset()
+        setIsAddLessonOpen(false)
+        toast.success('Create Lesson Success !')
+      },
+      onError: (error) => {
+        handleErrorApi({
+          error,
+          setError: form.setError
+        })
+      }
     })
-    setIsAddLessonOpen(true)
+  }
+
+  const { mutateAsync } = useDeleteLessonMutation()
+  const deleteLesson = async (id: string) => {
+    if (id) {
+      try {
+        await mutateAsync(id)
+
+        toast.success('Delete Lesson Successfully')
+      } catch (error) {
+        handleErrorApi({
+          error
+        })
+      }
+    }
   }
 
   // Handle form input change
@@ -147,29 +243,29 @@ export default function LessonsPage() {
       setIsEditLessonOpen(false)
     } else {
       // Add new lesson
-      const newLesson: Lesson = {
-        id: Date.now().toString(),
-        title: formData.title,
-        courseId: formData.courseId,
-        courseName: mockCourses.find((c) => c.id === formData.courseId)?.name || '',
-        order: Number(formData.order),
-        content: formData.content,
-        status: formData.status,
-        createdAt: now,
-        updatedAt: now
-      }
-      setLessons([...lessons, newLesson])
-      setIsAddLessonOpen(false)
+      // const newLesson: Lesson = {
+      //   id: Date.now().toString(),
+      //   title: formData.title,
+      //   courseId: formData.courseId,
+      //   courseName: mockCourses.find((c) => c.id === formData.courseId)?.name || '',
+      //   order: Number(formData.order),
+      //   content: formData.content,
+      //   status: formData.status,
+      //   createdAt: now,
+      //   updatedAt: now
+      // }
+      // setLessons([...lessons, newLesson])
+      // setIsAddLessonOpen(false)
     }
   }
 
   // Handle delete lesson
-  const handleDeleteLesson = (id: string) => {
-    if (confirm('Bạn có chắc chắn muốn xóa bài học này?')) {
-      const updatedLessons = lessons.filter((lesson) => lesson.id !== id)
-      setLessons(updatedLessons)
-    }
-  }
+  // const handleDeleteLesson = (id: string) => {
+  //   if (confirm('Bạn có chắc chắn muốn xóa bài học này?')) {
+  //     const updatedLessons = lessons.filter((lesson) => lesson.id !== id)
+  //     setLessons(updatedLessons)
+  //   }
+  // }
 
   // Handle checkbox selection
   const handleSelectLesson = (lessonId: string) => {
@@ -240,7 +336,7 @@ export default function LessonsPage() {
 
     const exportData = filteredLessons.map((lesson) => ({
       ...lesson,
-      status: lesson.status === 'published' ? 'Đã xuất bản' : 'Bản nháp',
+      status: lesson.course.isPublished === true ? 'Đã xuất bản' : 'Bản nháp',
       createdAt: formatDate(lesson.createdAt),
       updatedAt: formatDate(lesson.updatedAt)
     }))
@@ -287,44 +383,47 @@ export default function LessonsPage() {
                     Điền thông tin để thêm bài học mới vào khóa học
                   </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={form.handleSubmit(handleCreateSubmit)}>
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-4 py-4'>
                     <div className='space-y-2 md:col-span-2'>
                       <Label htmlFor='title' className='text-white'>
                         Tiêu đề bài học
                       </Label>
                       <Input
+                        {...form.register('title')}
                         id='title'
-                        name='title'
                         placeholder='Nhập tiêu đề bài học'
-                        className='bg-gray-800 border-gray-700 text-white'
-                        value={formData.title}
-                        onChange={handleInputChange}
-                        required
+                        className={`bg-gray-800 border text-white 
+                          ${form.formState.errors.title ? 'border-red-500' : 'border-gray-700'}`}
                       />
+                      {form.formState.errors.title && (
+                        <p className='text-red-500 text-sm'>{form.formState.errors.title.message}</p>
+                      )}
                     </div>
 
                     <div className='space-y-2'>
                       <Label htmlFor='courseId' className='text-white'>
                         Khóa học
                       </Label>
-                      <Select
-                        name='courseId'
-                        value={formData.courseId}
-                        onValueChange={(value) => handleSelectChange('courseId', value)}
-                        required
-                      >
-                        <SelectTrigger id='courseId' className='bg-gray-800 border-gray-700 text-white'>
+                      <Select onValueChange={(value) => form.setValue('courseId', value)}>
+                        <SelectTrigger
+                          id='courseId'
+                          className={`bg-gray-800 border text-white 
+                          ${form.formState.errors.courseId ? 'border-red-500' : 'border-gray-700'}`}
+                        >
                           <SelectValue placeholder='Chọn khóa học' />
                         </SelectTrigger>
                         <SelectContent className='bg-gray-800 border-gray-700 text-white'>
-                          {mockCourses.map((course) => (
+                          {courseList.map((course) => (
                             <SelectItem key={course.id} value={course.id}>
-                              {course.name}
+                              {course.title}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
+                      {form.formState.errors.courseId && (
+                        <p className='text-red-500 text-sm'>{form.formState.errors.courseId.message}</p>
+                      )}
                     </div>
 
                     <div className='space-y-2'>
@@ -332,15 +431,16 @@ export default function LessonsPage() {
                         Thứ tự bài học
                       </Label>
                       <Input
+                        {...form.register('order', { valueAsNumber: true })}
                         id='order'
-                        name='order'
                         type='number'
                         min='1'
-                        className='bg-gray-800 border-gray-700 text-white'
-                        value={formData.order}
-                        onChange={handleInputChange}
-                        required
+                        className={`bg-gray-800 border text-white ${form.formState.errors.order ? 'border-red-500' : 'border-gray-700'}`}
                       />
+
+                      {form.formState.errors.order && (
+                        <p className='text-red-500 text-sm'>{form.formState.errors.order.message}</p>
+                      )}
                     </div>
 
                     <div className='space-y-2 md:col-span-2'>
@@ -348,46 +448,27 @@ export default function LessonsPage() {
                         Nội dung bài học
                       </Label>
                       <Textarea
-                        id='content'
-                        name='content'
+                        {...form.register('description')}
+                        id='description'
                         placeholder='Nhập nội dung chi tiết của bài học'
-                        className='bg-gray-800 border-gray-700 text-white min-h-[120px]'
-                        value={formData.content}
-                        onChange={handleInputChange}
-                        required
+                        className={`bg-gray-800 border text-white 
+                          ${form.formState.errors.description ? 'border-red-500' : 'border-gray-700'}`}
                       />
+                      {form.formState.errors.description && (
+                        <p className='text-red-500 text-sm'>{form.formState.errors.description.message}</p>
+                      )}
                     </div>
-
-                    <div className='space-y-2'>
-                      <Label htmlFor='status' className='text-white'>
-                        Trạng thái
-                      </Label>
-                      <Select
-                        name='status'
-                        value={formData.status}
-                        onValueChange={(value) => handleSelectChange('status', value)}
-                      >
-                        <SelectTrigger id='status' className='bg-gray-800 border-gray-700 text-white'>
-                          <SelectValue placeholder='Chọn trạng thái' />
-                        </SelectTrigger>
-                        <SelectContent className='bg-gray-800 border-gray-700 text-white'>
-                          <SelectItem value='draft'>Bản nháp</SelectItem>
-                          <SelectItem value='published'>Đã xuất bản</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className='space-y-2'>
-                      <Label htmlFor='file' className='text-white'>
-                        Tài liệu bài học
-                      </Label>
-                      <Input
-                        id='file'
-                        name='file'
-                        type='file'
-                        className='bg-gray-800 border-gray-700 text-white'
-                        onChange={handleFileChange}
-                      />
+                    <div className='space-y-2 md:col-span-2'>
+                      <div className='flex items-center space-x-2'>
+                        <Switch
+                          id='isPublished'
+                          checked={form.watch('isPublished')}
+                          onCheckedChange={(value) => form.setValue('isPublished', value)}
+                        />
+                        <Label htmlFor='isPublished' className='text-white'>
+                          {form.watch('isPublished') ? 'Bật' : 'Tắt'}
+                        </Label>
+                      </div>
                     </div>
                   </div>
 
@@ -446,11 +527,18 @@ export default function LessonsPage() {
                   </SelectTrigger>
                   <SelectContent className='bg-gray-800 border-gray-700 text-white'>
                     <SelectItem value='all'>Tất cả khóa học</SelectItem>
-                    {mockCourses.map((course) => (
-                      <SelectItem key={course.id} value={course.id}>
-                        {course.name}
+                    {courseList.length > 0 ? (
+                      courseList.map((course) => (
+                        <SelectItem key={course.id} value={String(course.id)}>
+                          {' '}
+                          {course.title}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value='loading' disabled>
+                        Không có khóa học
                       </SelectItem>
-                    ))}
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -567,18 +655,18 @@ export default function LessonsPage() {
                           </div>
                         </td>
                         <td className='py-2 sm:py-3 px-2 sm:px-4 text-gray-300 text-xs sm:text-sm'>
-                          {lesson.courseName}
+                          {lesson.course.title}
                         </td>
                         <td className='py-2 sm:py-3 px-2 sm:px-4 text-gray-300 text-xs sm:text-sm'>{lesson.order}</td>
                         <td className='py-2 sm:py-3 px-2 sm:px-4'>
                           <Badge
                             className={`text-xs ${
-                              lesson.status === 'published'
+                              lesson.course.isPublished === true
                                 ? 'bg-green-900/30 text-green-500 hover:bg-green-900/40'
                                 : 'bg-yellow-900/30 text-yellow-500 hover:bg-yellow-900/40'
                             }`}
                           >
-                            {lesson.status === 'published' ? 'Đã xuất bản' : 'Bản nháp'}
+                            {lesson.course.isPublished === true ? 'Đã xuất bản' : 'Bản nháp'}
                           </Badge>
                         </td>
                         <td className='py-2 sm:py-3 px-2 sm:px-4 text-gray-300 text-xs sm:text-sm'>
@@ -600,12 +688,12 @@ export default function LessonsPage() {
                               <DropdownMenuSeparator className='bg-gray-700' />
                               <DropdownMenuItem
                                 className='hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'
-                                onClick={() => handleEditLesson(lesson)}
+                                // onClick={() => handleEditLesson(lesson)}
                               >
                                 <Icons.Edit className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Chỉnh sửa
                               </DropdownMenuItem>
                               <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'>
-                                {lesson.status === 'published' ? (
+                                {lesson.course.isPublished === true ? (
                                   <>
                                     <Icons.XCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Chuyển bản nháp
                                   </>
@@ -618,7 +706,7 @@ export default function LessonsPage() {
                               <DropdownMenuSeparator className='bg-gray-700' />
                               <DropdownMenuItem
                                 className='text-red-500 hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'
-                                onClick={() => handleDeleteLesson(lesson.id)}
+                                onClick={() => deleteLesson(lesson.id)}
                               >
                                 <Icons.Trash2 className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Xóa
                               </DropdownMenuItem>

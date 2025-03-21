@@ -43,6 +43,7 @@ export default function Header() {
   const router = useRouter()
   const pathname = usePathname()
   const isHomePage = pathname === pathURL.home
+  const isCourse = pathname === pathURL.dashboard_courses
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY)
@@ -121,7 +122,7 @@ export default function Header() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [handleKeyDown])
   return (
-    <div className='fixed top-0 left-0 right-0 z-50'>
+    <div className='fixed top-0 left-0 right-0 z-50 dark:shadow-xl'>
       <header
         className={`bg-white/80 dark:bg-gray-900/80 backdrop-blur-md transition-all duration-300 ease-in-out ${scrollY > 0 ? 'shadow-md' : ''}`}
       >
@@ -176,16 +177,18 @@ export default function Header() {
             )}
 
             <div className='hidden md:flex items-center space-x-4'>
-              <div className='relative order-1 sm:order-none flex-grow max-w-md'>
-                <Icons.Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
-                <Input
-                  type='search'
-                  placeholder='Tìm kiếm... (Ctrl+K)'
-                  className='w-full pl-8 bg-gray-800 border-gray-700 focus:border-purple-500 text-white'
-                  onClick={() => setSearchDialogOpen(true)}
-                  readOnly
-                />
-              </div>
+              {isCourse && (
+                <div className='relative order-1 sm:order-none flex-grow max-w-md'>
+                  <Icons.Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
+                  <Input
+                    type='search'
+                    placeholder='Tìm kiếm... (Ctrl+K)'
+                    className='w-full pl-8 dark:bg-gray-800 dark:border-gray-700 focus:border-purple-500 text-white'
+                    onClick={() => setSearchDialogOpen(true)}
+                    readOnly
+                  />
+                </div>
+              )}
               <ModeToggle />
               <Button
                 variant='ghost'

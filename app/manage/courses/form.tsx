@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -27,14 +27,19 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
-import { Switch } from '@/components/ui/switch'
 import { exportToExcel, formatCurrency } from '@/lib/excel'
-import { useCourseQuery, useDeleteCourseMutation } from '@/queries/useCourse'
+import { useAddCourseMutation, useCourseQuery, useDeleteCourseMutation } from '@/queries/useCourse'
 import { pagination } from '@/constants/pagination-config'
 import { formatDate, handleErrorApi } from '@/lib/utils'
 import { toast } from 'sonner'
 import { Course } from '@/models/course.type'
 import { Icons } from '@/components/ui/icons'
+import { useLevelListQuery } from '@/queries/useLevel'
+import { useCategoryListQuery } from '@/queries/useCategory'
+import { useUploadMediaMutation } from '@/queries/useMedia'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { CoursesBody, courseSchema, CreatecourseSchema } from '@/schemaValidator/course.schema'
 
 export default function CoursesPage() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -45,11 +50,113 @@ export default function CoursesPage() {
   const [currentCourse, setCurrentCourse] = useState<Course | null>(null)
   const [selectedCourses, setSelectedCourses] = useState<string[]>([])
   const [currentPage, setCurrentPage] = useState(1)
-  const [currentTab, setCurrentTab] = useState('basic')
+  const [bannerUrlFile, setBannerUrlFile] = useState<File | null>(null)
+  const [thumbnailUrlFile, setThumbnailUrlFile] = useState<File | null>(null)
+
   const coursesPerPage = 5
   const [page, setPage] = useState(pagination.PAGE)
   const courseQuery = useCourseQuery(pagination.LIMIT, page)
   const courses = courseQuery.data?.payload.data.data ?? []
+  const levelListQuery = useLevelListQuery(pagination.LIMIT, pagination.PAGE)
+  const categoryListQuery = useCategoryListQuery(pagination.LIMIT, pagination.PAGE)
+  const addCourseMutation = useAddCourseMutation()
+  const uploadImageMediaMutation = useUploadMediaMutation()
+
+  const form = useForm<CoursesBody>({
+    resolver: zodResolver(courseSchema),
+    defaultValues: {
+      bannerUrl: '',
+      categoryId: '',
+      description: '',
+      levelId: '',
+      price: undefined,
+      thumbnailUrl: '',
+      title: ''
+    }
+  })
+
+  {
+    Object.keys(form.formState.errors).length > 0 && (
+      <p className='text-red-500 text-sm'>Có lỗi trong form, vui lòng kiểm tra lại.</p>
+    )
+  }
+
+  const previewAvatarFromFile = useMemo(() => {
+    const previews: { banner?: string; thumbnail?: string } = {}
+
+    if (bannerUrlFile) {
+      previews.banner = URL.createObjectURL(bannerUrlFile)
+    }
+
+    if (thumbnailUrlFile) {
+      previews.thumbnail = URL.createObjectURL(thumbnailUrlFile)
+    }
+
+    return previews
+  }, [bannerUrlFile, thumbnailUrlFile])
+
+  const onSubmit = async (values: CoursesBody) => {
+    if (addCourseMutation.isPending) return
+
+    try {
+      let bannerUrl = values.bannerUrl
+      let thumbnailUrl = values.thumbnailUrl
+
+      // Upload bannerUrl nếu có file
+      if (bannerUrlFile) {
+        const formData = new FormData()
+        formData.append('file', bannerUrlFile) // Sử dụng bannerUrlFile thay vì banner
+        const uploadResponse = await uploadImageMediaMutation.mutateAsync(formData)
+
+        if (!uploadResponse?.payload?.data?.url) {
+          throw new Error('Upload banner failed: No valid URL received')
+        }
+
+        bannerUrl = uploadResponse.payload.data.url
+      }
+
+      if (thumbnailUrlFile) {
+        const formData = new FormData()
+        formData.append('file', thumbnailUrlFile)
+        const uploadResponse = await uploadImageMediaMutation.mutateAsync(formData)
+
+        if (!uploadResponse?.payload?.data?.url) {
+          throw new Error('Upload thumbnail failed: No valid URL received')
+        }
+
+        thumbnailUrl = uploadResponse.payload.data.url
+      }
+
+      const body: CoursesBody = {
+        ...values,
+        bannerUrl,
+        thumbnailUrl
+      }
+
+      await addCourseMutation.mutateAsync(body)
+
+      toast.success('Tạo khóa học thành công')
+      setIsAddCourseOpen(false)
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError
+      })
+    }
+  }
+
+  const levelList =
+    levelListQuery.data?.payload.data.data.map((item) => ({
+      id: item.id,
+      title: item.name
+    })) ?? []
+
+  const categoryList =
+    categoryListQuery.data?.payload.data.data.map((item) => ({
+      id: item.id,
+      title: item.name
+    })) ?? []
+
   // Filter courses based on search term, category, and status
   const filteredCourses = courses.filter((course) => {
     const matchesSearch =
@@ -139,6 +246,16 @@ export default function CoursesPage() {
     })
   }
 
+  const handleBannerChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] || null
+    setBannerUrlFile(file)
+  }
+
+  const handleThumbnailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] || null
+    setThumbnailUrlFile(file)
+  }
+
   return (
     <div className='min-h-screen bg-gradient-to-br from-[#0D0A25] to-[#1A1744] text-white p-6'>
       <div className='max-w-9xl mx-auto'>
@@ -164,343 +281,110 @@ export default function CoursesPage() {
                   <DialogTitle className='text-xl text-purple-400'>Thêm Khóa Học Mới</DialogTitle>
                   <DialogDescription className='text-gray-400'>Điền thông tin để tạo khóa học mới</DialogDescription>
                 </DialogHeader>
-
-                <Tabs defaultValue='basic' className='mt-4' onValueChange={setCurrentTab}>
-                  <TabsList className='bg-gray-800 mb-4'>
-                    <TabsTrigger value='basic' className='text-white data-[state=active]:bg-purple-600'>
-                      Thông tin cơ bản
-                    </TabsTrigger>
-                    <TabsTrigger value='content' className='text-white data-[state=active]:bg-purple-600'>
-                      Nội dung
-                    </TabsTrigger>
-                    <TabsTrigger value='pricing' className='text-white data-[state=active]:bg-purple-600'>
-                      Giá & Khuyến mãi
-                    </TabsTrigger>
-                    <TabsTrigger value='media' className='text-white data-[state=active]:bg-purple-600'>
-                      Hình ảnh & Video
-                    </TabsTrigger>
-                  </TabsList>
-
-                  <TabsContent value='basic'>
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                      <div className='space-y-2'>
-                        <Label htmlFor='title' className='text-white'>
-                          Tên khóa học
-                        </Label>
-                        <Input
-                          id='title'
-                          placeholder='Nhập tên khóa học'
-                          className='bg-gray-800 border-gray-700 text-white'
-                        />
-                      </div>
-                      <div className='space-y-2'>
-                        <Label htmlFor='category' className='text-white'>
-                          Danh mục
-                        </Label>
-                        <Select>
-                          <SelectTrigger className='bg-gray-800 border-gray-700 text-white'>
-                            <SelectValue placeholder='Chọn danh mục' />
-                          </SelectTrigger>
-                          <SelectContent className='bg-gray-800 border-gray-700 text-white'>
-                            <SelectItem value='web-development'>Web Development</SelectItem>
-                            <SelectItem value='mobile-development'>Mobile Development</SelectItem>
-                            <SelectItem value='data-science'>Data Science</SelectItem>
-                            <SelectItem value='design'>Design</SelectItem>
-                            <SelectItem value='marketing'>Marketing</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className='space-y-2 md:col-span-2'>
-                        <Label htmlFor='short-description' className='text-white'>
-                          Mô tả ngắn
-                        </Label>
-                        <Textarea
-                          id='short-description'
-                          placeholder='Mô tả ngắn gọn về khóa học (hiển thị ở trang danh sách)'
-                          className='bg-gray-800 border-gray-700 text-white'
-                          rows={2}
-                        />
-                      </div>
-                      <div className='space-y-2 md:col-span-2'>
-                        <Label htmlFor='full-description' className='text-white'>
-                          Mô tả chi tiết
-                        </Label>
-                        <Textarea
-                          id='full-description'
-                          placeholder='Mô tả đầy đủ về khóa học'
-                          className='bg-gray-800 border-gray-700 text-white'
-                          rows={5}
-                        />
-                      </div>
-                      <div className='space-y-2'>
-                        <Label htmlFor='instructor' className='text-white'>
-                          Giảng viên
-                        </Label>
-                        <Select>
-                          <SelectTrigger className='bg-gray-800 border-gray-700 text-white'>
-                            <SelectValue placeholder='Chọn giảng viên' />
-                          </SelectTrigger>
-                          <SelectContent className='bg-gray-800 border-gray-700 text-white'>
-                            <SelectItem value='instructor-1'>Nguyễn Văn A</SelectItem>
-                            <SelectItem value='instructor-2'>Trần Thị B</SelectItem>
-                            <SelectItem value='instructor-3'>Lê Văn C</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className='space-y-2'>
-                        <Label htmlFor='level' className='text-white'>
-                          Cấp độ
-                        </Label>
-                        <Select>
-                          <SelectTrigger className='bg-gray-800 border-gray-700 text-white'>
-                            <SelectValue placeholder='Chọn cấp độ' />
-                          </SelectTrigger>
-                          <SelectContent className='bg-gray-800 border-gray-700 text-white'>
-                            <SelectItem value='beginner'>Người mới bắt đầu</SelectItem>
-                            <SelectItem value='intermediate'>Trung cấp</SelectItem>
-                            <SelectItem value='advanced'>Nâng cao</SelectItem>
-                            <SelectItem value='all-levels'>Tất cả cấp độ</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className='space-y-2'>
-                        <Label htmlFor='duration' className='text-white'>
-                          Thời lượng (giờ)
-                        </Label>
-                        <Input
-                          id='duration'
-                          type='number'
-                          placeholder='Ví dụ: 10'
-                          className='bg-gray-800 border-gray-700 text-white'
-                        />
-                      </div>
-                      <div className='space-y-2'>
-                        <Label htmlFor='language' className='text-white'>
-                          Ngôn ngữ
-                        </Label>
-                        <Select>
-                          <SelectTrigger className='bg-gray-800 border-gray-700 text-white'>
-                            <SelectValue placeholder='Chọn ngôn ngữ' />
-                          </SelectTrigger>
-                          <SelectContent className='bg-gray-800 border-gray-700 text-white'>
-                            <SelectItem value='vietnamese'>Tiếng Việt</SelectItem>
-                            <SelectItem value='english'>Tiếng Anh</SelectItem>
-                            <SelectItem value='both'>Song ngữ</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                <form onSubmit={form.handleSubmit(onSubmit)}>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4 py-4'>
+                    <div className='space-y-2 md:col-span-2'>
+                      <Label htmlFor='title' className='text-white'>
+                        Tiêu đề khóa học
+                      </Label>
+                      <Input
+                        {...form.register('title')}
+                        id='title'
+                        placeholder='Nhập tiêu đề bài học'
+                        className={`bg-gray-800 border text-white ${form.formState.errors.title ? 'border-red-500' : 'border-gray-700'}`}
+                      />
+                      {form.formState.errors.title && (
+                        <p className='text-red-500 text-sm'>{form.formState.errors.title.message}</p>
+                      )}
                     </div>
-                  </TabsContent>
 
-                  <TabsContent value='content'>
-                    <div className='space-y-4'>
-                      <div className='space-y-2'>
-                        <Label className='text-white'>Mục tiêu khóa học</Label>
-                        <div className='space-y-2'>
-                          <div className='flex items-center gap-2'>
-                            <Input placeholder='Mục tiêu 1' className='bg-gray-800 border-gray-700 text-white' />
-                            <Button
-                              variant='ghost'
-                              size='icon'
-                              className='text-gray-400 hover:text-white hover:bg-gray-800'
-                            >
-                              <Icons.Trash2 className='h-4 w-4' />
-                            </Button>
-                          </div>
-                          <div className='flex items-center gap-2'>
-                            <Input placeholder='Mục tiêu 2' className='bg-gray-800 border-gray-700 text-white' />
-                            <Button
-                              variant='ghost'
-                              size='icon'
-                              className='text-gray-400 hover:text-white hover:bg-gray-800'
-                            >
-                              <Icons.Trash2 className='h-4 w-4' />
-                            </Button>
-                          </div>
-                          <Button
-                            variant='outline'
-                            size='sm'
-                            className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
-                          >
-                            <Icons.Plus className='h-4 w-4 mr-2' /> Thêm mục tiêu
-                          </Button>
-                        </div>
-                      </div>
-
-                      <div className='space-y-2'>
-                        <Label className='text-white'>Yêu cầu trước khi học</Label>
-                        <div className='space-y-2'>
-                          <div className='flex items-center gap-2'>
-                            <Input placeholder='Yêu cầu 1' className='bg-gray-800 border-gray-700 text-white' />
-                            <Button
-                              variant='ghost'
-                              size='icon'
-                              className='text-gray-400 hover:text-white hover:bg-gray-800'
-                            >
-                              <Icons.Trash2 className='h-4 w-4' />
-                            </Button>
-                          </div>
-                          <Button
-                            variant='outline'
-                            size='sm'
-                            className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
-                          >
-                            <Icons.Plus className='h-4 w-4 mr-2' /> Thêm yêu cầu
-                          </Button>
-                        </div>
-                      </div>
-
-                      <div className='space-y-2'>
-                        <Label className='text-white'>Nội dung khóa học</Label>
-                        <div className='space-y-4'>
-                          <div className='bg-gray-800 p-4 rounded-md'>
-                            <div className='flex justify-between items-center mb-2'>
-                              <Input placeholder='Tên phần 1' className='bg-gray-700 border-gray-600 text-white' />
-                              <Button
-                                variant='ghost'
-                                size='icon'
-                                className='text-gray-400 hover:text-white hover:bg-gray-700'
-                              >
-                                <Icons.Trash2 className='h-4 w-4' />
-                              </Button>
-                            </div>
-                            <div className='space-y-2 pl-4'>
-                              <div className='flex items-center gap-2'>
-                                <Input placeholder='Tên bài học 1' className='bg-gray-700 border-gray-600 text-white' />
-                                <Button
-                                  variant='ghost'
-                                  size='icon'
-                                  className='text-gray-400 hover:text-white hover:bg-gray-700'
-                                >
-                                  <Icons.Trash2 className='h-4 w-4' />
-                                </Button>
-                              </div>
-                              <Button
-                                variant='outline'
-                                size='sm'
-                                className='bg-gray-700 border-gray-600 hover:bg-gray-600 text-white'
-                              >
-                                <Icons.Plus className='h-4 w-4 mr-2' /> Thêm bài học
-                              </Button>
-                            </div>
-                          </div>
-                          <Button
-                            variant='outline'
-                            size='sm'
-                            className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
-                          >
-                            <Icons.Plus className='h-4 w-4 mr-2' /> Thêm phần mới
-                          </Button>
-                        </div>
-                      </div>
+                    <div className='space-y-2'>
+                      <Label htmlFor='categoryId' className='text-white'>
+                        Danh Mục
+                      </Label>
+                      <Select
+                        onValueChange={(value) => {
+                          setSelectedCategory(value)
+                          form.setValue('categoryId', value)
+                        }}
+                      >
+                        <SelectTrigger
+                          id='categoryId'
+                          className={`bg-gray-800 border text-white ${form.formState.errors.categoryId ? 'border-red-500' : 'border-gray-700'}`}
+                        >
+                          <SelectValue placeholder='Chọn khóa học' />
+                        </SelectTrigger>
+                        <SelectContent className='bg-gray-800 border-gray-700 text-white'>
+                          {categoryList.map((category) => (
+                            <SelectItem key={category.id} value={category.id}>
+                              {category.title}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {form.formState.errors.categoryId && (
+                        <p className='text-red-500 text-sm'>{form.formState.errors.categoryId.message}</p>
+                      )}
                     </div>
-                  </TabsContent>
 
-                  <TabsContent value='pricing'>
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                      <div className='space-y-2'>
-                        <Label htmlFor='price' className='text-white'>
-                          Giá khóa học (VND)
-                        </Label>
-                        <div className='relative'>
-                          <Icons.DollarSign className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
-                          <Input
-                            id='price'
-                            type='number'
-                            placeholder='Ví dụ: 599000'
-                            className='pl-8 bg-gray-800 border-gray-700 text-white'
+                    <div className='space-y-2'>
+                      <Label htmlFor='levelId' className='text-white'>
+                        Cấp độ
+                      </Label>
+                      <Select onValueChange={(value) => form.setValue('levelId', value)}>
+                        <SelectTrigger
+                          id='levelId'
+                          className={`bg-gray-800 border text-white ${form.formState.errors.levelId ? 'border-red-500' : 'border-gray-700'}`}
+                        >
+                          <SelectValue placeholder='Chọn khóa học' />
+                        </SelectTrigger>
+                        <SelectContent className='bg-gray-800 border-gray-700 text-white'>
+                          {levelList.map((level) => (
+                            <SelectItem key={level.id} value={level.id}>
+                              {level.title}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {form.formState.errors.levelId && (
+                        <p className='text-red-500 text-sm'>{form.formState.errors.levelId.message}</p>
+                      )}
+                    </div>
+
+                    <div className='space-y-2 md:col-span-2'>
+                      <Label htmlFor='description' className='text-white'>
+                        Mô tả khóa học
+                      </Label>
+                      <Textarea
+                        {...form.register('description')}
+                        id='description'
+                        placeholder='Nhập mô tả video'
+                        className={`bg-gray-800 border text-white ${form.formState.errors.description ? 'border-red-500' : 'border-gray-700'}`}
+                      />
+                      {form.formState.errors.description && (
+                        <p className='text-red-500 text-sm'>{form.formState.errors.description.message}</p>
+                      )}
+                    </div>
+
+                    <div className='space-y-2'>
+                      <Label className='text-white'>Ảnh thu nhỏ khóa học</Label>
+                      <div
+                        className='border-2 border-dashed border-gray-700 rounded-md p-4 text-center cursor-pointer'
+                        onClick={() => document.getElementById('thumbnailUpload')?.click()}
+                      >
+                        {thumbnailUrlFile ? (
+                          <img
+                            src={URL.createObjectURL(thumbnailUrlFile)}
+                            alt='Ảnh thu nhỏ khóa học'
+                            className='w-full h-40 object-cover rounded-md'
                           />
-                        </div>
-                      </div>
-                      <div className='space-y-2'>
-                        <Label htmlFor='sale-price' className='text-white'>
-                          Giá khuyến mãi (VND)
-                        </Label>
-                        <div className='relative'>
-                          <Icons.DollarSign className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
-                          <Input
-                            id='sale-price'
-                            type='number'
-                            placeholder='Để trống nếu không có khuyến mãi'
-                            className='pl-8 bg-gray-800 border-gray-700 text-white'
-                          />
-                        </div>
-                      </div>
-
-                      <div className='space-y-2'>
-                        <div className='flex items-center justify-between'>
-                          <Label htmlFor='has-promotion' className='text-white'>
-                            Có khuyến mãi
-                          </Label>
-                          <Switch id='has-promotion' />
-                        </div>
-                      </div>
-                      <div className='space-y-2'>
-                        <Label htmlFor='promotion-end' className='text-white'>
-                          Ngày kết thúc khuyến mãi
-                        </Label>
-                        <Input id='promotion-end' type='date' className='bg-gray-800 border-gray-700 text-white' />
-                      </div>
-
-                      <div className='md:col-span-2 space-y-2'>
-                        <Label className='text-white'>Các gói khóa học</Label>
-                        <div className='space-y-4'>
-                          <div className='bg-gray-800 p-4 rounded-md'>
-                            <div className='flex justify-between items-center mb-2'>
-                              <Input
-                                placeholder='Tên gói (VD: Cơ bản)'
-                                className='bg-gray-700 border-gray-600 text-white'
-                              />
-                              <Button
-                                variant='ghost'
-                                size='icon'
-                                className='text-gray-400 hover:text-white hover:bg-gray-700'
-                              >
-                                <Icons.Trash2 className='h-4 w-4' />
-                              </Button>
-                            </div>
-                            <div className='grid grid-cols-1 md:grid-cols-2 gap-2 mt-2'>
-                              <div className='relative'>
-                                <Icons.DollarSign className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
-                                <Input
-                                  placeholder='Giá gói'
-                                  type='number'
-                                  className='pl-8 bg-gray-700 border-gray-600 text-white'
-                                />
-                              </div>
-                              <Input
-                                placeholder='Thời gian truy cập (VD: 6 tháng)'
-                                className='bg-gray-700 border-gray-600 text-white'
-                              />
-                            </div>
-                            <Textarea
-                              placeholder='Mô tả gói'
-                              className='bg-gray-700 border-gray-600 text-white mt-2'
-                              rows={2}
-                            />
-                          </div>
-                          <Button
-                            variant='outline'
-                            size='sm'
-                            className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
-                          >
-                            <Icons.Plus className='h-4 w-4 mr-2' /> Thêm gói mới
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value='media'>
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                      <div className='space-y-2'>
-                        <Label className='text-white'>Ảnh thu nhỏ khóa học</Label>
-                        <div className='border-2 border-dashed border-gray-700 rounded-md p-4 text-center'>
+                        ) : (
                           <div className='flex flex-col items-center'>
                             <Icons.Image className='h-8 w-8 text-gray-400 mb-2' />
                             <p className='text-sm text-gray-400 mb-2'>Kéo thả hoặc nhấp để tải lên</p>
                             <p className='text-xs text-gray-500'>PNG, JPG hoặc GIF (Tối đa 2MB)</p>
                             <Button
+                              type='button'
                               variant='outline'
                               size='sm'
                               className='mt-2 bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
@@ -508,17 +392,36 @@ export default function CoursesPage() {
                               <Icons.Upload className='h-4 w-4 mr-2' /> Chọn tệp
                             </Button>
                           </div>
-                        </div>
+                        )}
                       </div>
+                      <Input
+                        type='file'
+                        id='thumbnailUpload'
+                        className='hidden'
+                        accept='image/png, image/jpeg, image/gif'
+                        onChange={handleThumbnailChange}
+                      />
+                    </div>
 
-                      <div className='space-y-2'>
-                        <Label className='text-white'>Ảnh bìa khóa học</Label>
-                        <div className='border-2 border-dashed border-gray-700 rounded-md p-4 text-center'>
+                    <div className='space-y-2'>
+                      <Label className='text-white'>Ảnh bìa khóa học</Label>
+                      <div
+                        className='border-2 border-dashed border-gray-700 rounded-md p-4 text-center cursor-pointer'
+                        onClick={() => document.getElementById('bannerUpload')?.click()}
+                      >
+                        {bannerUrlFile ? (
+                          <img
+                            src={URL.createObjectURL(bannerUrlFile)}
+                            alt='Ảnh bìa khóa học'
+                            className='w-full h-40 object-cover rounded-md'
+                          />
+                        ) : (
                           <div className='flex flex-col items-center'>
                             <Icons.Image className='h-8 w-8 text-gray-400 mb-2' />
                             <p className='text-sm text-gray-400 mb-2'>Kéo thả hoặc nhấp để tải lên</p>
                             <p className='text-xs text-gray-500'>PNG, JPG hoặc GIF (Tối đa 2MB)</p>
                             <Button
+                              type='button'
                               variant='outline'
                               size='sm'
                               className='mt-2 bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
@@ -526,57 +429,47 @@ export default function CoursesPage() {
                               <Icons.Upload className='h-4 w-4 mr-2' /> Chọn tệp
                             </Button>
                           </div>
-                        </div>
+                        )}
                       </div>
-
-                      <div className='md:col-span-2 space-y-2'>
-                        <Label className='text-white'>Video giới thiệu</Label>
-                        <div className='border-2 border-dashed border-gray-700 rounded-md p-4 text-center'>
-                          <div className='flex flex-col items-center'>
-                            <Icons.Upload className='h-8 w-8 text-gray-400 mb-2' />
-                            <p className='text-sm text-gray-400 mb-2'>Tải lên video giới thiệu khóa học</p>
-                            <p className='text-xs text-gray-500'>MP4 hoặc WebM (Tối đa 50MB)</p>
-                            <Button
-                              variant='outline'
-                              size='sm'
-                              className='mt-2 bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
-                            >
-                              <Icons.Upload className='h-4 w-4 mr-2' /> Chọn tệp
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className='md:col-span-2 space-y-2'>
-                        <Label htmlFor='youtube-url' className='text-white'>
-                          Hoặc nhập URL YouTube
-                        </Label>
-                        <Input
-                          id='youtube-url'
-                          placeholder='https://www.youtube.com/watch?v=...'
-                          className='bg-gray-800 border-gray-700 text-white'
-                        />
-                      </div>
+                      <Input
+                        type='file'
+                        id='bannerUpload'
+                        className='hidden'
+                        accept='image/png, image/jpeg, image/gif'
+                        onChange={handleBannerChange}
+                      />
                     </div>
-                  </TabsContent>
-                </Tabs>
-
-                <DialogFooter className='mt-6'>
-                  <div className='flex items-center mr-auto'>
-                    <Switch id='publish-course' />
-                    <Label htmlFor='publish-course' className='ml-2 text-white'>
-                      Xuất bản ngay
-                    </Label>
+                    <div className='space-y-2'>
+                      <Label htmlFor='price' className='text-white'>
+                        Giá
+                      </Label>
+                      <Input
+                        {...form.register('price', { valueAsNumber: true })}
+                        id='price'
+                        type='number'
+                        min='1'
+                        className={`bg-gray-800 border text-white ${form.formState.errors.price ? 'border-red-500' : 'border-gray-700'}`}
+                      />
+                      {form.formState.errors.price && (
+                        <p className='text-red-500 text-sm'>{form.formState.errors.price.message}</p>
+                      )}
+                    </div>
                   </div>
-                  <Button
-                    variant='outline'
-                    onClick={() => setIsAddCourseOpen(false)}
-                    className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
-                  >
-                    Hủy
-                  </Button>
-                  <Button className='bg-purple-600 hover:bg-purple-700'>Tạo khóa học</Button>
-                </DialogFooter>
+
+                  <DialogFooter className='flex-col sm:flex-row gap-2 sm:gap-0'>
+                    <Button
+                      type='button'
+                      variant='outline'
+                      onClick={() => setIsAddCourseOpen(false)}
+                      className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto'
+                    >
+                      Hủy
+                    </Button>
+                    <Button type='submit' className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto'>
+                      Thêm video
+                    </Button>
+                  </DialogFooter>
+                </form>
               </DialogContent>
             </Dialog>
           </div>

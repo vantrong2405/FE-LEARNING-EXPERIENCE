@@ -10,5 +10,6 @@ export const pathURL = {
   cart: '/dashboard/cart',
   manage: '/manage',
   payment: '/dashboard/courses-payment',
+  viewer: '/dashboard/courses-viewer',
   courses_detail: (id: string) => `/dashboard/courses/${id}`
 }

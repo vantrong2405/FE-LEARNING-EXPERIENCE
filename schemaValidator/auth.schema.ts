@@ -180,6 +180,7 @@ export const GetMeRes = z.object({
     reviews: z.array(z.unknown()),
     role: z.string(),
     verify: z.number(),
+    status_account: z.number(),
     createdAt: z.string(),
     updatedAt: z.string()
   })
@@ -282,10 +283,16 @@ const UserSchema = z.object({
   courses: z.array(CourseSchema),
   reviews: z.array(ReviewSchema),
   role: z.string(),
-  verify: z.number().min(0).max(1)
+  verify: z.number().min(0).max(1),
+  status_account: z.number()
 })
 
 const DataSchema = z.object({
   data: z.array(UserSchema)
 })
 export type GetListMeResType = z.TypeOf<typeof DataSchema>
+
+export const StatusBody = z.object({
+  userId: z.string()
+})
+export type StatusBodyType = z.TypeOf<typeof StatusBody>
