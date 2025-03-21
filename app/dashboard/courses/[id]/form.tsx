@@ -72,7 +72,7 @@ export default function CoursePage() {
           </div>
           <div className='flex items-center gap-4 mb-6'>
             <Image
-              src={course?.instructor.avatarUrl || '/assets/images/avatar.jpg'}
+              src={course?.instructor.avatarUrl || '/placeholder.svg'}
               alt='John Doe'
               width={60}
               height={60}
@@ -449,7 +449,7 @@ export default function CoursePage() {
                       ({course.totalReviews.toLocaleString()} students)
                     </span>
                   </div>
-                  <span className='text-lg font-bold text-purple-400'>${course.price}</span>
+                  <span className='text-lg font-bold text-purple-400'>{course.price}đ</span>
                 </div>
               </CardContent>
             </Card>

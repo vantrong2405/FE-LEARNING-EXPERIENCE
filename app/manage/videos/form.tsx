@@ -100,8 +100,13 @@ export default function VideosPage() {
       })) || []
     )
   }, [courseQuery.data])
-  const [selectedCourse, setSelectedCourse] = useState('')
-  const lessonByIdQuery = useLessonByIdQuery(pagination.PAGE, pagination.LIMIT, selectedCourse)
+  const [selectedCourse, setSelectedCourse] = useState<string | undefined>(undefined)
+  useEffect(() => {
+    if (courseList.length > 0) {
+      setSelectedCourse(String(courseList[0].id))
+    }
+  }, [courseList])
+  const lessonByIdQuery = useLessonByIdQuery(pagination.PAGE, pagination.LIMIT, selectedCourse as string)
 
   const data = lessonByIdQuery.data?.payload.data.data || []
   const video = data.flatMap((lesson) => lesson.videos)
@@ -659,7 +664,6 @@ export default function VideosPage() {
                     <SelectValue placeholder='Chọn khóa học' />
                   </SelectTrigger>
                   <SelectContent className='bg-gray-800 border-gray-700 text-white'>
-                    <SelectItem value='all'>Tất cả khóa học</SelectItem>
                     {courseList.map((course) => (
                       <SelectItem key={course.id} value={course.id}>
                         {course.title}

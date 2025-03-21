@@ -35,8 +35,8 @@ export function PaginationDemo({ total, page, limit, totalPages, onPageChange }:
               onClick={() => onPageChange(p)}
               className={`px-3 py-1 rounded transition-colors duration-200 cursor-pointer ${
                 p === page
-                  ? 'bg-purple-600 text-white font-bold dark:bg-purple-400 dark:text-black' // Active Page
-                  : 'hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300' // Default
+                  ? 'bg-purple-600 text-white font-bold dark:bg-purple-400 dark:text-black'
+                  : 'hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
               }`}
             >
               {p}

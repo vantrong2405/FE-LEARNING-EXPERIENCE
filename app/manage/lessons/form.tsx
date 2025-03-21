@@ -83,8 +83,13 @@ export default function LessonsPage() {
     )
   }, [courseQuery.data])
 
-  const [selectedCourse, setSelectedCourse] = useState('all')
-  const lessonByIdQuery = useLessonByIdQuery(pagination.PAGE, pagination.LIMIT, selectedCourse)
+  const [selectedCourse, setSelectedCourse] = useState<string | undefined>(undefined)
+  useEffect(() => {
+    if (courseList.length > 0) {
+      setSelectedCourse(String(courseList[0].id))
+    }
+  }, [courseList])
+  const lessonByIdQuery = useLessonByIdQuery(pagination.PAGE, pagination.LIMIT, selectedCourse as string)
   const data = lessonByIdQuery.data?.payload.data.data || []
   const [lessons, setLessons] = useState<LessonType[]>([])
 
