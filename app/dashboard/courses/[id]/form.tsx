@@ -9,44 +9,39 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Star, Clock, Users, PlayCircle, FileText, Download, Globe, CheckCircle, Coffee, Award } from 'lucide-react'
 import Carousel from '@/components/courses/related-courses'
 import { handleErrorApi, weeksAgo } from '@/lib/utils'
-import { useCourseQuery, useGetCourseQuery, useSearchCourseQuery } from '@/queries/useCourse'
+import { useCourseQuery, useGetCourseQuery } from '@/queries/useCourse'
 import { useParams, useRouter } from 'next/navigation'
 import { useRef, useState } from 'react'
-import { paginationGeneral } from '@/constants/pagination-config'
+import { pagination } from '@/constants/pagination-config'
 import Link from 'next/link'
 import { pathURL } from '@/constants/path'
 import { useCartMutation } from '@/queries/useCart'
 import { CartBodyType } from '@/schemaValidator/cart.schema'
+import { useQueryClient } from '@tanstack/react-query'
 
 const placeholderImage =
   'https://img.freepik.com/free-vector/students-using-e-learning-platform-video-laptop-graduation-cap-online-education-platform-e-learning-platform-online-teaching-concept_335657-795.jpg'
 
 export default function CoursePage() {
+  const queryClient = useQueryClient()
   const router = useRouter()
-  const [selectedVideo, setSelectedVideo] = useState<string | null>(null)
-  const videoRef = useRef<HTMLVideoElement>(null)
   const { id } = useParams()
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null)
+
+  const videoRef = useRef<HTMLVideoElement>(null)
   const courseId = id as string
 
   const getCourse = useGetCourseQuery(courseId)
   const course = getCourse.data?.payload.data
   const cartMutation = useCartMutation()
-  const courseQuery = useCourseQuery(paginationGeneral.LIMIT, paginationGeneral.PAGE)
+  const courseQuery = useCourseQuery(pagination.LIMIT, pagination.PAGE)
   const courses = courseQuery.data?.payload.data.data ?? []
-
-  const handleVideoSelect = (videoUrl: string) => {
-    setSelectedVideo(videoUrl)
-    if (videoRef.current) {
-      videoRef.current.src = videoUrl
-      videoRef.current.load()
-      videoRef.current.play()
-    }
-  }
 
   const handleAddCart = (body: CartBodyType) => {
     cartMutation.mutate(body, {
       onSuccess: (data) => {
         router.push(pathURL.cart)
+        queryClient.invalidateQueries({ queryKey: ['cart'] })
       },
       onError: (error) => {
         handleErrorApi({ error })
@@ -92,8 +87,8 @@ export default function CoursePage() {
           </div>
           {/* create video ... demo */}
           <div className='rounded-xl overflow-hidden border border-gray-400 mb-6'>
-            <video ref={videoRef} className='w-full aspect-video' controls poster={course?.bannerUrl}>
-              <source src={selectedVideo as string} type='video/mp4' />
+            <video className='w-full aspect-video' controls poster={course?.bannerUrl}>
+              <source src='/assets/videos/video.mp4' type='video/mp4' />
               Your browser does not support the video tag.
             </video>
           </div>
@@ -113,6 +108,12 @@ export default function CoursePage() {
               className='w-full text-lg py-6 mb-6 bg-purple-400 hover:bg-purple-700 text-white'
             >
               Add Cart
+            </Button>
+            <Button
+              onClick={() => router.push(`${pathURL.viewer}?id=${courseId}`)}
+              className='w-full text-lg py-6 mb-6 bg-purple-400 hover:bg-purple-700 text-white'
+            >
+              See Now
             </Button>
 
             <div className='text-center text-gray-700 dark:text-gray-300 mb-6'>30-Day Money-Back Guarantee</div>
@@ -252,7 +253,6 @@ export default function CoursePage() {
                           <li key={video.id} className='flex items-center'>
                             <PlayCircle className='w-5 h-5 mr-2 text-purple-400' />
                             <button
-                              onClick={() => handleVideoSelect(video.videoUrl)}
                               rel='noopener noreferrer'
                               className='text-lg text-gray-700 dark:text-gray-300 hover:text-purple-400'
                             >

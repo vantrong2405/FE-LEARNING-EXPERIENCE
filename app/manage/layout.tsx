@@ -5,22 +5,30 @@ import type React from 'react'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Home, Users, BookOpen, Star, Settings, LogOut, Bell, Search, Menu, X, HelpCircle, Receipt } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog'
-import { DialogTitle } from '@radix-ui/react-dialog'
 import { useGetMeQuery, useLogoutMutation } from '@/queries/useAuth'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { getRefreshTokenFromLocalStorage } from '@/lib/utils'
+import { decodeToken, getRefreshTokenFromLocalStorage } from '@/lib/utils'
+import { Icons } from '@/components/ui/icons'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchDialogOpen, setSearchDialogOpen] = useState(false)
+
   const searchInputRef = useRef<HTMLInputElement>(null)
   const pathname = usePathname()
   const router = useRouter()
+
+  useEffect(() => {
+    const token = localStorage.getItem('access_token')
+    const decode = decodeToken(token as string)
+    const role = decode.role === 'User'
+
+    if (token && role && pathname.startsWith('/manage')) {
+      router.replace('/')
+    }
+  }, [pathname, router])
 
   const getMeQuery = useGetMeQuery()
   const logoutMutation = useLogoutMutation()
@@ -28,29 +36,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   // Define navigation items
   const navItems = [
-    { href: '/manage', label: 'Dashboard', icon: Home },
-    { href: '/manage/users', label: 'Người dùng', icon: Users },
-    { href: '/manage/courses', label: 'Khóa học', icon: BookOpen },
-    { href: '/manage/enrollments', label: 'Đăng ký', icon: BookOpen },
-    { href: '/manage/lessons', label: 'Lesson', icon: BookOpen },
-    { href: '/manage/videos', label: 'Videos', icon: BookOpen },
-    { href: '/manage/reviews', label: 'Đánh giá', icon: Star },
-    { href: '/manage/payments', label: 'Thanh toán', icon: Receipt },
-    { href: '/manage/faqs', label: 'FAQs', icon: HelpCircle }
+    { href: '/manage', label: 'Dashboard', icon: Icons.Home },
+    { href: '/manage/users', label: 'Người dùng', icon: Icons.Users },
+    { href: '/manage/courses', label: 'Khóa học', icon: Icons.BookOpen },
+    { href: '/manage/enrollments', label: 'Đăng ký', icon: Icons.BookOpen },
+    { href: '/manage/lessons', label: 'Lesson', icon: Icons.BookOpen },
+    { href: '/manage/videos', label: 'Videos', icon: Icons.BookOpen },
+    { href: '/manage/reviews', label: 'Đánh giá', icon: Icons.Star },
+    { href: '/manage/payments', label: 'Thanh toán', icon: Icons.Receipt },
+    { href: '/manage/faqs', label: 'FAQs', icon: Icons.HelpCircle }
   ]
 
   // Check if current path is active
   const isActive = (path: string) => {
     return pathname === path
   }
-
-  // Handle keyboard shortcut for search
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-      e.preventDefault()
-      setSearchDialogOpen(true)
-    }
-  }, [])
 
   // Focus search input when dialog opens
   useEffect(() => {
@@ -60,12 +60,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       }, 100)
     }
   }, [searchDialogOpen])
-
-  // Add keyboard event listener
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [handleKeyDown])
 
   // Close sidebar on mobile when navigating
   useEffect(() => {
@@ -127,7 +121,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className='text-gray-400 hover:text-white hover:bg-gray-800'
           >
-            {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+            {sidebarOpen ? <Icons.X size={20} /> : <Icons.Menu size={20} />}
           </Button>
         </div>
         <nav className='mt-6 px-4'>
@@ -154,7 +148,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               variant='ghost'
               className='w-full justify-start text-gray-400 hover:bg-gray-800 hover:text-white'
             >
-              <LogOut className='mr-2 h-5 w-5' />
+              <Icons.LogOut className='mr-2 h-5 w-5' />
               {sidebarOpen && 'Đăng xuất'}
             </Button>
           </div>
@@ -176,24 +170,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
 
             <div className='flex items-center ml-auto gap-3 sm:gap-4'>
-              <div className='relative order-1 sm:order-none flex-grow max-w-md'>
-                <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
-                <Input
-                  type='search'
-                  placeholder='Tìm kiếm... (Ctrl+K)'
-                  className='w-full pl-8 bg-gray-800 border-gray-700 focus:border-purple-500 text-white'
-                  onClick={() => setSearchDialogOpen(true)}
-                  readOnly
-                />
-              </div>
-
               <div className='flex items-center gap-2'>
                 <Button
                   variant='outline'
                   size='icon'
                   className='relative bg-gray-800 border-gray-700 hover:bg-gray-700'
                 >
-                  <Bell className='h-5 w-5 text-gray-400' />
+                  <Icons.Bell className='h-5 w-5 text-gray-400' />
                   <span className='absolute -top-1 -right-1 bg-purple-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center'>
                     3
                   </span>
@@ -204,7 +187,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   size='sm'
                   className='hidden md:flex items-center gap-2 bg-gray-800 border-gray-700 hover:bg-gray-700'
                 >
-                  <Settings className='h-4 w-4 text-gray-400' />
+                  <Icons.Settings className='h-4 w-4 text-gray-400' />
                   <span>Cài đặt</span>
                 </Button>
 
@@ -225,57 +208,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Page Content */}
         <main className='p-6'>{children}</main>
       </div>
-
-      {/* Search Dialog */}
-      <Dialog open={searchDialogOpen} onOpenChange={setSearchDialogOpen}>
-        <DialogContent className='sm:max-w-[550px] bg-gray-900 border border-gray-700 text-white p-0 rounded-lg shadow-lg'>
-          {/* Header */}
-          <DialogHeader className='p-4 border-b border-gray-800'>
-            <DialogTitle className='text-lg font-semibold'>Tìm kiếm</DialogTitle>
-          </DialogHeader>
-
-          {/* Search Input */}
-          <div className='p-4 border-b border-gray-800'>
-            <div className='relative'>
-              <Search className='absolute left-3 top-2 h-5 w-5 text-gray-400' />
-              <Input
-                ref={searchInputRef}
-                type='search'
-                placeholder='Tìm kiếm khóa học, người dùng, đánh giá...'
-                className='w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 focus:border-purple-500 text-white text-base rounded-md'
-                autoFocus
-              />
-            </div>
-          </div>
-
-          {/* Recent Searches */}
-          <div className='p-4'>
-            <div className='text-sm text-gray-400 mb-2'>Tìm kiếm gần đây</div>
-            <div className='space-y-2'>
-              {['JavaScript Cơ Bản', 'React Advanced', 'Nguyễn Văn A'].map((item, index) => (
-                <div
-                  key={index}
-                  className='flex items-center p-2 hover:bg-gray-800 rounded-md cursor-pointer transition'
-                >
-                  <Search className='h-4 w-4 text-gray-500 mr-2' />
-                  <span>{item}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Keyboard Shortcuts */}
-            <div className='mt-4 text-xs text-gray-500 flex justify-between'>
-              <span>
-                Nhấn <kbd className='px-2 py-1 bg-gray-800 rounded'>↑</kbd>{' '}
-                <kbd className='px-2 py-1 bg-gray-800 rounded'>↓</kbd> để điều hướng
-              </span>
-              <span>
-                Nhấn <kbd className='px-2 py-1 bg-gray-800 rounded'>Enter</kbd> để chọn
-              </span>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }

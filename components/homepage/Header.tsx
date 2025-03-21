@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import Link from 'next/link'
@@ -15,6 +15,9 @@ import Chatbox from '../chatbox/Chatbox'
 import { useGetMeQuery, useLogoutMutation } from '@/queries/useAuth'
 import { getRefreshTokenFromLocalStorage } from '@/lib/utils'
 import { useRouter, usePathname } from 'next/navigation'
+import { Input } from '@/components/ui/input'
+import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog'
+import { DialogTitle } from '@radix-ui/react-dialog'
 
 const navItems = [
   { name: 'Home', href: '#home' },
@@ -26,6 +29,8 @@ const navItems = [
 ]
 
 export default function Header() {
+  const searchInputRef = useRef<HTMLInputElement>(null)
+  const [searchDialogOpen, setSearchDialogOpen] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [showAlert, setShowAlert] = useState(true)
   const [showScrollTop, setShowScrollTop] = useState(false)
@@ -38,6 +43,7 @@ export default function Header() {
   const router = useRouter()
   const pathname = usePathname()
   const isHomePage = pathname === pathURL.home
+  const isCourse = pathname === pathURL.dashboard_courses
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY)
@@ -102,8 +108,21 @@ export default function Header() {
     router.push('/login')
   }
 
+  // Handle keyboard shortcut for search
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault()
+      setSearchDialogOpen(true)
+    }
+  }, [])
+
+  // Add keyboard event listener
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [handleKeyDown])
   return (
-    <div className='fixed top-0 left-0 right-0 z-50'>
+    <div className='fixed top-0 left-0 right-0 z-50 dark:shadow-xl'>
       <header
         className={`bg-white/80 dark:bg-gray-900/80 backdrop-blur-md transition-all duration-300 ease-in-out ${scrollY > 0 ? 'shadow-md' : ''}`}
       >
@@ -158,6 +177,18 @@ export default function Header() {
             )}
 
             <div className='hidden md:flex items-center space-x-4'>
+              {isCourse && (
+                <div className='relative order-1 sm:order-none flex-grow max-w-md'>
+                  <Icons.Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
+                  <Input
+                    type='search'
+                    placeholder='Tìm kiếm... (Ctrl+K)'
+                    className='w-full pl-8 dark:bg-gray-800 dark:border-gray-700 focus:border-purple-500 text-white'
+                    onClick={() => setSearchDialogOpen(true)}
+                    readOnly
+                  />
+                </div>
+              )}
               <ModeToggle />
               <Button
                 variant='ghost'
@@ -291,6 +322,56 @@ export default function Header() {
         {isMusicOn ? <Volume2 className='h-6 w-6' /> : <VolumeX className='h-6 w-6' />}
       </Button>
       <Chatbox /> {/* Chatbox luôn nằm dưới cùng */}
+      {/* Search Dialog */}
+      <Dialog open={searchDialogOpen} onOpenChange={setSearchDialogOpen}>
+        <DialogContent className='sm:max-w-[550px] bg-gray-900 border border-gray-700 text-white p-0 rounded-lg shadow-lg'>
+          {/* Header */}
+          <DialogHeader className='p-4 border-b border-gray-800'>
+            <DialogTitle className='text-lg font-semibold'>Tìm kiếm</DialogTitle>
+          </DialogHeader>
+
+          {/* Search Input */}
+          <div className='p-4 border-b border-gray-800'>
+            <div className='relative'>
+              <Icons.Search className='absolute left-3 top-2 h-5 w-5 text-gray-400' />
+              <Input
+                ref={searchInputRef}
+                type='search'
+                placeholder='Tìm kiếm khóa học, người dùng, đánh giá...'
+                className='w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-700 focus:border-purple-500 text-white text-base rounded-md'
+                autoFocus
+              />
+            </div>
+          </div>
+
+          {/* Recent Searches */}
+          <div className='p-4'>
+            <div className='text-sm text-gray-400 mb-2'>Tìm kiếm gần đây</div>
+            <div className='space-y-2'>
+              {['JavaScript Cơ Bản', 'React Advanced', 'Nguyễn Văn A'].map((item, index) => (
+                <div
+                  key={index}
+                  className='flex items-center p-2 hover:bg-gray-800 rounded-md cursor-pointer transition'
+                >
+                  <Icons.Search className='h-4 w-4 text-gray-500 mr-2' />
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Keyboard Shortcuts */}
+            <div className='mt-4 text-xs text-gray-500 flex justify-between'>
+              <span>
+                Nhấn <kbd className='px-2 py-1 bg-gray-800 rounded'>↑</kbd>{' '}
+                <kbd className='px-2 py-1 bg-gray-800 rounded'>↓</kbd> để điều hướng
+              </span>
+              <span>
+                Nhấn <kbd className='px-2 py-1 bg-gray-800 rounded'>Enter</kbd> để chọn
+              </span>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

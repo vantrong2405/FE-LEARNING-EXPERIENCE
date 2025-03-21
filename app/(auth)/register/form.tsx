@@ -32,14 +32,15 @@ import { useRouter } from 'next/navigation'
 
 export default function FormRegister() {
   const router = useRouter()
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const accessToken = getAccessTokenFromLocalStorage()
   const refreshToken = getRefreshTokenFromLocalStorage()
   if (accessToken && refreshToken) {
     router.back()
   }
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
   const togglePasswordVisibility = () => setShowPassword(!showPassword)
   const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword)
   const registerMutation = useRegisterMutation()

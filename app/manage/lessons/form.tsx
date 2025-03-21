@@ -2,20 +2,7 @@
 
 import type React from 'react'
 
-import { useState } from 'react'
-import {
-  Search,
-  Plus,
-  Edit,
-  Trash2,
-  MoreHorizontal,
-  CheckCircle,
-  XCircle,
-  ChevronLeft,
-  ChevronRight,
-  Download,
-  FileText
-} from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -42,138 +29,76 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Textarea } from '@/components/ui/textarea'
 import { exportToExcel } from '@/lib/excel'
+import { Lesson } from '@/models/lesson.type'
+import { Icons } from '@/components/ui/icons'
+import { mockCourses, mockLessons } from '@/database_example/lesson.db'
+import { useLessonByIdQuery } from '@/queries/useLesson'
+import { pagination } from '@/constants/pagination-config'
+import { useCourseQuery } from '@/queries/useCourse'
 
-// Mock data for lessons
-const mockLessons = [
-  {
-    id: '1',
-    title: 'Giới thiệu JavaScript',
-    courseId: '1',
-    courseName: 'JavaScript Cơ Bản',
-    order: 1,
-    content: 'Giới thiệu về ngôn ngữ lập trình JavaScript và lịch sử phát triển.',
-    createdAt: '2024-05-15T10:00:00Z',
-    updatedAt: '2024-05-16T14:30:00Z',
-    status: 'published'
-  },
-  {
-    id: '2',
-    title: 'Biến và Kiểu dữ liệu',
-    courseId: '1',
-    courseName: 'JavaScript Cơ Bản',
-    order: 2,
-    content: 'Tìm hiểu về biến và các kiểu dữ liệu trong JavaScript.',
-    createdAt: '2024-05-15T11:00:00Z',
-    updatedAt: '2024-05-16T15:30:00Z',
-    status: 'published'
-  },
-  {
-    id: '3',
-    title: 'Components và Props',
-    courseId: '2',
-    courseName: 'React Advanced',
-    order: 1,
-    content: 'Tìm hiểu về React Components và cách truyền dữ liệu qua Props.',
-    createdAt: '2024-05-16T09:00:00Z',
-    updatedAt: '2024-05-17T10:30:00Z',
-    status: 'draft'
-  },
-  {
-    id: '4',
-    title: 'State và Lifecycle',
-    courseId: '2',
-    courseName: 'React Advanced',
-    order: 2,
-    content: 'Tìm hiểu về State và vòng đời của một Component trong React.',
-    createdAt: '2024-05-16T10:00:00Z',
-    updatedAt: '2024-05-17T11:30:00Z',
-    status: 'published'
-  },
-  {
-    id: '5',
-    title: 'Hooks cơ bản',
-    courseId: '2',
-    courseName: 'React Advanced',
-    order: 3,
-    content: 'Tìm hiểu về các Hooks cơ bản trong React như useState, useEffect.',
-    createdAt: '2024-05-16T11:00:00Z',
-    updatedAt: '2024-05-17T12:30:00Z',
-    status: 'published'
-  },
-  {
-    id: '6',
-    title: 'Giới thiệu Python',
-    courseId: '3',
-    courseName: 'Python for Data Science',
-    order: 1,
-    content: 'Giới thiệu về ngôn ngữ lập trình Python và ứng dụng trong Data Science.',
-    createdAt: '2024-05-17T09:00:00Z',
-    updatedAt: '2024-05-18T10:30:00Z',
-    status: 'published'
-  },
-  {
-    id: '7',
-    title: 'NumPy và Pandas',
-    courseId: '3',
-    courseName: 'Python for Data Science',
-    order: 2,
-    content: 'Tìm hiểu về thư viện NumPy và Pandas trong Python.',
-    createdAt: '2024-05-17T10:00:00Z',
-    updatedAt: '2024-05-18T11:30:00Z',
-    status: 'draft'
+type LessonType = {
+  course: {
+    id: string
+    title: string
+    description: string
+    price: number
+    thumbnailUrl: string
+    bannerUrl: string
+    isPublished: boolean
+    createdAt: string
+    updatedAt: string
+    instructor: {
+      id: string
+      name: string
+      gender: string
+    }
+    category: {
+      id: string
+      name: string
+    }
   }
-]
-
-// Mock data for courses
-const mockCourses = [
-  { id: '1', name: 'JavaScript Cơ Bản' },
-  { id: '2', name: 'React Advanced' },
-  { id: '3', name: 'Python for Data Science' },
-  { id: '4', name: 'UI/UX Design' }
-]
-
-interface Lesson {
   id: string
   title: string
-  courseId: string
-  courseName: string
-  order: number
-  content: string
   createdAt: string
   updatedAt: string
-  status: string
+  order: number
+  videos: { id: string }[]
 }
 
 export default function LessonsPage() {
-  const [lessons, setLessons] = useState<Lesson[]>(mockLessons)
-  const [searchTerm, setSearchTerm] = useState('')
+  const courseQuery = useCourseQuery(pagination.LIMIT, pagination.PAGE)
+  const courseList = useMemo(() => {
+    return (
+      courseQuery.data?.payload.data.data.map((course) => ({
+        id: course.id,
+        title: course.title
+      })) || []
+    )
+  }, [courseQuery.data])
+
   const [selectedCourse, setSelectedCourse] = useState('all')
+  const lessonByIdQuery = useLessonByIdQuery(pagination.PAGE, pagination.LIMIT, selectedCourse)
+  const data = lessonByIdQuery.data?.payload.data.data || []
+  const [lessons, setLessons] = useState<LessonType[]>([])
+
+  useEffect(() => {
+    if (data && Array.isArray(data)) {
+      setLessons((prevLessons) => {
+        return JSON.stringify(prevLessons) !== JSON.stringify(data) ? data : prevLessons
+      })
+    }
+  }, [data])
+
+  const [searchTerm, setSearchTerm] = useState('')
   const [selectedStatus, setSelectedStatus] = useState('all')
   const [isAddLessonOpen, setIsAddLessonOpen] = useState(false)
   const [isEditLessonOpen, setIsEditLessonOpen] = useState(false)
   const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null)
   const [selectedLessons, setSelectedLessons] = useState<string[]>([])
   const [currentPage, setCurrentPage] = useState(1)
-  const lessonsPerPage = 5
-
-  // Filter lessons based on search, course, and status
-  const filteredLessons = lessons.filter((lesson) => {
-    const matchesSearch =
-      lesson.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      lesson.courseName.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCourse = selectedCourse === 'all' || lesson.courseId === selectedCourse
-    const matchesStatus = selectedStatus === 'all' || lesson.status === selectedStatus
-
-    return matchesSearch && matchesCourse && matchesStatus
-  })
-
-  // Pagination
-  const indexOfLastLesson = currentPage * lessonsPerPage
-  const indexOfFirstLesson = indexOfLastLesson - lessonsPerPage
-  const currentLessons = filteredLessons.slice(indexOfFirstLesson, indexOfLastLesson)
-  const totalPages = Math.ceil(filteredLessons.length / lessonsPerPage)
 
   // Form state
+
   const [formData, setFormData] = useState({
     id: '',
     title: '',
@@ -184,20 +109,39 @@ export default function LessonsPage() {
     file: null as File | null
   })
 
+  const lessonsPerPage = 5
+
+  // Filter lessons based on search, course, and status
+  const filteredLessons = lessons?.filter((lesson) => {
+    const matchesSearch =
+      lesson.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      lesson.title.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesCourse = selectedCourse === 'all' || lesson.course.id === selectedCourse
+    const matchesStatus = selectedStatus === 'all' || lesson.id === selectedStatus
+
+    return matchesSearch && matchesCourse && matchesStatus
+  })
+
+  // Pagination
+  const indexOfLastLesson = currentPage * lessonsPerPage
+  const indexOfFirstLesson = indexOfLastLesson - lessonsPerPage
+  const currentLessons = filteredLessons?.slice(indexOfFirstLesson, indexOfLastLesson)
+  const totalPages = Math.ceil(filteredLessons.length / lessonsPerPage)
+
   // Handle edit lesson
-  const handleEditLesson = (lesson: Lesson) => {
-    setCurrentLesson(lesson)
-    setFormData({
-      id: lesson.id,
-      title: lesson.title,
-      courseId: lesson.courseId,
-      order: lesson.order,
-      content: lesson.content,
-      status: lesson.status,
-      file: null
-    })
-    setIsEditLessonOpen(true)
-  }
+  // const handleEditLesson = (lesson: Lesson) => {
+  //   setCurrentLesson(lesson)
+  //   setFormData({
+  //     id: lesson.id,
+  //     title: lesson.title,
+  //     courseId: lesson.courseId,
+  //     order: lesson.order,
+  //     content: lesson.content,
+  //     status: lesson.status,
+  //     file: null
+  //   })
+  //   setIsEditLessonOpen(true)
+  // }
 
   // Handle add new lesson
   const handleAddLesson = () => {
@@ -258,19 +202,19 @@ export default function LessonsPage() {
       setIsEditLessonOpen(false)
     } else {
       // Add new lesson
-      const newLesson: Lesson = {
-        id: Date.now().toString(),
-        title: formData.title,
-        courseId: formData.courseId,
-        courseName: mockCourses.find((c) => c.id === formData.courseId)?.name || '',
-        order: Number(formData.order),
-        content: formData.content,
-        status: formData.status,
-        createdAt: now,
-        updatedAt: now
-      }
-      setLessons([...lessons, newLesson])
-      setIsAddLessonOpen(false)
+      // const newLesson: Lesson = {
+      //   id: Date.now().toString(),
+      //   title: formData.title,
+      //   courseId: formData.courseId,
+      //   courseName: mockCourses.find((c) => c.id === formData.courseId)?.name || '',
+      //   order: Number(formData.order),
+      //   content: formData.content,
+      //   status: formData.status,
+      //   createdAt: now,
+      //   updatedAt: now
+      // }
+      // setLessons([...lessons, newLesson])
+      // setIsAddLessonOpen(false)
     }
   }
 
@@ -351,7 +295,7 @@ export default function LessonsPage() {
 
     const exportData = filteredLessons.map((lesson) => ({
       ...lesson,
-      status: lesson.status === 'published' ? 'Đã xuất bản' : 'Bản nháp',
+      status: lesson.course.isPublished === true ? 'Đã xuất bản' : 'Bản nháp',
       createdAt: formatDate(lesson.createdAt),
       updatedAt: formatDate(lesson.updatedAt)
     }))
@@ -381,13 +325,13 @@ export default function LessonsPage() {
               className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto text-xs sm:text-sm'
               onClick={handleExportExcel}
             >
-              <Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+              <Icons.Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
               <span>Xuất Excel</span>
             </Button>
             <Dialog open={isAddLessonOpen} onOpenChange={setIsAddLessonOpen}>
               <DialogTrigger asChild>
                 <Button className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto text-xs sm:text-sm'>
-                  <Plus className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+                  <Icons.Plus className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
                   <span>Thêm Bài Học</span>
                 </Button>
               </DialogTrigger>
@@ -536,7 +480,7 @@ export default function LessonsPage() {
                   Tìm kiếm
                 </Label>
                 <div className='relative'>
-                  <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
+                  <Icons.Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
                   <Input
                     id='search'
                     type='search'
@@ -557,11 +501,18 @@ export default function LessonsPage() {
                   </SelectTrigger>
                   <SelectContent className='bg-gray-800 border-gray-700 text-white'>
                     <SelectItem value='all'>Tất cả khóa học</SelectItem>
-                    {mockCourses.map((course) => (
-                      <SelectItem key={course.id} value={course.id}>
-                        {course.name}
+                    {courseList.length > 0 ? (
+                      courseList.map((course) => (
+                        <SelectItem key={course.id} value={String(course.id)}>
+                          {' '}
+                          {course.title}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value='loading' disabled>
+                        Không có khóa học
                       </SelectItem>
-                    ))}
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -604,7 +555,7 @@ export default function LessonsPage() {
                       className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white text-xs'
                       onClick={handleBulkPublish}
                     >
-                      <CheckCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-1' /> Xuất bản
+                      <Icons.CheckCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-1' /> Xuất bản
                     </Button>
                     <Button
                       variant='outline'
@@ -612,10 +563,10 @@ export default function LessonsPage() {
                       className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white text-xs'
                       onClick={handleBulkDraft}
                     >
-                      <XCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-1' /> Bản nháp
+                      <Icons.XCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-1' /> Bản nháp
                     </Button>
                     <Button variant='destructive' size='sm' className='text-xs' onClick={handleBulkDelete}>
-                      <Trash2 className='h-3 w-3 sm:h-4 sm:w-4 mr-1' /> Xóa
+                      <Icons.Trash2 className='h-3 w-3 sm:h-4 sm:w-4 mr-1' /> Xóa
                     </Button>
                   </div>
                 </div>
@@ -669,7 +620,7 @@ export default function LessonsPage() {
                         <td className='py-2 sm:py-3 px-2 sm:px-4'>
                           <div className='flex items-center'>
                             <div className='w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-purple-600 flex items-center justify-center mr-2 sm:mr-3'>
-                              <FileText className='h-3 w-3 sm:h-4 sm:w-4 text-white' />
+                              <Icons.FileText className='h-3 w-3 sm:h-4 sm:w-4 text-white' />
                             </div>
                             <div>
                               <div className='font-medium text-xs sm:text-sm'>{lesson.title}</div>
@@ -678,18 +629,18 @@ export default function LessonsPage() {
                           </div>
                         </td>
                         <td className='py-2 sm:py-3 px-2 sm:px-4 text-gray-300 text-xs sm:text-sm'>
-                          {lesson.courseName}
+                          {lesson.course.title}
                         </td>
                         <td className='py-2 sm:py-3 px-2 sm:px-4 text-gray-300 text-xs sm:text-sm'>{lesson.order}</td>
                         <td className='py-2 sm:py-3 px-2 sm:px-4'>
                           <Badge
                             className={`text-xs ${
-                              lesson.status === 'published'
+                              lesson.course.isPublished === true
                                 ? 'bg-green-900/30 text-green-500 hover:bg-green-900/40'
                                 : 'bg-yellow-900/30 text-yellow-500 hover:bg-yellow-900/40'
                             }`}
                           >
-                            {lesson.status === 'published' ? 'Đã xuất bản' : 'Bản nháp'}
+                            {lesson.course.isPublished === true ? 'Đã xuất bản' : 'Bản nháp'}
                           </Badge>
                         </td>
                         <td className='py-2 sm:py-3 px-2 sm:px-4 text-gray-300 text-xs sm:text-sm'>
@@ -703,7 +654,7 @@ export default function LessonsPage() {
                                 size='icon'
                                 className='h-7 w-7 sm:h-8 sm:w-8 text-gray-400 hover:text-white hover:bg-gray-800'
                               >
-                                <MoreHorizontal className='h-4 w-4' />
+                                <Icons.MoreHorizontal className='h-4 w-4' />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className='bg-gray-800 border-gray-700 text-white'>
@@ -711,18 +662,18 @@ export default function LessonsPage() {
                               <DropdownMenuSeparator className='bg-gray-700' />
                               <DropdownMenuItem
                                 className='hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'
-                                onClick={() => handleEditLesson(lesson)}
+                                // onClick={() => handleEditLesson(lesson)}
                               >
-                                <Edit className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Chỉnh sửa
+                                <Icons.Edit className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Chỉnh sửa
                               </DropdownMenuItem>
                               <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'>
-                                {lesson.status === 'published' ? (
+                                {lesson.course.isPublished === true ? (
                                   <>
-                                    <XCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Chuyển bản nháp
+                                    <Icons.XCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Chuyển bản nháp
                                   </>
                                 ) : (
                                   <>
-                                    <CheckCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Xuất bản
+                                    <Icons.CheckCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Xuất bản
                                   </>
                                 )}
                               </DropdownMenuItem>
@@ -731,7 +682,7 @@ export default function LessonsPage() {
                                 className='text-red-500 hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'
                                 onClick={() => handleDeleteLesson(lesson.id)}
                               >
-                                <Trash2 className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Xóa
+                                <Icons.Trash2 className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Xóa
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -763,7 +714,7 @@ export default function LessonsPage() {
                   disabled={currentPage === 1}
                   className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white h-8 w-8 sm:h-9 sm:w-9'
                 >
-                  <ChevronLeft className='h-4 w-4' />
+                  <Icons.ChevronLeft className='h-4 w-4' />
                 </Button>
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <Button
@@ -787,7 +738,7 @@ export default function LessonsPage() {
                   disabled={currentPage === totalPages}
                   className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white h-8 w-8 sm:h-9 sm:w-9'
                 >
-                  <ChevronRight className='h-4 w-4' />
+                  <Icons.ChevronRight className='h-4 w-4' />
                 </Button>
               </div>
             </div>

@@ -17,7 +17,6 @@ export default function FormEmailVerificationSuccess() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const email_verify_token = params.get('token')
-
     if (email_verify_token) {
       verifyMutation.mutate(
         { email_verify_token },
@@ -34,6 +33,7 @@ export default function FormEmailVerificationSuccess() {
       )
     }
   }, [verifyMutation, router])
+
   return (
     <div className='min-h-screen flex items-center justify-center dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden'>
       <div className='absolute inset-0 pointer-events-none z-0'>

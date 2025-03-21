@@ -108,6 +108,8 @@ const VideoSchema = z.object({
   id: z.string(),
   lessonId: z.string(),
   videoUrl: z.string().url(),
+  title: z.string(),
+  orderLesson: z.number(),
   duration: z.number(),
   createdAt: z.string(),
   updatedAt: z.string()

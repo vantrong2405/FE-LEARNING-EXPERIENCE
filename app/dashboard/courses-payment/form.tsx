@@ -7,50 +7,43 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Input } from '@/components/ui/input'
-import { QrCode, CreditCard, RefreshCw, Tag, Clock, User, BanknoteIcon, CopyIcon, AlertCircle } from 'lucide-react'
 import qr from '@/public/assets/images/qr.png'
 import { useCart } from '@/components/ui/cart-context'
-
-interface CartItem {
-  cartId: string
-  course: {
-    id: string
-    description: string
-    instructor: {
-      avatarUrl: string
-      name: string
-    }
-    thumbnailUrl: string
-    title: string
-  }
-  id: string
-  courseId: string
-  createdAt: string
-  updatedAt: string
-  price: number
-  quantity: number
-}
+import { Icons } from '@/components/ui/icons'
+import { CartItem } from '@/models/cart.type'
 
 const QRPayment = () => {
-  const { cart, selectedItems } = useCart() as { cart: CartItem[]; selectedItems: string[] }
-
-  const selectedItemsData = useMemo(() => {
-    return cart.filter((item) => selectedItems.includes(item.id))
-  }, [cart, selectedItems])
-
-  useEffect(() => {
-    console.log('cart updated', cart)
-    console.log('selectedItemsData', selectedItemsData)
-  }, [cart])
-
   const [paymentMethod, setPaymentMethod] = useState('qr')
   const [paymentStatus, setPaymentStatus] = useState('pending')
   const [voucher, setVoucher] = useState('')
   const [price, setPrice] = useState(129.99)
   const [discount, setDiscount] = useState(0)
-  const [timeLeft, setTimeLeft] = useState(900) // 15 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(900)
   const [paymentCode, setPaymentCode] = useState('')
   const [copiedField, setCopiedField] = useState('')
+
+  const { cart, selectedItems, setSelectedItems } = useCart() as {
+    cart: CartItem[]
+    selectedItems: string[]
+    setSelectedItems: (items: string[]) => void
+  }
+
+  useEffect(() => {
+    if (selectedItems.length > 0) {
+      localStorage.setItem('selectedItems', JSON.stringify(selectedItems))
+    }
+  }, [selectedItems])
+
+  useEffect(() => {
+    const savedItems = localStorage.getItem('selectedItems')
+    if (savedItems && selectedItems.length === 0) {
+      setSelectedItems(JSON.parse(savedItems))
+    }
+  }, [])
+
+  const selectedItemsData = useMemo(() => {
+    return cart.filter((item) => selectedItems.includes(item.id))
+  }, [cart, selectedItems])
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -105,7 +98,7 @@ const QRPayment = () => {
             <CardTitle className='text-2xl font-semibold text-gray-900 dark:text-white flex items-center justify-between'>
               <span>{paymentMethod === 'qr' ? 'Scan QR Code to Pay' : 'Payment Method'}</span>
               <div className='flex items-center text-red-500'>
-                <Clock className='w-5 h-5 mr-2' />
+                <Icons.Clock className='w-5 h-5 mr-2' />
                 <span>{formatTime(timeLeft)}</span>
               </div>
             </CardTitle>
@@ -119,14 +112,14 @@ const QRPayment = () => {
               <div className='flex items-center space-x-2'>
                 <RadioGroupItem value='qr' id='qr' />
                 <Label htmlFor='qr' className='flex items-center space-x-2 cursor-pointer'>
-                  <QrCode className='w-6 h-6 text-purple-600' />
+                  <Icons.QrCode className='w-6 h-6 text-purple-600' />
                   <span>QR Code</span>
                 </Label>
               </div>
               <div className='flex items-center space-x-2'>
                 <RadioGroupItem value='card' id='card' />
                 <Label htmlFor='card' className='flex items-center space-x-2 cursor-pointer'>
-                  <CreditCard className='w-6 h-6 text-purple-600' />
+                  <Icons.CreditCard className='w-6 h-6 text-purple-600' />
                   <span>Credit Card</span>
                 </Label>
               </div>
@@ -146,7 +139,7 @@ const QRPayment = () => {
                   <div className='space-y-4 text-sm text-gray-700 dark:text-gray-300'>
                     <div className='flex items-center justify-between bg-white dark:bg-gray-800 p-3 rounded-md shadow'>
                       <div className='flex items-center font-semibold'>
-                        <User className='w-5 h-5 mr-3 text-purple-600' />
+                        <Icons.User className='w-5 h-5 mr-3 text-purple-600' />
                         <span>Doan Vo Van Trong</span>
                       </div>
                       <Button
@@ -155,13 +148,13 @@ const QRPayment = () => {
                         onClick={() => copyToClipboard('Doan Vo Van Trong', 'name')}
                         className='text-purple-600 hover:text-purple-700'
                       >
-                        <CopyIcon className='w-4 h-4' />
+                        <Icons.CopyIcon className='w-4 h-4' />
                         <span className='sr-only'>Copy name</span>
                       </Button>
                     </div>
                     <div className='flex items-center justify-between bg-white dark:bg-gray-800 p-3 rounded-md shadow'>
                       <div className='flex items-center font-semibold'>
-                        <BanknoteIcon className='w-5 h-5 mr-3 text-purple-600' />
+                        <Icons.BanknoteIcon className='w-5 h-5 mr-3 text-purple-600' />
                         <span>MB-BANK</span>
                       </div>
                       <Button
@@ -170,13 +163,13 @@ const QRPayment = () => {
                         onClick={() => copyToClipboard('MB-BANK', 'bank')}
                         className='text-purple-600 hover:text-purple-700'
                       >
-                        <CopyIcon className='w-4 h-4' />
+                        <Icons.CopyIcon className='w-4 h-4' />
                         <span className='sr-only'>Copy bank name</span>
                       </Button>
                     </div>
                     <div className='flex items-center justify-between bg-white dark:bg-gray-800 p-3 rounded-md shadow'>
                       <div className='flex items-center font-semibold'>
-                        <CreditCard className='w-5 h-5 mr-3 text-purple-600' />
+                        <Icons.CreditCard className='w-5 h-5 mr-3 text-purple-600' />
                         <span>Number Account: 0357407264</span>
                       </div>
                       <Button
@@ -185,13 +178,13 @@ const QRPayment = () => {
                         onClick={() => copyToClipboard('0357407264', 'account')}
                         className='text-purple-600 hover:text-purple-700'
                       >
-                        <CopyIcon className='w-4 h-4' />
+                        <Icons.CopyIcon className='w-4 h-4' />
                         <span className='sr-only'>Copy account number</span>
                       </Button>
                     </div>
                     <div className='flex items-center justify-between bg-white dark:bg-gray-800 p-3 rounded-md shadow'>
                       <div className='flex items-center font-semibold'>
-                        <Tag className='w-5 h-5 mr-3 text-purple-600' />
+                        <Icons.Tag className='w-5 h-5 mr-3 text-purple-600' />
                         <span>Payment Code: {paymentCode}</span>
                       </div>
                       <Button
@@ -200,7 +193,7 @@ const QRPayment = () => {
                         onClick={() => copyToClipboard(paymentCode, 'code')}
                         className='text-purple-600 hover:text-purple-700'
                       >
-                        <CopyIcon className='w-4 h-4' />
+                        <Icons.CopyIcon className='w-4 h-4' />
                         <span className='sr-only'>Copy payment code</span>
                       </Button>
                     </div>
@@ -220,9 +213,9 @@ const QRPayment = () => {
                   className='bg-purple-600 hover:bg-purple-700 text-white transition duration-300 ease-in-out transform hover:scale-105'
                 >
                   {paymentStatus === 'checking' ? (
-                    <RefreshCw className='mr-2 h-4 w-4' />
+                    <Icons.RefreshCw className='mr-2 h-4 w-4' />
                   ) : (
-                    <RefreshCw className='mr-2 h-4 w-4' />
+                    <Icons.RefreshCw className='mr-2 h-4 w-4' />
                   )}
                   Check Payment Status
                 </Button>
@@ -244,7 +237,7 @@ const QRPayment = () => {
           </CardHeader>
           <CardContent>
             <>
-              {cart.map((cartItem) => (
+              {selectedItemsData.map((cartItem) => (
                 <div key={cartItem.id}>
                   {/* Thông tin khóa học */}
                   <div className='flex items-center space-x-4 mb-6'>
@@ -265,11 +258,11 @@ const QRPayment = () => {
                   <div className='space-y-2 mb-6'>
                     <div className='flex justify-between'>
                       <span className='text-gray-700 dark:text-gray-300'>Original Price:</span>
-                      <span className='text-gray-900 dark:text-white'>${cartItem.price.toFixed(2)}</span>
+                      <span className='text-gray-900 dark:text-white'>{cartItem.price.toFixed(2)}đ</span>
                     </div>
                     <div className='flex justify-between'>
                       <span className='text-gray-700 dark:text-gray-300'>Discount:</span>
-                      {discount > 0 ? <span className='text-green-600'>-${discount.toFixed(2)}</span> : 0}
+                      {discount > 0 ? <span className='text-green-600'>{discount.toFixed(2)}</span> : 0}đ
                     </div>
                   </div>
                 </div>
@@ -280,7 +273,7 @@ const QRPayment = () => {
                 <div className='flex justify-between text-lg font-semibold'>
                   <span className='text-gray-900 dark:text-white'>Total:</span>
                   <span className='text-gray-900 dark:text-white'>
-                    ${cart.reduce((total, item) => total + item.price, 0).toFixed(2)}
+                    {selectedItemsData.reduce((total, item) => total + item.price, 0).toFixed(2)}đ
                   </span>
                 </div>
               </div>
@@ -304,7 +297,7 @@ const QRPayment = () => {
                     onClick={applyVoucher}
                     className='  rounded-l-none bg-purple-600 hover:bg-purple-700 text-white'
                   >
-                    <Tag className='mr-2 h-3 w-3' />
+                    <Icons.Tag className='mr-2 h-3 w-3' />
                     Apply
                   </Button>
                 </div>
@@ -313,7 +306,7 @@ const QRPayment = () => {
             <div className='mt-4 p-4 bg-yellow-50 dark:bg-yellow-900 rounded-lg'>
               <div className='flex'>
                 <div className='flex-shrink-0'>
-                  <AlertCircle className='h-5 w-5 text-yellow-400' aria-hidden='true' />
+                  <Icons.AlertCircle className='h-5 w-5 text-yellow-400' aria-hidden='true' />
                 </div>
                 <div className='ml-3'>
                   <h3 className='text-sm font-medium text-yellow-800 dark:text-yellow-100'>

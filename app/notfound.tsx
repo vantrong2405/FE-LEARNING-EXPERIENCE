@@ -8,7 +8,6 @@ import { Icons } from '@/components/ui/icons'
 export default function NotFoundPage() {
   return (
     <div className='min-h-screen flex flex-col items-center justify-center dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden'>
-      {/* Hiệu ứng đốm bay bay */}
       <div className='absolute inset-0 pointer-events-none z-0'>
         {Array.from({ length: 25 }).map((_, i) => (
           <motion.div

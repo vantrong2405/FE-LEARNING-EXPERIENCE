@@ -1,21 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Search,
-  Plus,
-  Edit,
-  Trash2,
-  MoreHorizontal,
-  ChevronLeft,
-  ChevronRight,
-  Download,
-  RefreshCw,
-  HelpCircle,
-  BookOpen,
-  Eye,
-  EyeOff
-} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -43,116 +28,9 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Textarea } from '@/components/ui/textarea'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { exportToExcel } from '@/lib/excel'
-
-// Sample FAQ data
-const faqs = [
-  {
-    id: 1,
-    question: 'Làm thế nào để đăng ký khóa học?',
-    answer:
-      'Để đăng ký khóa học, bạn cần tạo tài khoản trên hệ thống, sau đó chọn khóa học mong muốn và tiến hành thanh toán. Sau khi thanh toán thành công, bạn sẽ được cấp quyền truy cập vào khóa học ngay lập tức.',
-    category: 'Đăng ký & Thanh toán',
-    course: null,
-    isPublished: true,
-    order: 1
-  },
-  {
-    id: 2,
-    question: 'Các phương thức thanh toán được chấp nhận?',
-    answer:
-      'Chúng tôi chấp nhận nhiều phương thức thanh toán khác nhau bao gồm thẻ tín dụng/ghi nợ (Visa, Mastercard), chuyển khoản ngân hàng, và các ví điện tử phổ biến như MoMo, ZaloPay, VNPay.',
-    category: 'Đăng ký & Thanh toán',
-    course: null,
-    isPublished: true,
-    order: 2
-  },
-  {
-    id: 3,
-    question: 'Tôi có thể yêu cầu hoàn tiền không?',
-    answer:
-      'Có, chúng tôi có chính sách hoàn tiền trong vòng 7 ngày kể từ ngày đăng ký khóa học nếu bạn không hài lòng với nội dung. Tuy nhiên, bạn chỉ có thể yêu cầu hoàn tiền nếu đã hoàn thành dưới 20% khóa học.',
-    category: 'Đăng ký & Thanh toán',
-    course: null,
-    isPublished: true,
-    order: 3
-  },
-  {
-    id: 4,
-    question: 'Tôi có thể truy cập khóa học trong bao lâu?',
-    answer:
-      'Sau khi đăng ký, bạn sẽ có quyền truy cập vĩnh viễn vào khóa học. Điều này có nghĩa là bạn có thể học theo tốc độ của riêng mình và quay lại xem lại nội dung bất cứ khi nào bạn muốn.',
-    category: 'Truy cập khóa học',
-    course: null,
-    isPublished: true,
-    order: 1
-  },
-  {
-    id: 5,
-    question: 'Làm thế nào để tải xuống tài liệu khóa học?',
-    answer:
-      'Các tài liệu khóa học có thể được tải xuống trực tiếp từ trang nội dung khóa học. Bên cạnh mỗi bài giảng có tài liệu đính kèm, bạn sẽ thấy biểu tượng tải xuống. Nhấp vào đó để lưu tài liệu về máy tính của bạn.',
-    category: 'Truy cập khóa học',
-    course: null,
-    isPublished: true,
-    order: 2
-  },
-  {
-    id: 6,
-    question: 'Tôi có thể học trên thiết bị di động không?',
-    answer:
-      'Có, nền tảng của chúng tôi hoàn toàn tương thích với các thiết bị di động. Bạn có thể truy cập và học các khóa học trên điện thoại thông minh hoặc máy tính bảng thông qua trình duyệt web hoặc ứng dụng di động của chúng tôi.',
-    category: 'Truy cập khóa học',
-    course: null,
-    isPublished: true,
-    order: 3
-  },
-  {
-    id: 7,
-    question: 'Tôi cần có kiến thức nền tảng gì để học JavaScript Cơ Bản?',
-    answer:
-      'Khóa học JavaScript Cơ Bản được thiết kế cho người mới bắt đầu, vì vậy bạn không cần kiến thức lập trình trước đó. Tuy nhiên, hiểu biết cơ bản về HTML và CSS sẽ giúp bạn tiếp thu nội dung dễ dàng hơn.',
-    category: 'Nội dung khóa học',
-    course: {
-      id: 201,
-      title: 'JavaScript Cơ Bản'
-    },
-    isPublished: true,
-    order: 1
-  },
-  {
-    id: 8,
-    question: 'React Advanced có phù hợp với người mới học React không?',
-    answer:
-      'Khóa học React Advanced được thiết kế cho những người đã có kiến thức cơ bản về React. Bạn nên hoàn thành khóa học React Cơ Bản hoặc có ít nhất 3-6 tháng kinh nghiệm làm việc với React trước khi tham gia khóa học này.',
-    category: 'Nội dung khóa học',
-    course: {
-      id: 202,
-      title: 'React Advanced'
-    },
-    isPublished: true,
-    order: 1
-  },
-  {
-    id: 9,
-    question: 'Tôi có nhận được chứng chỉ sau khi hoàn thành khóa học không?',
-    answer:
-      'Có, sau khi hoàn thành tất cả các bài học và bài tập trong khóa học, bạn sẽ nhận được chứng chỉ hoàn thành. Chứng chỉ này có thể được tải xuống, chia sẻ trên LinkedIn hoặc in ra để sử dụng trong hồ sơ xin việc của bạn.',
-    category: 'Chứng chỉ',
-    course: null,
-    isPublished: true,
-    order: 1
-  },
-  {
-    id: 10,
-    question: 'Làm thế nào để liên hệ với giảng viên nếu tôi có thắc mắc?',
-    answer:
-      'Bạn có thể liên hệ với giảng viên thông qua hệ thống nhắn tin nội bộ của khóa học. Ngoài ra, mỗi bài giảng đều có phần bình luận nơi bạn có thể đặt câu hỏi và nhận phản hồi từ giảng viên hoặc các học viên khác.',
-    category: 'Hỗ trợ',
-    course: null,
-    isPublished: true,
-    order: 1
-  }
-]
+import { FAQ } from '@/models/faq.type'
+import { Icons } from '@/components/ui/icons'
+import { faqs } from '@/database_example/faq.db'
 
 // Get unique categories
 const uniqueCategories = [...new Set(faqs.map((faq) => faq.category))]
@@ -197,36 +75,13 @@ export default function FAQsPage() {
   const totalPages = Math.ceil(filteredFAQs.length / faqsPerPage)
 
   // Handle edit FAQ
-  interface FAQ {
-    id: number
-    question: string
-    answer: string
-    category: string
-    course: { id: number; title: string } | null
-    isPublished: boolean
-    order: number
-  }
 
-  const handleEditFAQ = (faq: FAQ) => {
+  const handleEditFAQ = (faq: any) => {
     setCurrentFAQ(faq)
     setIsEditFAQOpen(true)
   }
 
   // Handle checkbox selection
-  interface FAQ {
-    id: number
-    question: string
-    answer: string
-    category: string
-    course: { id: number; title: string } | null
-    isPublished: boolean
-    order: number
-  }
-
-  interface Course {
-    id: number
-    title: string
-  }
 
   const handleSelectFAQ = (faqId: number) => {
     if (selectedFAQs.includes(faqId)) {
@@ -274,13 +129,13 @@ export default function FAQsPage() {
               className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white w-full sm:w-auto text-xs sm:text-sm'
               onClick={handleExportExcel}
             >
-              <Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+              <Icons.Download className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
               <span>Xuất Excel</span>
             </Button>
             <Dialog open={isAddFAQOpen} onOpenChange={setIsAddFAQOpen}>
               <DialogTrigger asChild>
                 <Button className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto text-xs sm:text-sm'>
-                  <Plus className='h-3 h-3 sm:h-4 sm:w-4 mr-1 sm:mr-2' />
+                  <Icons.Plus className='sm:h-4 sm:w-4 mr-1 sm:mr-2' />
                   <span>Thêm FAQ</span>
                 </Button>
               </DialogTrigger>
@@ -388,7 +243,7 @@ export default function FAQsPage() {
                   <h3 className='text-2xl font-bold text-white mt-1'>{faqs.length}</h3>
                 </div>
                 <div className='h-12 w-12 bg-purple-900/30 rounded-lg flex items-center justify-center'>
-                  <HelpCircle className='h-6 w-6 text-purple-400' />
+                  <Icons.HelpCircle className='h-6 w-6 text-purple-400' />
                 </div>
               </div>
             </CardContent>
@@ -402,7 +257,7 @@ export default function FAQsPage() {
                   <h3 className='text-2xl font-bold text-white mt-1'>{uniqueCategories.length}</h3>
                 </div>
                 <div className='h-12 w-12 bg-purple-900/30 rounded-lg flex items-center justify-center'>
-                  <BookOpen className='h-6 w-6 text-purple-400' />
+                  <Icons.BookOpen className='h-6 w-6 text-purple-400' />
                 </div>
               </div>
             </CardContent>
@@ -416,7 +271,7 @@ export default function FAQsPage() {
                   <h3 className='text-2xl font-bold text-white mt-1'>{faqs.filter((faq) => faq.isPublished).length}</h3>
                 </div>
                 <div className='h-12 w-12 bg-purple-900/30 rounded-lg flex items-center justify-center'>
-                  <Eye className='h-6 w-6 text-purple-400' />
+                  <Icons.Eye className='h-6 w-6 text-purple-400' />
                 </div>
               </div>
             </CardContent>
@@ -435,7 +290,7 @@ export default function FAQsPage() {
                   Tìm kiếm
                 </Label>
                 <div className='relative'>
-                  <Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
+                  <Icons.Search className='absolute left-2.5 top-2.5 h-4 w-4 text-gray-400' />
                   <Input
                     id='search'
                     type='search'
@@ -502,17 +357,17 @@ export default function FAQsPage() {
                     size='sm'
                     className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                   >
-                    <Eye className='h-4 w-4 mr-1' /> Xuất bản
+                    <Icons.Eye className='h-4 w-4 mr-1' /> Xuất bản
                   </Button>
                   <Button
                     variant='outline'
                     size='sm'
                     className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                   >
-                    <EyeOff className='h-4 w-4 mr-1' /> Ẩn
+                    <Icons.EyeOff className='h-4 w-4 mr-1' /> Ẩn
                   </Button>
                   <Button variant='destructive' size='sm'>
-                    <Trash2 className='h-4 w-4 mr-1' /> Xóa
+                    <Icons.Trash2 className='h-4 w-4 mr-1' /> Xóa
                   </Button>
                 </div>
               )}
@@ -580,7 +435,7 @@ export default function FAQsPage() {
                                 size='icon'
                                 className='h-8 w-8 text-gray-400 hover:text-white hover:bg-gray-800'
                               >
-                                <MoreHorizontal className='h-4 w-4' />
+                                <Icons.MoreHorizontal className='h-4 w-4' />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className='bg-gray-800 border-gray-700 text-white'>
@@ -590,22 +445,22 @@ export default function FAQsPage() {
                                 className='hover:bg-gray-700 cursor-pointer'
                                 onClick={() => handleEditFAQ(faq)}
                               >
-                                <Edit className='h-4 w-4 mr-2' /> Chỉnh sửa
+                                <Icons.Edit className='h-4 w-4 mr-2' /> Chỉnh sửa
                               </DropdownMenuItem>
                               <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer'>
                                 {faq.isPublished ? (
                                   <>
-                                    <EyeOff className='h-4 w-4 mr-2' /> Ẩn
+                                    <Icons.EyeOff className='h-4 w-4 mr-2' /> Ẩn
                                   </>
                                 ) : (
                                   <>
-                                    <Eye className='h-4 w-4 mr-2' /> Xuất bản
+                                    <Icons.Eye className='h-4 w-4 mr-2' /> Xuất bản
                                   </>
                                 )}
                               </DropdownMenuItem>
                               <DropdownMenuSeparator className='bg-gray-700' />
                               <DropdownMenuItem className='text-red-500 hover:bg-gray-700 cursor-pointer'>
-                                <Trash2 className='h-4 w-4 mr-2' /> Xóa
+                                <Icons.Trash2 className='h-4 w-4 mr-2' /> Xóa
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -630,7 +485,7 @@ export default function FAQsPage() {
                     disabled={currentPage === 1}
                     className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                   >
-                    <ChevronLeft className='h-4 w-4' />
+                    <Icons.ChevronLeft className='h-4 w-4' />
                   </Button>
                   {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                     <Button
@@ -654,7 +509,7 @@ export default function FAQsPage() {
                     disabled={currentPage === totalPages}
                     className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white'
                   >
-                    <ChevronRight className='h-4 w-4' />
+                    <Icons.ChevronRight className='h-4 w-4' />
                   </Button>
                 </div>
               </div>

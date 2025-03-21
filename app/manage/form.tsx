@@ -1,26 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  TrendingUp,
-  DollarSign,
-  Users,
-  BookOpen,
-  Star,
-  Download,
-  Eye,
-  BarChart2,
-  Activity,
-  Calendar,
-  Award,
-  CreditCard
-} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart'
 import { Bar, BarChart, Line, LineChart, XAxis, YAxis, ResponsiveContainer } from 'recharts'
 import { exportToExcel, formatCurrency } from '@/lib/excel'
+import { Icons } from '@/components/ui/icons'
 
 export default function DashboardPage() {
   const [period, setPeriod] = useState('week')
@@ -104,11 +91,11 @@ export default function DashboardPage() {
             className='bg-gray-800 border-purple-500 hover:bg-purple-700 text-white w-full sm:w-auto text-xs sm:text-sm'
             onClick={handleExportExcel}
           >
-            <Download className='w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2' />
+            <Icons.Download className='w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2' />
             <span>Xuất Excel</span>
           </Button>
           <Button className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto text-xs sm:text-sm'>
-            <Eye className='w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2' />
+            <Icons.Eye className='w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2' />
             <span>Xem chi tiết</span>
           </Button>
         </div>
@@ -123,7 +110,7 @@ export default function DashboardPage() {
               value='overview'
               className='text-white data-[state=active]:bg-purple-600 transition-all duration-200 text-xs sm:text-sm py-2'
             >
-              <Activity className='w-4 h-4 mr-1 sm:mr-2' />
+              <Icons.Activity className='w-4 h-4 mr-1 sm:mr-2' />
               <span className='hidden sm:inline'>Tổng quan</span>
               <span className='sm:hidden'>Tổng</span>
             </TabsTrigger>
@@ -131,7 +118,7 @@ export default function DashboardPage() {
               value='revenue'
               className='text-white data-[state=active]:bg-purple-600 transition-all duration-200 text-xs sm:text-sm py-2'
             >
-              <BarChart2 className='w-4 h-4 mr-1 sm:mr-2' />
+              <Icons.BarChart2 className='w-4 h-4 mr-1 sm:mr-2' />
               <span className='hidden sm:inline'>Doanh thu</span>
               <span className='sm:hidden'>Doanh</span>
             </TabsTrigger>
@@ -139,7 +126,7 @@ export default function DashboardPage() {
               value='reviews'
               className='text-white data-[state=active]:bg-purple-600 transition-all duration-200 text-xs sm:text-sm py-2'
             >
-              <Star className='w-4 h-4 mr-1 sm:mr-2' />
+              <Icons.Star className='w-4 h-4 mr-1 sm:mr-2' />
               <span className='hidden sm:inline'>Đánh giá</span>
               <span className='sm:hidden'>Đánh</span>
             </TabsTrigger>
@@ -280,7 +267,7 @@ export default function DashboardPage() {
                   <CardContent className='p-4'>
                     <div className='flex items-center gap-3'>
                       <div className='bg-purple-900/50 p-2 rounded-lg'>
-                        <CreditCard className='w-5 h-5 text-purple-400' />
+                        <Icons.CreditCard className='w-5 h-5 text-purple-400' />
                       </div>
                       <div>
                         <p className='text-sm text-gray-400'>Tổng giao dịch</p>
@@ -294,7 +281,7 @@ export default function DashboardPage() {
                   <CardContent className='p-4'>
                     <div className='flex items-center gap-3'>
                       <div className='bg-purple-900/50 p-2 rounded-lg'>
-                        <Calendar className='w-5 h-5 text-purple-400' />
+                        <Icons.Calendar className='w-5 h-5 text-purple-400' />
                       </div>
                       <div>
                         <p className='text-sm text-gray-400'>Trung bình/ngày</p>
@@ -308,7 +295,7 @@ export default function DashboardPage() {
                   <CardContent className='p-4'>
                     <div className='flex items-center gap-3'>
                       <div className='bg-purple-900/50 p-2 rounded-lg'>
-                        <Award className='w-5 h-5 text-purple-400' />
+                        <Icons.Award className='w-5 h-5 text-purple-400' />
                       </div>
                       <div>
                         <p className='text-sm text-gray-400'>Khóa học bán chạy</p>
@@ -435,7 +422,7 @@ export default function DashboardPage() {
                                   <span
                                     className={`inline-flex items-center ${growth >= 0 ? 'text-green-500' : 'text-red-500'}`}
                                   >
-                                    <TrendingUp className='w-3 h-3 mr-1' />
+                                    <Icons.TrendingUp className='w-3 h-3 mr-1' />
                                     {growth.toFixed(1)}%
                                   </span>
                                 </td>
@@ -533,7 +520,7 @@ export default function DashboardPage() {
                             {Array(5)
                               .fill(0)
                               .map((_, i) => (
-                                <Star
+                                <Icons.Star
                                   key={i}
                                   className={`w-3 h-3 sm:w-4 sm:h-4 ${i < review.rating ? 'text-yellow-400' : 'text-gray-600'}`}
                                 />
@@ -567,11 +554,11 @@ export default function DashboardPage() {
                   <p className='text-xs sm:text-sm text-gray-400'>Tổng người dùng</p>
                   <h3 className='text-xl sm:text-2xl md:text-3xl font-bold text-purple-400 mt-1'>1,245</h3>
                   <p className='text-xs sm:text-sm text-green-500 mt-1 flex items-center'>
-                    <TrendingUp className='w-3 h-3 sm:w-4 sm:h-4 mr-1' /> +12.5%
+                    <Icons.TrendingUp className='w-3 h-3 sm:w-4 sm:h-4 mr-1' /> +12.5%
                   </p>
                 </div>
                 <div className='bg-purple-900/50 p-2 sm:p-3 rounded-lg'>
-                  <Users className='w-6 h-6 sm:w-8 sm:h-8 text-purple-400' />
+                  <Icons.Users className='w-6 h-6 sm:w-8 sm:h-8 text-purple-400' />
                 </div>
               </div>
             </CardContent>
@@ -584,11 +571,11 @@ export default function DashboardPage() {
                   <p className='text-xs sm:text-sm text-gray-400'>Tổng khóa học</p>
                   <h3 className='text-xl sm:text-2xl md:text-3xl font-bold text-purple-400 mt-1'>78</h3>
                   <p className='text-xs sm:text-sm text-green-500 mt-1 flex items-center'>
-                    <TrendingUp className='w-3 h-3 sm:w-4 sm:h-4 mr-1' /> +8.3%
+                    <Icons.TrendingUp className='w-3 h-3 sm:w-4 sm:h-4 mr-1' /> +8.3%
                   </p>
                 </div>
                 <div className='bg-purple-900/50 p-2 sm:p-3 rounded-lg'>
-                  <BookOpen className='w-6 h-6 sm:w-8 sm:h-8 text-purple-400' />
+                  <Icons.BookOpen className='w-6 h-6 sm:w-8 sm:h-8 text-purple-400' />
                 </div>
               </div>
             </CardContent>
@@ -601,11 +588,11 @@ export default function DashboardPage() {
                   <p className='text-xs sm:text-sm text-gray-400'>Tổng doanh thu</p>
                   <h3 className='text-xl sm:text-2xl md:text-3xl font-bold text-purple-400 mt-1'>45.8M</h3>
                   <p className='text-xs sm:text-sm text-green-500 mt-1 flex items-center'>
-                    <TrendingUp className='w-3 h-3 sm:w-4 sm:h-4 mr-1' /> +15.2%
+                    <Icons.TrendingUp className='w-3 h-3 sm:w-4 sm:h-4 mr-1' /> +15.2%
                   </p>
                 </div>
                 <div className='bg-purple-900/50 p-2 sm:p-3 rounded-lg'>
-                  <DollarSign className='w-6 h-6 sm:w-8 sm:h-8 text-purple-400' />
+                  <Icons.DollarSign className='w-6 h-6 sm:w-8 sm:h-8 text-purple-400' />
                 </div>
               </div>
             </CardContent>
@@ -618,11 +605,11 @@ export default function DashboardPage() {
                   <p className='text-xs sm:text-sm text-gray-400'>Đánh giá trung bình</p>
                   <h3 className='text-xl sm:text-2xl md:text-3xl font-bold text-purple-400 mt-1'>4.7</h3>
                   <p className='text-xs sm:text-sm text-green-500 mt-1 flex items-center'>
-                    <TrendingUp className='w-3 h-3 sm:w-4 sm:h-4 mr-1' /> +0.3
+                    <Icons.TrendingUp className='w-3 h-3 sm:w-4 sm:h-4 mr-1' /> +0.3
                   </p>
                 </div>
                 <div className='bg-purple-900/50 p-2 sm:p-3 rounded-lg'>
-                  <Star className='w-6 h-6 sm:w-8 sm:h-8 text-purple-400' />
+                  <Icons.Star className='w-6 h-6 sm:w-8 sm:h-8 text-purple-400' />
                 </div>
               </div>
             </CardContent>

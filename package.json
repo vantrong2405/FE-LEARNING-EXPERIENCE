@@ -8,8 +8,8 @@
     "start": "next start",
     "lint": "eslint . --max-warnings 0",
     "lint:fix": "eslint --fix .",
-    "prettier": "prettier --check \"{app,components,stores,constants,lib}/**/*.{tsx,ts,css,scss}\"",
-    "prettier:fix": "prettier --write \"{app,components,stores,constants,lib}/**/*.{tsx,ts,css,scss}\"",
+    "prettier": "prettier --check \"app/**/*.{tsx,ts,css,scss}\" \"components/**/*.{tsx,ts,css,scss}\" \"stores/**/*.{tsx,ts,css,scss}\" \"constants/**/*.{tsx,ts,css,scss}\" \"lib/**/*.{tsx,ts,css,scss}\" \"models/**/*.{tsx,ts,css,scss}\"",
+    "format": "prettier --write \"components/**/*.{tsx,ts,css,scss}\" \"stores/**/*.{tsx,ts,css,scss}\" \"constants/**/*.{tsx,ts,css,scss}\" \"lib/**/*.{tsx,ts,css,scss}\" \"models/**/*.{tsx,ts,css,scss}\"",
     "prepare": "husky install",
     "lint-staged": "lint-staged"
   },

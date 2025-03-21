@@ -7,16 +7,8 @@ import AudioPlayer from '@/components/common/AudioPlayer'
 import LazyLoading from '@/components/common/lazy-loading'
 import AppProvider from '@/components/ui/app-provider'
 import { Toaster } from 'sonner'
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin']
-})
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin']
-})
+import AuthGuard from './auth-layout'
+import { Suspense } from 'react'
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -31,15 +23,19 @@ export default function RootLayout({
   return (
     <html lang='en' suppressHydrationWarning>
       <body className='transition-colors duration-300'>
-        <Toaster richColors position='bottom-right' />
-        <AppProvider>
-          <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
-            {children}
-          </ThemeProvider>
-        </AppProvider>
-        <AudioPlayer />
-        <LazyLoading />
-        {/* <NProgressHandler /> */}
+        <Suspense>
+          <AuthGuard>
+            <Toaster richColors position='bottom-right' />
+            <AppProvider>
+              <ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
+                {children}
+              </ThemeProvider>
+            </AppProvider>
+            <AudioPlayer />
+            <LazyLoading />
+          </AuthGuard>
+          {/* <NProgressHandler /> */}
+        </Suspense>
       </body>
     </html>
   )

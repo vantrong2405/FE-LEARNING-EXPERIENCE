@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -26,13 +26,16 @@ import { toast } from 'sonner'
 
 export default function AdminLogin() {
   const router = useRouter()
-
-  const accessToken = getAccessTokenFromLocalStorage()
-  const refreshToken = getRefreshTokenFromLocalStorage()
-  if (accessToken && refreshToken) {
-    router.back()
-  }
   const [showPassword, setShowPassword] = useState(false)
+
+  useEffect(() => {
+    const accessToken = getAccessTokenFromLocalStorage()
+    const refreshToken = getRefreshTokenFromLocalStorage()
+
+    if (accessToken && refreshToken) {
+      router.replace(pathURL.manage)
+    }
+  }, [router])
 
   const form = useForm<LoginBodyType>({
     resolver: zodResolver(LoginBody),

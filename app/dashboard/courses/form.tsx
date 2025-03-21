@@ -18,27 +18,25 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useCourseQuery } from '@/queries/useCourse'
 import { useCategoryListQuery } from '@/queries/useCategory'
 import { useLevelListQuery } from '@/queries/useLevel'
-import { pagination, paginationGeneral } from '@/constants/pagination-config'
+import { pagination } from '@/constants/pagination-config'
 import { PaginationDemo } from '@/lib/pagination'
-import { useRouter } from 'next/navigation'
 
 export default function CoursesPage() {
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(pagination.PAGE)
+  const [selectedCategory, setSelectedCategory] = useState('All')
+  const [priceRange, setPriceRange] = useState([0, 500000])
+  const [searchQuery, setSearchQuery] = useState('')
+
   const courseQuery = useCourseQuery(pagination.LIMIT, page)
-  const categoryQuery = useCategoryListQuery(paginationGeneral.LIMIT, pagination.PAGE)
-  const levelQuery = useLevelListQuery(paginationGeneral.LIMIT, pagination.PAGE)
+
+  const categoryQuery = useCategoryListQuery(pagination.LIMIT, pagination.PAGE)
+  const levelQuery = useLevelListQuery(pagination.LIMIT, pagination.PAGE)
 
   const courses = courseQuery.data?.payload.data.data ?? []
   const data = courseQuery.data?.payload.data.pagination
-
   const categories = categoryQuery.data?.payload.data.data ?? []
   const levels = levelQuery.data?.payload.data.data ?? []
-  const [selectedCategory, setSelectedCategory] = useState('All')
-  const [priceRange, setPriceRange] = useState([0, 1000000])
-  const [searchQuery, setSearchQuery] = useState('')
   const [filteredCourses, setFilteredCourses] = useState(courses)
-
-  const router = useRouter()
 
   useEffect(() => {
     if (!courses.length) return
@@ -62,8 +60,6 @@ export default function CoursesPage() {
     setPage(newPage)
   }, [])
   const handleFilter = () => {
-    // Implement your filter logic here
-    console.log('Filtering with:', { searchQuery, priceRange, category, level })
     setIsDialogOpen(false)
   }
 
@@ -288,7 +284,7 @@ export default function CoursesPage() {
 
       <section className='space-y-6'>
         <h2 className='text-2xl font-semibold text-gray-900 dark:text-white'>All Courses</h2>
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
           {filteredCourses.map((course, index) => (
             <Card
               key={index}
@@ -310,24 +306,28 @@ export default function CoursesPage() {
                 <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-1'>
                   {course.title}
                 </h3>
-                <p className='text-sm text-gray-600 dark:text-gray-400 mb-2'>{course.category.name}</p>
-                <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2'>
-                  <Users className='h-4 w-4' />
-                  <span>{course.instructor.name}</span>
+                <div className='flex justify-between'>
+                  <p className='text-sm text-gray-600 dark:text-gray-400 mb-2'>{course.category.name}</p>
+                  <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2'>
+                    <Users className='h-4 w-4' />
+                    <span>{course.instructor.name}</span>
+                  </div>
                 </div>
-                <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2'>
-                  <Book className='h-4 w-4' />
-                  <span>{course.articlesCount}</span>
-                  <span>•</span>
-                  <Clock className='h-4 w-4' />
-                  <span>{course.videoHours}</span>
-                </div>
-                <div className='flex items-center gap-2 text-sm text-yellow-500 mb-2'>
-                  <Star className='h-4 w-4 fill-current' />
-                  <span>{course.rating}</span>
-                  <span className='text-gray-600 dark:text-gray-400'>
-                    ({course.totalReviews.toLocaleString()} students)
-                  </span>
+                <div className='flex justify-between'>
+                  <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2'>
+                    <Book className='h-4 w-4' />
+                    <span>{course.articlesCount}</span>
+                    <span>•</span>
+                    <Clock className='h-4 w-4' />
+                    <span>{course.videoHours}</span>
+                  </div>
+                  <div className='flex items-center gap-2 text-sm text-yellow-500 mb-2'>
+                    <Star className='h-4 w-4 fill-current' />
+                    <span>{course.rating}</span>
+                    <span className='text-gray-600 dark:text-gray-400'>
+                      ({course.totalReviews.toLocaleString()} students)
+                    </span>
+                  </div>
                 </div>
               </CardContent>
               <CardFooter className='p-4 bg-gray-100 dark:bg-gray-750 border-t border-gray-300 dark:border-gray-700'>
