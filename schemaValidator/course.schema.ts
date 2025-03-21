@@ -175,3 +175,69 @@ const CourseResSchema = z.object({
 })
 
 export type CoursesResType = z.TypeOf<typeof CourseResSchema>
+
+export const courseSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  description: z.string().min(1, 'Description is required'),
+  price: z.number().positive('Price must be a positive number'),
+  categoryId: z.string(),
+  levelId: z.string(),
+  thumbnailUrl: z.string(),
+  bannerUrl: z.string()
+})
+
+export type CoursesBody = z.TypeOf<typeof courseSchema>
+
+export const instructorSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  username: z.string(),
+  email: z.string().email(),
+  role: z.string(),
+  verify: z.number(),
+  status_account: z.number(),
+  dateOfBirth: z.string().datetime(),
+  avatarUrl: z.string().url(),
+  bio: z.string().nullable(),
+  gender: z.string(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime()
+})
+
+export const categorySchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime()
+})
+
+export const CreatecourseSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string().min(1, 'Title is required'),
+  description: z.string().min(1, 'Description is required'),
+  price: z.number().positive('Price must be a positive number'),
+  thumbnailUrl: z.string().url('Invalid thumbnail URL format'),
+  bannerUrl: z.string().url('Invalid banner URL format'),
+  instructorId: z.string().uuid(),
+  categoryId: z.string().uuid(),
+  isPublished: z.boolean(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
+  rating: z.number(),
+  totalReviews: z.number(),
+  moneyBackGuarantee: z.boolean(),
+  videoHours: z.number(),
+  articlesCount: z.number(),
+  downloadableResources: z.number(),
+  lifetimeAccess: z.boolean(),
+  certificate: z.boolean(),
+  courseOverview: z.string().nullable(),
+  learningObjectives: z.string().nullable(),
+  courseFeatures: z.string().nullable(),
+  requirements: z.string().nullable(),
+  levelId: z.string().uuid(),
+  instructor: instructorSchema,
+  category: categorySchema
+})
+
+export type CreateCourseResType = z.infer<typeof CreatecourseSchema>

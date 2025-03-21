@@ -8,14 +8,13 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { useGetCourseQuery } from '@/queries/useCourse'
 import { Icons } from '@/components/ui/icons'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { pathURL } from '@/constants/path'
 
 const CourseViewer = () => {
   const router = useRouter()
   const videoRef = useRef<HTMLVideoElement>(null)
-  const searchParams = useSearchParams()
-  const courseId = searchParams.get('id')
+  const courseId = localStorage.getItem('courseId')
   const [currentLesson, setCurrentLesson] = useState(0)
   const [currentVideoUrl, setCurrentVideoUrl] = useState<string | null>(null)
 
@@ -23,7 +22,6 @@ const CourseViewer = () => {
   const course = getCourse.data?.payload.data
 
   const handleVideoSelect = (videoUrl: string) => {
-    console.log('Selected video URL:', videoUrl)
     setCurrentVideoUrl(videoUrl)
 
     setTimeout(() => {
@@ -58,16 +56,17 @@ const CourseViewer = () => {
           <div className='flex items-center space-x-4 mb-4 lg:mb-0'>
             {course?.instructor.avatarUrl && (
               <Image
-                src={course.instructor.avatarUrl}
+                src={course.instructor.avatarUrl || '/assets/images/avatar.jpg'}
                 alt={course.instructor.name || 'Instructor'}
                 width={64}
                 height={64}
                 className='rounded-full h-10 w-10'
+                unoptimized
               />
             )}
 
             <div>
-              <h2 className='text-xl lg:text-2xl font-semibold'>{course?.lessons[currentLesson].title}</h2>
+              <h2 className='text-xl lg:text-2xl font-semibold'>{course?.lessons[currentLesson]?.title}</h2>
               <p className='text-gray-400'>Instructor: {course?.instructor.name}</p>
             </div>
           </div>
@@ -103,7 +102,7 @@ const CourseViewer = () => {
               <h3 className='text-xl font-semibold mb-4'>Next Up</h3>
               {course?.lessons[currentLesson + 1] ? (
                 <>
-                  <p className='text-base lg:text-lg text-gray-300 mb-4'>{course.lessons[currentLesson + 1].title}</p>
+                  <p className='text-base lg:text-lg text-gray-300 mb-4'>{course.lessons[currentLesson + 1]?.title}</p>
                   <Button
                     className='w-full bg-purple-600 hover:bg-purple-700 text-white text-base lg:text-lg'
                     onClick={() => setCurrentLesson((prev) => prev + 1)}
@@ -130,7 +129,7 @@ const CourseViewer = () => {
                 value={`section-${sectionIndex}`}
                 className='border-b border-purple-500'
               >
-                <AccordionTrigger className='text-lg hover:text-purple-400'>{section.title}</AccordionTrigger>
+                <AccordionTrigger className='text-lg hover:text-purple-400'>{section?.title}</AccordionTrigger>
                 <AccordionContent>
                   {section.videos.map((lesson, lessonIndex) => (
                     <div
@@ -138,11 +137,11 @@ const CourseViewer = () => {
                       className={`flex items-center justify-between p-3 rounded text-base cursor-pointer ${
                         currentLesson === lessonIndex ? 'bg-purple-600 text-white' : 'hover:bg-gray-700'
                       }`}
-                      onClick={() => handleVideoSelect(lesson.videoUrl)}
+                      onClick={() => handleVideoSelect(lesson?.videoUrl)}
                     >
                       <div className='flex items-center'>
                         <Icons.PlayCircle className='w-5 h-5 mr-3 text-gray-400 flex-shrink-0' />
-                        <span>{lesson.title}</span>
+                        <span>{lesson?.title}</span>
                       </div>
                       <span className='text-sm text-gray-400 ml-2 flex-shrink-0'>{lesson.duration}</span>
                     </div>

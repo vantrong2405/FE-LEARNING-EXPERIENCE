@@ -13,12 +13,20 @@ export const useGetCourseQuery = (id: string) => {
     queryFn: () => courseApiRequest.getCourse(id)
   })
 }
-export const useSearchCourseQuery = (limit: number, page: number, query: string) => {
+export const useSearchCourseQuery = (
+  limit: number,
+  page: number,
+  query: string,
+  categoryId?: string,
+  levelId?: string
+) => {
   return useQuery({
-    queryKey: ['course', page, limit, query],
-    queryFn: () => courseApiRequest.courseSearch(page, limit, query)
+    queryKey: ['course', page, limit, query, categoryId, levelId],
+    queryFn: () => courseApiRequest.courseSearch(limit, page, query, categoryId, levelId),
+    enabled: !!query || !!categoryId || !!levelId
   })
 }
+
 export const useDeleteCourseMutation = () => {
   const queryClient = useQueryClient()
   return useMutation({
@@ -28,5 +36,10 @@ export const useDeleteCourseMutation = () => {
         queryKey: ['course']
       })
     }
+  })
+}
+export const useAddCourseMutation = () => {
+  return useMutation({
+    mutationFn: courseApiRequest.addCouse
   })
 }

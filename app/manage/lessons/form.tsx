@@ -32,11 +32,17 @@ import { exportToExcel } from '@/lib/excel'
 import { Lesson } from '@/models/lesson.type'
 import { Icons } from '@/components/ui/icons'
 import { mockCourses, mockLessons } from '@/database_example/lesson.db'
-import { useLessonByIdQuery } from '@/queries/useLesson'
+import { useAddLessonMutation, useDeleteLessonMutation, useLessonByIdQuery } from '@/queries/useLesson'
 import { pagination } from '@/constants/pagination-config'
 import { useCourseQuery } from '@/queries/useCourse'
+import { useForm } from 'react-hook-form'
+import { lessonBody, LessonBodyType } from '@/schemaValidator/lesson.schema'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
+import { handleErrorApi } from '@/lib/utils'
+import { Switch } from '@/components/ui/switch'
 
-type LessonType = {
+export type LessonType = {
   course: {
     id: string
     title: string
@@ -66,6 +72,7 @@ type LessonType = {
 }
 
 export default function LessonsPage() {
+  const addLessonMutation = useAddLessonMutation()
   const courseQuery = useCourseQuery(pagination.LIMIT, pagination.PAGE)
   const courseList = useMemo(() => {
     return (
@@ -144,18 +151,47 @@ export default function LessonsPage() {
   // }
 
   // Handle add new lesson
-  const handleAddLesson = () => {
-    setCurrentLesson(null)
-    setFormData({
-      id: '',
-      title: '',
+
+  const form = useForm<LessonBodyType>({
+    resolver: zodResolver(lessonBody),
+    defaultValues: {
       courseId: '',
-      order: 1,
-      content: '',
-      status: 'draft',
-      file: null
+      description: '',
+      isPublished: false,
+      order: undefined,
+      title: ''
+    }
+  })
+
+  const handleCreateSubmit = (body: LessonBodyType) => {
+    addLessonMutation.mutate(body, {
+      onSuccess: (data) => {
+        form.reset()
+        setIsAddLessonOpen(false)
+        toast.success('Create Lesson Success !')
+      },
+      onError: (error) => {
+        handleErrorApi({
+          error,
+          setError: form.setError
+        })
+      }
     })
-    setIsAddLessonOpen(true)
+  }
+
+  const { mutateAsync } = useDeleteLessonMutation()
+  const deleteLesson = async (id: string) => {
+    if (id) {
+      try {
+        await mutateAsync(id)
+
+        toast.success('Delete Lesson Successfully')
+      } catch (error) {
+        handleErrorApi({
+          error
+        })
+      }
+    }
   }
 
   // Handle form input change
@@ -219,12 +255,12 @@ export default function LessonsPage() {
   }
 
   // Handle delete lesson
-  const handleDeleteLesson = (id: string) => {
-    if (confirm('Bạn có chắc chắn muốn xóa bài học này?')) {
-      const updatedLessons = lessons.filter((lesson) => lesson.id !== id)
-      setLessons(updatedLessons)
-    }
-  }
+  // const handleDeleteLesson = (id: string) => {
+  //   if (confirm('Bạn có chắc chắn muốn xóa bài học này?')) {
+  //     const updatedLessons = lessons.filter((lesson) => lesson.id !== id)
+  //     setLessons(updatedLessons)
+  //   }
+  // }
 
   // Handle checkbox selection
   const handleSelectLesson = (lessonId: string) => {
@@ -342,44 +378,47 @@ export default function LessonsPage() {
                     Điền thông tin để thêm bài học mới vào khóa học
                   </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={form.handleSubmit(handleCreateSubmit)}>
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-4 py-4'>
                     <div className='space-y-2 md:col-span-2'>
                       <Label htmlFor='title' className='text-white'>
                         Tiêu đề bài học
                       </Label>
                       <Input
+                        {...form.register('title')}
                         id='title'
-                        name='title'
                         placeholder='Nhập tiêu đề bài học'
-                        className='bg-gray-800 border-gray-700 text-white'
-                        value={formData.title}
-                        onChange={handleInputChange}
-                        required
+                        className={`bg-gray-800 border text-white 
+                          ${form.formState.errors.title ? 'border-red-500' : 'border-gray-700'}`}
                       />
+                      {form.formState.errors.title && (
+                        <p className='text-red-500 text-sm'>{form.formState.errors.title.message}</p>
+                      )}
                     </div>
 
                     <div className='space-y-2'>
                       <Label htmlFor='courseId' className='text-white'>
                         Khóa học
                       </Label>
-                      <Select
-                        name='courseId'
-                        value={formData.courseId}
-                        onValueChange={(value) => handleSelectChange('courseId', value)}
-                        required
-                      >
-                        <SelectTrigger id='courseId' className='bg-gray-800 border-gray-700 text-white'>
+                      <Select onValueChange={(value) => form.setValue('courseId', value)}>
+                        <SelectTrigger
+                          id='courseId'
+                          className={`bg-gray-800 border text-white 
+                          ${form.formState.errors.courseId ? 'border-red-500' : 'border-gray-700'}`}
+                        >
                           <SelectValue placeholder='Chọn khóa học' />
                         </SelectTrigger>
                         <SelectContent className='bg-gray-800 border-gray-700 text-white'>
-                          {mockCourses.map((course) => (
+                          {courseList.map((course) => (
                             <SelectItem key={course.id} value={course.id}>
-                              {course.name}
+                              {course.title}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
+                      {form.formState.errors.courseId && (
+                        <p className='text-red-500 text-sm'>{form.formState.errors.courseId.message}</p>
+                      )}
                     </div>
 
                     <div className='space-y-2'>
@@ -387,15 +426,16 @@ export default function LessonsPage() {
                         Thứ tự bài học
                       </Label>
                       <Input
+                        {...form.register('order', { valueAsNumber: true })}
                         id='order'
-                        name='order'
                         type='number'
                         min='1'
-                        className='bg-gray-800 border-gray-700 text-white'
-                        value={formData.order}
-                        onChange={handleInputChange}
-                        required
+                        className={`bg-gray-800 border text-white ${form.formState.errors.order ? 'border-red-500' : 'border-gray-700'}`}
                       />
+
+                      {form.formState.errors.order && (
+                        <p className='text-red-500 text-sm'>{form.formState.errors.order.message}</p>
+                      )}
                     </div>
 
                     <div className='space-y-2 md:col-span-2'>
@@ -403,46 +443,27 @@ export default function LessonsPage() {
                         Nội dung bài học
                       </Label>
                       <Textarea
-                        id='content'
-                        name='content'
+                        {...form.register('description')}
+                        id='description'
                         placeholder='Nhập nội dung chi tiết của bài học'
-                        className='bg-gray-800 border-gray-700 text-white min-h-[120px]'
-                        value={formData.content}
-                        onChange={handleInputChange}
-                        required
+                        className={`bg-gray-800 border text-white 
+                          ${form.formState.errors.description ? 'border-red-500' : 'border-gray-700'}`}
                       />
+                      {form.formState.errors.description && (
+                        <p className='text-red-500 text-sm'>{form.formState.errors.description.message}</p>
+                      )}
                     </div>
-
-                    <div className='space-y-2'>
-                      <Label htmlFor='status' className='text-white'>
-                        Trạng thái
-                      </Label>
-                      <Select
-                        name='status'
-                        value={formData.status}
-                        onValueChange={(value) => handleSelectChange('status', value)}
-                      >
-                        <SelectTrigger id='status' className='bg-gray-800 border-gray-700 text-white'>
-                          <SelectValue placeholder='Chọn trạng thái' />
-                        </SelectTrigger>
-                        <SelectContent className='bg-gray-800 border-gray-700 text-white'>
-                          <SelectItem value='draft'>Bản nháp</SelectItem>
-                          <SelectItem value='published'>Đã xuất bản</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div className='space-y-2'>
-                      <Label htmlFor='file' className='text-white'>
-                        Tài liệu bài học
-                      </Label>
-                      <Input
-                        id='file'
-                        name='file'
-                        type='file'
-                        className='bg-gray-800 border-gray-700 text-white'
-                        onChange={handleFileChange}
-                      />
+                    <div className='space-y-2 md:col-span-2'>
+                      <div className='flex items-center space-x-2'>
+                        <Switch
+                          id='isPublished'
+                          checked={form.watch('isPublished')}
+                          onCheckedChange={(value) => form.setValue('isPublished', value)}
+                        />
+                        <Label htmlFor='isPublished' className='text-white'>
+                          {form.watch('isPublished') ? 'Bật' : 'Tắt'}
+                        </Label>
+                      </div>
                     </div>
                   </div>
 
@@ -680,7 +701,7 @@ export default function LessonsPage() {
                               <DropdownMenuSeparator className='bg-gray-700' />
                               <DropdownMenuItem
                                 className='text-red-500 hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'
-                                onClick={() => handleDeleteLesson(lesson.id)}
+                                onClick={() => deleteLesson(lesson.id)}
                               >
                                 <Icons.Trash2 className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Xóa
                               </DropdownMenuItem>

@@ -97,13 +97,13 @@ export default function CoursesPage() {
                 <div className='space-y-4 py-4'>
                   <div className='space-y-2'>
                     <Label htmlFor='category'>Category</Label>
-                    <Select value={category} onValueChange={setCategory}>
+                    <Select value={category} onValueChange={(value) => setCategory(value)}>
                       <SelectTrigger id='category'>
                         <SelectValue placeholder='Select category' />
                       </SelectTrigger>
                       <SelectContent>
                         {categories.map((cat) => (
-                          <SelectItem key={cat.id} value={cat.name}>
+                          <SelectItem key={cat.id} value={cat.id}>
                             {cat.name}
                           </SelectItem>
                         ))}
@@ -112,13 +112,13 @@ export default function CoursesPage() {
                   </div>
                   <div className='space-y-2'>
                     <Label htmlFor='level'>Level</Label>
-                    <Select value={level} onValueChange={setLevel}>
+                    <Select value={level} onValueChange={(value) => setLevel(value)}>
                       <SelectTrigger id='level'>
                         <SelectValue placeholder='Select level' />
                       </SelectTrigger>
                       <SelectContent>
                         {levels.map((lvl) => (
-                          <SelectItem key={lvl.id} value={lvl.name}>
+                          <SelectItem key={lvl.id} value={lvl.id}>
                             {lvl.name}
                           </SelectItem>
                         ))}
@@ -213,72 +213,72 @@ export default function CoursesPage() {
           </Button>
         </div>
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-          {filteredCourses.slice(0, 3).map((course, index) => (
-            <Card
-              key={course.id} // Dùng course.id nếu có, tránh lỗi key
-              className='bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow duration-300'
-            >
-              <CardHeader className='p-0'>
-                <div className='relative w-full h-48'>
-                  <Image
-                    src={course.thumbnailUrl && course.thumbnailUrl.trim() !== '' ? course.thumbnailUrl : ''}
-                    alt={course.title}
-                    fill
-                    className='object-cover'
-                  />
-
-                  {course.description && (
-                    <Badge className='absolute top-2 left-2 bg-purple-500 text-white'>{course.title}</Badge>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className='p-4'>
-                <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-1'>
-                  {course.title ?? 'Untitled Course'}
-                </h3>
-                <p className='text-sm text-gray-600 dark:text-gray-400 mb-2'>
-                  {course.category?.name ?? 'No Category'}
-                </p>
-                <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2'>
-                  <Users className='h-4 w-4' />
-                  <span>{course.instructor?.name ?? 'Unknown Instructor'}</span>
-                </div>
-                <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2'>
-                  <Book className='h-4 w-4' />
-                  <span>{course.articlesCount ?? 0} lessons</span>
-                  <span>•</span>
-                  <Clock className='h-4 w-4' />
-                  <span>{course.videoHours ?? 'Unknown duration'}</span>
-                </div>
-                <div className='flex items-center gap-2 text-sm text-yellow-500 mb-2'>
-                  <Star className='h-4 w-4 fill-current' />
-                  <span>{course.rating ?? 'N/A'}</span>
-                  <span className='text-gray-600 dark:text-gray-400'>
-                    ({course.totalReviews?.toLocaleString() ?? 0} students)
-                  </span>
-                </div>
-              </CardContent>
-              <CardFooter className='p-4 bg-gray-100 border-t border-gray-300 dark:border-gray-700'>
-                <div className='flex items-center justify-between w-full'>
-                  <div>
-                    <span className='text-lg font-bold text-gray-900 dark:text-black'>
-                      {course.price?.toLocaleString() ?? 0}đ
-                    </span>
-                    {course.price && (
-                      <span className='text-sm text-gray-600 dark:text-gray-400 line-through ml-2'>
-                        {course.price.toLocaleString()}đ
-                      </span>
+          {filteredCourses
+            .filter((course) => course.rating && course.rating >= 4.8) // Lọc các khóa học có rating >= 4.8
+            .slice(0, 3)
+            .map((course, index) => (
+              <Card
+                key={course.id}
+                className='bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow duration-300'
+              >
+                <CardHeader className='p-0'>
+                  <div className='relative w-full h-48'>
+                    <Image
+                      src={course.thumbnailUrl && course.thumbnailUrl.trim() !== '' ? course.thumbnailUrl : ''}
+                      alt={course.title}
+                      fill
+                      className='object-cover'
+                    />
+                    {course.description && (
+                      <Badge className='absolute top-2 left-2 bg-purple-500 text-white'>{course.title}</Badge>
                     )}
                   </div>
-                  <Link href={pathURL.courses_detail(course.id ?? '')}>
-                    {' '}
-                    {/* Tránh truyền giá trị cố định */}
-                    <Button className='bg-purple-600 hover:bg-purple-700 text-white'>View Details</Button>
-                  </Link>
-                </div>
-              </CardFooter>
-            </Card>
-          ))}
+                </CardHeader>
+                <CardContent className='p-4'>
+                  <h3 className='text-lg font-semibold text-gray-900 dark:text-white mb-2 line-clamp-1'>
+                    {course.title ?? 'Untitled Course'}
+                  </h3>
+                  <p className='text-sm text-gray-600 dark:text-gray-400 mb-2'>
+                    {course.category?.name ?? 'No Category'}
+                  </p>
+                  <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2'>
+                    <Users className='h-4 w-4' />
+                    <span>{course.instructor?.name ?? 'Unknown Instructor'}</span>
+                  </div>
+                  <div className='flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2'>
+                    <Book className='h-4 w-4' />
+                    <span>{course.articlesCount ?? 0} lessons</span>
+                    <span>•</span>
+                    <Clock className='h-4 w-4' />
+                    <span>{course.videoHours ?? 'Unknown duration'}</span>
+                  </div>
+                  <div className='flex items-center gap-2 text-sm text-yellow-500 mb-2'>
+                    <Star className='h-4 w-4 fill-current' />
+                    <span>{course.rating ?? 'N/A'}</span>
+                    <span className='text-gray-600 dark:text-gray-400'>
+                      ({course.totalReviews?.toLocaleString() ?? 0} students)
+                    </span>
+                  </div>
+                </CardContent>
+                <CardFooter className='p-4 bg-gray-100 border-t border-gray-300 dark:border-gray-700'>
+                  <div className='flex items-center justify-between w-full'>
+                    <div>
+                      <span className='text-lg font-bold text-gray-900 dark:text-black'>
+                        {course.price?.toLocaleString() ?? 0}đ
+                      </span>
+                      {course.price && (
+                        <span className='text-sm text-gray-600 dark:text-gray-400 line-through ml-2'>
+                          {course.price.toLocaleString()}đ
+                        </span>
+                      )}
+                    </div>
+                    <Link href={pathURL.courses_detail(course.id ?? '')}>
+                      <Button className='bg-purple-600 hover:bg-purple-700 text-white'>View Details</Button>
+                    </Link>
+                  </div>
+                </CardFooter>
+              </Card>
+            ))}
         </div>
       </section>
 

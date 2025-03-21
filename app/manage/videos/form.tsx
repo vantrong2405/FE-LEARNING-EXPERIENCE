@@ -2,7 +2,7 @@
 
 import type React from 'react'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -30,115 +30,19 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Textarea } from '@/components/ui/textarea'
 import { exportToExcel } from '@/lib/excel'
 import { Icons } from '@/components/ui/icons'
+import { useAddVideoMutation, useDeleteVideoMutation } from '@/queries/useVideo'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { videoSchema, VideoTypeBody } from '@/schemaValidator/video.schema'
+import { useUploadVideoMediaMutation } from '@/queries/useMedia'
+import { toast } from 'sonner'
+import { handleErrorApi } from '@/lib/utils'
+import { useCourseQuery } from '@/queries/useCourse'
+import { pagination } from '@/constants/pagination-config'
+import { useLessonByIdQuery } from '@/queries/useLesson'
+import { LessonType } from '@/app/manage/lessons/form'
 
 // Mock data for videos
-const mockVideos = [
-  {
-    id: '1',
-    title: 'Giới thiệu JavaScript',
-    lessonId: '1',
-    lessonTitle: 'Giới thiệu JavaScript',
-    courseId: '1',
-    courseName: 'JavaScript Cơ Bản',
-    order: 1,
-    description: 'Video giới thiệu về ngôn ngữ lập trình JavaScript và lịch sử phát triển.',
-    url: 'https://www.youtube.com/watch?v=MVMoBwPdbiI&list=RDMVMoBwPdbiI&start_radio=1',
-    duration: 720, // seconds
-    createdAt: '2024-05-15T10:00:00Z',
-    updatedAt: '2024-05-16T14:30:00Z',
-    status: 'published'
-  },
-  {
-    id: '2',
-    title: 'Biến và Kiểu dữ liệu cơ bản',
-    lessonId: '2',
-    lessonTitle: 'Biến và Kiểu dữ liệu',
-    courseId: '1',
-    courseName: 'JavaScript Cơ Bản',
-    order: 1,
-    description: 'Video hướng dẫn về biến và các kiểu dữ liệu cơ bản trong JavaScript.',
-    url: 'https://www.youtube.com/watch?v=MVMoBwPdbiI&list=RDMVMoBwPdbiI&start_radio=1',
-    duration: 840, // seconds
-    createdAt: '2024-05-15T11:00:00Z',
-    updatedAt: '2024-05-16T15:30:00Z',
-    status: 'published'
-  },
-  {
-    id: '3',
-    title: 'Kiểu dữ liệu nâng cao',
-    lessonId: '2',
-    lessonTitle: 'Biến và Kiểu dữ liệu',
-    courseId: '1',
-    courseName: 'JavaScript Cơ Bản',
-    order: 2,
-    description: 'Video hướng dẫn về các kiểu dữ liệu nâng cao trong JavaScript.',
-    url: 'https://www.youtube.com/watch?v=MVMoBwPdbiI&list=RDMVMoBwPdbiI&start_radio=1',
-    duration: 960, // seconds
-    createdAt: '2024-05-15T12:00:00Z',
-    updatedAt: '2024-05-16T16:30:00Z',
-    status: 'draft'
-  },
-  {
-    id: '4',
-    title: 'Giới thiệu về React Components',
-    lessonId: '3',
-    lessonTitle: 'Components và Props',
-    courseId: '2',
-    courseName: 'React Advanced',
-    order: 1,
-    description: 'Video giới thiệu về React Components và cách sử dụng.',
-    url: 'https://www.youtube.com/watch?v=MVMoBwPdbiI&list=RDMVMoBwPdbiI&start_radio=1',
-    duration: 1080, // seconds
-    createdAt: '2024-05-16T09:00:00Z',
-    updatedAt: '2024-05-17T10:30:00Z',
-    status: 'published'
-  },
-  {
-    id: '5',
-    title: 'Truyền dữ liệu với Props',
-    lessonId: '3',
-    lessonTitle: 'Components và Props',
-    courseId: '2',
-    courseName: 'React Advanced',
-    order: 2,
-    description: 'Video hướng dẫn cách truyền dữ liệu giữa các components với Props.',
-    url: 'https://www.youtube.com/watch?v=MVMoBwPdbiI&list=RDMVMoBwPdbiI&start_radio=1',
-    duration: 1200, // seconds
-    createdAt: '2024-05-16T10:00:00Z',
-    updatedAt: '2024-05-17T11:30:00Z',
-    status: 'published'
-  },
-  {
-    id: '6',
-    title: 'Hooks trong React',
-    lessonId: '5',
-    lessonTitle: 'Hooks cơ bản',
-    courseId: '2',
-    courseName: 'React Advanced',
-    order: 1,
-    description: 'Video hướng dẫn về các hooks cơ bản trong React.',
-    url: 'https://www.youtube.com/watch?v=MVMoBwPdbiI&list=RDMVMoBwPdbiI&start_radio=1',
-    duration: 1500, // seconds
-    createdAt: '2024-05-16T11:00:00Z',
-    updatedAt: '2024-05-17T12:30:00Z',
-    status: 'draft'
-  },
-  {
-    id: '7',
-    title: 'Giới thiệu Python',
-    lessonId: '6',
-    lessonTitle: 'Giới thiệu Python',
-    courseId: '3',
-    courseName: 'Python for Data Science',
-    order: 1,
-    description: 'Video giới thiệu về ngôn ngữ lập trình Python.',
-    url: 'https://www.youtube.com/watch?v=MVMoBwPdbiI&list=RDMVMoBwPdbiI&start_radio=1',
-    duration: 1320, // seconds
-    createdAt: '2024-05-17T09:00:00Z',
-    updatedAt: '2024-05-18T10:30:00Z',
-    status: 'published'
-  }
-]
 
 // Mock data for courses
 const mockCourses = [
@@ -159,26 +63,21 @@ const mockLessons = [
   { id: '7', title: 'NumPy và Pandas', courseId: '3' }
 ]
 
-interface VideoType {
+type VideoType = {
   id: string
-  title: string
   lessonId: string
-  lessonTitle: string
   courseId: string
-  courseName: string
-  order: number
-  description: string
-  url: string
+  orderLesson: number
+  title: string
+  description: string | null
+  videoUrl: string
   duration: number
   createdAt: string
   updatedAt: string
-  status: string
 }
 
 export default function VideosPage() {
-  const [videos, setVideos] = useState<VideoType[]>(mockVideos)
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedCourse, setSelectedCourse] = useState('all')
   const [selectedLesson, setSelectedLesson] = useState('all')
   const [selectedStatus, setSelectedStatus] = useState('all')
   const [isAddVideoOpen, setIsAddVideoOpen] = useState(false)
@@ -189,17 +88,123 @@ export default function VideosPage() {
   const [selectedVideos, setSelectedVideos] = useState<string[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [filteredLessons, setFilteredLessons] = useState(mockLessons)
+  const [file, setFile] = useState<File | null>(null)
   const videosPerPage = 5
+
+  const courseQuery = useCourseQuery(pagination.LIMIT, pagination.PAGE)
+  const courseList = useMemo(() => {
+    return (
+      courseQuery.data?.payload.data.data.map((course) => ({
+        id: course.id,
+        title: course.title
+      })) || []
+    )
+  }, [courseQuery.data])
+  const [selectedCourse, setSelectedCourse] = useState('')
+  const lessonByIdQuery = useLessonByIdQuery(pagination.PAGE, pagination.LIMIT, selectedCourse)
+
+  const data = lessonByIdQuery.data?.payload.data.data || []
+  const video = data.flatMap((lesson) => lesson.videos)
+  const [videos, setVideos] = useState(video)
+
+  useEffect(() => {
+    const video = data.flatMap((lesson) => lesson.videos)
+    if (JSON.stringify(video) !== JSON.stringify(videos)) {
+      setVideos(video)
+    }
+  }, [data])
+
+  const [lessons, setLessons] = useState<LessonType[]>([])
+
+  useEffect(() => {
+    if (data && Array.isArray(data)) {
+      setLessons((prevLessons) => {
+        return JSON.stringify(prevLessons) !== JSON.stringify(data) ? data : prevLessons
+      })
+    }
+  }, [data])
+
+  const addVideoMutation = useAddVideoMutation()
+  const uploadVideoMediaMutation = useUploadVideoMediaMutation()
+
+  const form = useForm<VideoTypeBody>({
+    resolver: zodResolver(videoSchema),
+    defaultValues: {
+      courseId: '',
+      description: '',
+      duration: undefined,
+      lessonId: '',
+      orderLesson: undefined,
+      title: '',
+      videoUrl: ''
+    }
+  })
+
+  {
+    Object.keys(form.formState.errors).length > 0 && (
+      <p className='text-red-500 text-sm'>Có lỗi trong form, vui lòng kiểm tra lại.</p>
+    )
+  }
+
+  const onSubmit = async (values: VideoTypeBody) => {
+    if (addVideoMutation.isPending) return
+
+    try {
+      let videoUrl = values.videoUrl
+
+      if (file) {
+        const formData = new FormData()
+        formData.append('file', file)
+        const uploadResponse = await uploadVideoMediaMutation.mutateAsync(formData)
+
+        if (!uploadResponse?.payload?.data?.url) {
+          throw new Error('Upload failed: No valid URL received')
+        }
+
+        videoUrl = uploadResponse.payload.data.url
+      }
+
+      const body: VideoTypeBody = {
+        ...values,
+        videoUrl
+      }
+
+      await addVideoMutation.mutateAsync(body)
+
+      toast.success('create video success')
+      setIsAddVideoOpen(false)
+    } catch (error) {
+      handleErrorApi({
+        error,
+        setError: form.setError
+      })
+    }
+  }
+
+  const { mutateAsync } = useDeleteVideoMutation()
+  const deleteVideo = async (id: string) => {
+    if (id) {
+      try {
+        await mutateAsync(id)
+
+        toast.success('Delete Video Successfully')
+      } catch (error) {
+        handleErrorApi({
+          error
+        })
+      }
+    }
+  }
 
   // Filter videos based on search, course, lesson, and status
   const filteredVideos = videos.filter((video) => {
     const matchesSearch =
       video.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      video.courseName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      video.lessonTitle.toLowerCase().includes(searchTerm.toLowerCase())
+      video.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      video.title.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesCourse = selectedCourse === 'all' || video.courseId === selectedCourse
     const matchesLesson = selectedLesson === 'all' || video.lessonId === selectedLesson
-    const matchesStatus = selectedStatus === 'all' || video.status === selectedStatus
+    const matchesStatus = selectedStatus === 'all' || video.id === selectedStatus
 
     return matchesSearch && matchesCourse && matchesLesson && matchesStatus
   })
@@ -244,11 +249,11 @@ export default function VideosPage() {
       title: video.title,
       courseId: video.courseId,
       lessonId: video.lessonId,
-      order: video.order,
-      description: video.description,
-      url: video.url,
+      order: video.orderLesson,
+      description: video.description || '',
+      url: video.videoUrl,
       duration: video.duration,
-      status: video.status
+      status: video.id
     })
 
     // Update filtered lessons for the selected course
@@ -256,23 +261,6 @@ export default function VideosPage() {
     setFilteredLessons(lessonsForCourse)
 
     setIsEditVideoOpen(true)
-  }
-
-  // Handle add new video
-  const handleAddVideo = () => {
-    setCurrentVideo(null)
-    setFormData({
-      id: '',
-      title: '',
-      courseId: '',
-      lessonId: '',
-      order: 1,
-      description: '',
-      url: '',
-      duration: 0,
-      status: 'draft'
-    })
-    setIsAddVideoOpen(true)
   }
 
   // Handle preview video
@@ -334,14 +322,11 @@ export default function VideosPage() {
         id: Date.now().toString(),
         title: formData.title,
         courseId: formData.courseId,
-        courseName: mockCourses.find((c) => c.id === formData.courseId)?.name || '',
         lessonId: formData.lessonId,
-        lessonTitle: mockLessons.find((l) => l.id === formData.lessonId)?.title || '',
-        order: Number(formData.order),
+        orderLesson: Number(formData.order),
         description: formData.description,
-        url: formData.url,
+        videoUrl: formData.url,
         duration: Number(formData.duration),
-        status: formData.status,
         createdAt: now,
         updatedAt: now
       }
@@ -435,7 +420,6 @@ export default function VideosPage() {
     const exportData = filteredVideos.map((video) => ({
       ...video,
       duration: formatDuration(video.duration),
-      status: video.status === 'published' ? 'Đã xuất bản' : 'Bản nháp',
       createdAt: formatDate(video.createdAt),
       updatedAt: formatDate(video.updatedAt)
     }))
@@ -446,6 +430,11 @@ export default function VideosPage() {
       data: exportData,
       columns: columns
     })
+  }
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0]
+    setFile(selectedFile || null)
   }
 
   return (
@@ -482,21 +471,21 @@ export default function VideosPage() {
                     Điền thông tin để thêm video mới vào bài học
                   </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={form.handleSubmit(onSubmit)}>
                   <div className='grid grid-cols-1 md:grid-cols-2 gap-4 py-4'>
                     <div className='space-y-2 md:col-span-2'>
                       <Label htmlFor='title' className='text-white'>
-                        Tiêu đề video
+                        Tiêu đề bài học
                       </Label>
                       <Input
+                        {...form.register('title')}
                         id='title'
-                        name='title'
-                        placeholder='Nhập tiêu đề video'
-                        className='bg-gray-800 border-gray-700 text-white'
-                        value={formData.title}
-                        onChange={handleInputChange}
-                        required
+                        placeholder='Nhập tiêu đề bài học'
+                        className={`bg-gray-800 border text-white ${form.formState.errors.title ? 'border-red-500' : 'border-gray-700'}`}
                       />
+                      {form.formState.errors.title && (
+                        <p className='text-red-500 text-sm'>{form.formState.errors.title.message}</p>
+                      )}
                     </div>
 
                     <div className='space-y-2'>
@@ -504,46 +493,54 @@ export default function VideosPage() {
                         Khóa học
                       </Label>
                       <Select
-                        name='courseId'
-                        value={formData.courseId}
-                        onValueChange={(value) => handleSelectChange('courseId', value)}
-                        required
+                        onValueChange={(value) => {
+                          setSelectedCourse(value)
+                          form.setValue('courseId', value)
+                        }}
                       >
-                        <SelectTrigger id='courseId' className='bg-gray-800 border-gray-700 text-white'>
+                        <SelectTrigger
+                          id='courseId'
+                          className={`bg-gray-800 border text-white 
+                                              ${form.formState.errors.courseId ? 'border-red-500' : 'border-gray-700'}`}
+                        >
                           <SelectValue placeholder='Chọn khóa học' />
                         </SelectTrigger>
                         <SelectContent className='bg-gray-800 border-gray-700 text-white'>
-                          {mockCourses.map((course) => (
+                          {courseList.map((course) => (
                             <SelectItem key={course.id} value={course.id}>
-                              {course.name}
+                              {course.title}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
+                      {form.formState.errors.courseId && (
+                        <p className='text-red-500 text-sm'>{form.formState.errors.courseId.message}</p>
+                      )}
                     </div>
 
                     <div className='space-y-2'>
                       <Label htmlFor='lessonId' className='text-white'>
                         Bài học
                       </Label>
-                      <Select
-                        name='lessonId'
-                        value={formData.lessonId}
-                        onValueChange={(value) => handleSelectChange('lessonId', value)}
-                        required
-                        disabled={!formData.courseId}
-                      >
-                        <SelectTrigger id='lessonId' className='bg-gray-800 border-gray-700 text-white'>
-                          <SelectValue placeholder={formData.courseId ? 'Chọn bài học' : 'Chọn khóa học trước'} />
+                      <Select onValueChange={(value) => form.setValue('lessonId', value)}>
+                        <SelectTrigger
+                          id='lessonId'
+                          className={`bg-gray-800 border text-white 
+                                              ${form.formState.errors.courseId ? 'border-red-500' : 'border-gray-700'}`}
+                        >
+                          <SelectValue placeholder='Chọn khóa học' />
                         </SelectTrigger>
                         <SelectContent className='bg-gray-800 border-gray-700 text-white'>
-                          {filteredLessons.map((lesson) => (
+                          {lessons.map((lesson) => (
                             <SelectItem key={lesson.id} value={lesson.id}>
                               {lesson.title}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
+                      {form.formState.errors.courseId && (
+                        <p className='text-red-500 text-sm'>{form.formState.errors.courseId.message}</p>
+                      )}
                     </div>
 
                     <div className='space-y-2 md:col-span-2'>
@@ -551,46 +548,44 @@ export default function VideosPage() {
                         Mô tả video
                       </Label>
                       <Textarea
+                        {...form.register('description')}
                         id='description'
-                        name='description'
-                        placeholder='Nhập mô tả chi tiết của video'
-                        className='bg-gray-800 border-gray-700 text-white min-h-[120px]'
-                        value={formData.description}
-                        onChange={handleInputChange}
-                        required
+                        placeholder='Nhập mô tả video'
+                        className={`bg-gray-800 border text-white ${form.formState.errors.description ? 'border-red-500' : 'border-gray-700'}`}
                       />
+                      {form.formState.errors.description && (
+                        <p className='text-red-500 text-sm'>{form.formState.errors.description.message}</p>
+                      )}
                     </div>
 
                     <div className='space-y-2 md:col-span-2'>
-                      <Label htmlFor='url' className='text-white'>
-                        URL video
+                      <Label htmlFor='videoUrl' className='text-white'>
+                        Upload Video
                       </Label>
                       <Input
-                        id='url'
-                        name='url'
-                        type='url'
-                        placeholder='https://www.youtube.com/watch?v=MVMoBwPdbiI&list=RDMVMoBwPdbiI&start_radio=1'
+                        type='file'
+                        accept='video/*'
                         className='bg-gray-800 border-gray-700 text-white'
-                        value={formData.url}
-                        onChange={handleInputChange}
-                        required
+                        onChange={handleFileChange}
                       />
+
+                      {file && <p className='text-white'>File selected: {file.name}</p>}
                     </div>
 
                     <div className='space-y-2'>
-                      <Label htmlFor='order' className='text-white'>
+                      <Label htmlFor='orderLesson' className='text-white'>
                         Thứ tự video
                       </Label>
                       <Input
-                        id='order'
-                        name='order'
+                        {...form.register('orderLesson', { valueAsNumber: true })}
+                        id='orderLesson'
                         type='number'
                         min='1'
-                        className='bg-gray-800 border-gray-700 text-white'
-                        value={formData.order}
-                        onChange={handleInputChange}
-                        required
+                        className={`bg-gray-800 border text-white ${form.formState.errors.orderLesson ? 'border-red-500' : 'border-gray-700'}`}
                       />
+                      {form.formState.errors.orderLesson && (
+                        <p className='text-red-500 text-sm'>{form.formState.errors.orderLesson.message}</p>
+                      )}
                     </div>
 
                     <div className='space-y-2'>
@@ -598,34 +593,15 @@ export default function VideosPage() {
                         Thời lượng (giây)
                       </Label>
                       <Input
+                        {...form.register('duration', { valueAsNumber: true })}
                         id='duration'
-                        name='duration'
                         type='number'
                         min='1'
-                        className='bg-gray-800 border-gray-700 text-white'
-                        value={formData.duration}
-                        onChange={handleInputChange}
-                        required
+                        className={`bg-gray-800 border text-white ${form.formState.errors.duration ? 'border-red-500' : 'border-gray-700'}`}
                       />
-                    </div>
-
-                    <div className='space-y-2'>
-                      <Label htmlFor='status' className='text-white'>
-                        Trạng thái
-                      </Label>
-                      <Select
-                        name='status'
-                        value={formData.status}
-                        onValueChange={(value) => handleSelectChange('status', value)}
-                      >
-                        <SelectTrigger id='status' className='bg-gray-800 border-gray-700 text-white'>
-                          <SelectValue placeholder='Chọn trạng thái' />
-                        </SelectTrigger>
-                        <SelectContent className='bg-gray-800 border-gray-700 text-white'>
-                          <SelectItem value='draft'>Bản nháp</SelectItem>
-                          <SelectItem value='published'>Đã xuất bản</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      {form.formState.errors.duration && (
+                        <p className='text-red-500 text-sm'>{form.formState.errors.duration.message}</p>
+                      )}
                     </div>
                   </div>
 
@@ -684,9 +660,9 @@ export default function VideosPage() {
                   </SelectTrigger>
                   <SelectContent className='bg-gray-800 border-gray-700 text-white'>
                     <SelectItem value='all'>Tất cả khóa học</SelectItem>
-                    {mockCourses.map((course) => (
+                    {courseList.map((course) => (
                       <SelectItem key={course.id} value={course.id}>
-                        {course.name}
+                        {course.title}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -768,87 +744,54 @@ export default function VideosPage() {
             </div>
           </CardHeader>
           <CardContent className='p-4 sm:p-6 pt-0'>
-            {/* Responsive Table with Horizontal Scroll */}
             <div className='overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0'>
-              <table className='w-full min-w-[800px]'>
+              <table className='w-full min-w-[800px] border-collapse'>
                 <thead>
-                  <tr className='border-b border-gray-800'>
-                    <th className='text-left py-2 sm:py-3 px-2 sm:px-4'>
+                  <tr className='border-b border-gray-700 bg-gray-900 text-white'>
+                    <th className='py-3 px-4 w-12 text-center'>
                       <Checkbox
                         checked={selectedVideos.length === currentVideos.length && currentVideos.length > 0}
                         onCheckedChange={handleSelectAll}
                         className='border-gray-600'
                       />
                     </th>
-                    <th className='text-left py-2 sm:py-3 px-2 sm:px-4 text-gray-400 font-medium text-xs sm:text-sm'>
-                      Tiêu đề video
-                    </th>
-                    <th className='text-left py-2 sm:py-3 px-2 sm:px-4 text-gray-400 font-medium text-xs sm:text-sm'>
-                      Bài học
-                    </th>
-                    <th className='text-left py-2 sm:py-3 px-2 sm:px-4 text-gray-400 font-medium text-xs sm:text-sm'>
-                      Khóa học
-                    </th>
-                    <th className='text-left py-2 sm:py-3 px-2 sm:px-4 text-gray-400 font-medium text-xs sm:text-sm'>
-                      Thời lượng
-                    </th>
-                    <th className='text-left py-2 sm:py-3 px-2 sm:px-4 text-gray-400 font-medium text-xs sm:text-sm'>
-                      Trạng thái
-                    </th>
-                    <th className='text-left py-2 sm:py-3 px-2 sm:px-4 text-gray-400 font-medium text-xs sm:text-sm'>
-                      Hành động
-                    </th>
+                    <th className='py-3 px-4 w-1/3 text-left text-sm font-medium text-gray-300'>Tiêu đề video</th>
+                    <th className='py-3 px-4 w-1/4 text-left text-sm font-medium text-gray-300'>Bài học</th>
+                    <th className='py-3 px-4 w-1/6 text-center text-sm font-medium text-gray-300'>Thời lượng</th>
+                    <th className='py-3 px-4 w-1/6 text-center text-sm font-medium text-gray-300'>Hành động</th>
                   </tr>
                 </thead>
                 <tbody>
                   {currentVideos.length > 0 ? (
                     currentVideos.map((video) => (
-                      <tr key={video.id} className='border-b border-gray-800 hover:bg-gray-800/50'>
-                        <td className='py-2 sm:py-3 px-2 sm:px-4'>
+                      <tr key={video.id} className='border-b border-gray-700 hover:bg-gray-800'>
+                        <td className='py-3 px-4 text-center'>
                           <Checkbox
                             checked={selectedVideos.includes(video.id)}
                             onCheckedChange={() => handleSelectVideo(video.id)}
                             className='border-gray-600'
                           />
                         </td>
-                        <td className='py-2 sm:py-3 px-2 sm:px-4'>
-                          <div className='flex items-center'>
-                            <div className='w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-purple-600 flex items-center justify-center mr-2 sm:mr-3'>
-                              <Icons.Video className='h-3 w-3 sm:h-4 sm:w-4 text-white' />
-                            </div>
-                            <div>
-                              <div className='font-medium text-xs sm:text-sm'>{video.title}</div>
-                              <div className='text-xs text-gray-400'>Tạo: {formatDate(video.createdAt)}</div>
-                            </div>
+                        <td className='py-3 px-4 flex items-center space-x-3'>
+                          <div className='w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center'>
+                            <Icons.Video className='w-4 h-4 text-white' />
+                          </div>
+                          <div>
+                            <div className='text-sm font-medium'>{video.title}</div>
+                            <div className='text-xs text-gray-400'>Tạo: {formatDate(video.createdAt)}</div>
                           </div>
                         </td>
-                        <td className='py-2 sm:py-3 px-2 sm:px-4 text-gray-300 text-xs sm:text-sm'>
-                          {video.lessonTitle}
-                        </td>
-                        <td className='py-2 sm:py-3 px-2 sm:px-4 text-gray-300 text-xs sm:text-sm'>
-                          {video.courseName}
-                        </td>
-                        <td className='py-2 sm:py-3 px-2 sm:px-4 text-gray-300 text-xs sm:text-sm'>
+                        <td className='py-3 px-4 text-sm text-gray-300'>{video.title}</td>
+                        <td className='py-3 px-4 text-sm text-center text-gray-300'>
                           {formatDuration(video.duration)}
                         </td>
-                        <td className='py-2 sm:py-3 px-2 sm:px-4'>
-                          <Badge
-                            className={`text-xs ${
-                              video.status === 'published'
-                                ? 'bg-green-900/30 text-green-500 hover:bg-green-900/40'
-                                : 'bg-yellow-900/30 text-yellow-500 hover:bg-yellow-900/40'
-                            }`}
-                          >
-                            {video.status === 'published' ? 'Đã xuất bản' : 'Bản nháp'}
-                          </Badge>
-                        </td>
-                        <td className='py-2 sm:py-3 px-2 sm:px-4'>
-                          <div className='flex items-center gap-1'>
+                        <td className='py-3 px-4 text-center'>
+                          <div className='flex items-center justify-center space-x-2'>
                             <Button
                               variant='ghost'
                               size='icon'
-                              className='h-7 w-7 sm:h-8 sm:w-8 text-green-400 hover:text-white hover:bg-gray-800'
-                              onClick={() => handlePreviewVideo(video.url)}
+                              className='h-8 w-8 text-green-400 hover:text-white hover:bg-gray-800'
+                              onClick={() => handlePreviewVideo(video.videoUrl)}
                             >
                               <Icons.Play className='h-4 w-4' />
                             </Button>
@@ -857,37 +800,26 @@ export default function VideosPage() {
                                 <Button
                                   variant='ghost'
                                   size='icon'
-                                  className='h-7 w-7 sm:h-8 sm:w-8 text-gray-400 hover:text-white hover:bg-gray-800'
+                                  className='h-8 w-8 text-gray-400 hover:text-white hover:bg-gray-800'
                                 >
                                   <Icons.MoreHorizontal className='h-4 w-4' />
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent className='bg-gray-800 border-gray-700 text-white'>
-                                <DropdownMenuLabel className='text-xs sm:text-sm'>Hành động</DropdownMenuLabel>
+                                <DropdownMenuLabel className='text-sm'>Hành động</DropdownMenuLabel>
                                 <DropdownMenuSeparator className='bg-gray-700' />
                                 <DropdownMenuItem
-                                  className='hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'
+                                  className='hover:bg-gray-700 cursor-pointer text-sm'
                                   onClick={() => handleEditVideo(video)}
                                 >
-                                  <Icons.Edit className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Chỉnh sửa
-                                </DropdownMenuItem>
-                                <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'>
-                                  {video.status === 'published' ? (
-                                    <>
-                                      <Icons.XCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Chuyển bản nháp
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Icons.CheckCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Xuất bản
-                                    </>
-                                  )}
+                                  <Icons.Edit className='h-4 w-4 mr-2' /> Chỉnh sửa
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator className='bg-gray-700' />
                                 <DropdownMenuItem
-                                  className='text-red-500 hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'
-                                  onClick={() => handleDeleteVideo(video.id)}
+                                  className='text-red-500 hover:bg-gray-700 cursor-pointer text-sm'
+                                  onClick={() => deleteVideo(video.id)}
                                 >
-                                  <Icons.Trash2 className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Xóa
+                                  <Icons.Trash2 className='h-4 w-4 mr-2' /> Xóa
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -897,7 +829,7 @@ export default function VideosPage() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={7} className='text-center py-6 text-gray-400'>
+                      <td colSpan={5} className='text-center py-6 text-gray-400'>
                         Không tìm thấy video nào
                       </td>
                     </tr>
@@ -912,13 +844,13 @@ export default function VideosPage() {
                 Hiển thị {indexOfFirstVideo + 1}-{Math.min(indexOfLastVideo, filteredVideos.length)} trong số{' '}
                 {filteredVideos.length} video
               </div>
-              <div className='flex items-center space-x-1 sm:space-x-2 order-1 sm:order-2'>
+              <div className='flex items-center space-x-2 order-1 sm:order-2'>
                 <Button
                   variant='outline'
                   size='icon'
                   onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                   disabled={currentPage === 1}
-                  className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white h-8 w-8 sm:h-9 sm:w-9'
+                  className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white h-9 w-9'
                 >
                   <Icons.ChevronLeft className='h-4 w-4' />
                 </Button>
@@ -942,7 +874,7 @@ export default function VideosPage() {
                   size='icon'
                   onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                   disabled={currentPage === totalPages}
-                  className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white h-8 w-8 sm:h-9 sm:w-9'
+                  className='bg-gray-800 border-gray-700 hover:bg-gray-700 text-white h-9 w-9'
                 >
                   <Icons.ChevronRight className='h-4 w-4' />
                 </Button>

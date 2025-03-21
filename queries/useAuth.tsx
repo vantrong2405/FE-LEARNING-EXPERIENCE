@@ -75,3 +75,9 @@ export const useDeleteMutation = () => {
     }
   })
 }
+
+export const useChangeStatusMutation = () => {
+  return useMutation({
+    mutationFn: authApiRequest.changeStatus
+  })
+}

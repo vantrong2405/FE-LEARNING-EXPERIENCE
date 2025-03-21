@@ -12,6 +12,7 @@ import {
   RegisterBodyType,
   RegisterRes,
   ResetPasswordBodyType,
+  StatusBodyType,
   VerifyBodyType,
   VerifyEmailPasswordBodyType,
   VerifyResType
@@ -34,6 +35,7 @@ const authApiRequest = {
   updateMe: (body: MeBodyType) => http.post<GetMeResType>('auth/update-me', body),
   changePassword: (body: ChangePasswordBodyType) => http.post('auth/change-password', body),
   list: () => http.get<GetListMeResType>('/auth/users'),
-  delete: (id: string) => http.delete(`auth/users/${id}`)
+  delete: (id: string) => http.delete(`auth/users/${id}`),
+  changeStatus: (body: StatusBodyType) => http.patch('auth/status-account', body)
 }
 export default authApiRequest

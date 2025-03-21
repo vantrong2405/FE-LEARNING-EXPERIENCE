@@ -26,10 +26,16 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { exportToExcel } from '@/lib/excel'
-import { useDeleteMutation, useGetListQuery, useRegisterMutation, useUpdateMeMutation } from '@/queries/useAuth'
+import {
+  useChangeStatusMutation,
+  useDeleteMutation,
+  useGetListQuery,
+  useRegisterMutation,
+  useUpdateMeMutation
+} from '@/queries/useAuth'
 import { cn, formatDate, handleErrorApi } from '@/lib/utils'
 import { useForm } from 'react-hook-form'
-import { MeBody, MeBodyType, RegisterBody, RegisterBodyType } from '@/schemaValidator/auth.schema'
+import { MeBody, MeBodyType, RegisterBody, RegisterBodyType, StatusBodyType } from '@/schemaValidator/auth.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -54,13 +60,15 @@ export default function UsersPage() {
   const registerMutation = useRegisterMutation()
   const users = getListQuery.data?.payload.data ?? []
 
+  const changeStatusMutation = useChangeStatusMutation()
+
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesRole = selectedRole === 'all' || user.role.toLowerCase() === selectedRole.toLowerCase()
     const matchesStatus =
-      selectedStatus === 'all' || (user.verify === 1 ? 'active' : 'unactive') === selectedStatus.toLowerCase()
+      selectedStatus === 'all' || (user.status_account === 1 ? 'active' : 'unactive') === selectedStatus.toLowerCase()
 
     return matchesSearch && matchesRole && matchesStatus
   })
@@ -97,11 +105,9 @@ export default function UsersPage() {
     }
   }, [currentUser, form.reset])
 
-  const handleUpdate = (body: MeBodyType) => {
-    updateMeMutation.mutate(body, {
-      onSuccess: () => {
-        toast.success('Update Account Success!')
-      },
+  const handleChangeStatus = (body: StatusBodyType) => {
+    changeStatusMutation.mutate(body, {
+      onSuccess: () => {},
       onError: (error) => {
         handleErrorApi({
           error,
@@ -186,7 +192,7 @@ export default function UsersPage() {
     const exportData = filteredUsers.map((user) => ({
       ...user,
       role: user.role === 'Admin' ? 'Quản trị viên' : user.role === 'Instructor' ? 'Giảng viên' : 'Học viên',
-      status: user.verify === 1 ? 'Kích hoạt' : user.verify === 0 ? 'Tạm khóa' : 'Chờ xác nhận'
+      status: user.status_account === 1 ? 'Kích hoạt' : user.status_account === 0 ? 'Tạm khóa' : 'Chờ xác nhận'
     }))
 
     exportToExcel({
@@ -549,14 +555,18 @@ export default function UsersPage() {
                       <td className='py-2 sm:py-3 px-2 sm:px-4'>
                         <Badge
                           className={`text-xs ${
-                            user.verify === 1
+                            user.status_account === 1
                               ? 'bg-green-900/30 text-green-500 hover:bg-green-900/40'
-                              : user.verify === 0
+                              : user.status_account === 0
                                 ? 'bg-red-900/30 text-red-500 hover:bg-red-900/40'
                                 : 'bg-yellow-900/30 text-yellow-500 hover:bg-yellow-900/40'
                           }`}
                         >
-                          {user.verify === 1 ? 'Kích hoạt' : user.verify === 0 ? 'Tạm khóa' : 'Chờ xác nhận'}
+                          {user.status_account === 1
+                            ? 'Kích hoạt'
+                            : user.status_account === 0
+                              ? 'Tạm khóa'
+                              : 'Chờ xác nhận'}
                         </Badge>
                       </td>
                       <td className='py-2 sm:py-3 px-2 sm:px-4 text-gray-300 text-xs sm:text-sm'>
@@ -582,8 +592,15 @@ export default function UsersPage() {
                             >
                               <Icons.Edit className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Chỉnh sửa
                             </DropdownMenuItem>
-                            <DropdownMenuItem className='hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'>
-                              {user.verify === 1 ? (
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleChangeStatus({
+                                  userId: user.id
+                                })
+                              }
+                              className='hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'
+                            >
+                              {user.status_account === 1 ? (
                                 <>
                                   <Icons.XCircle className='h-3 w-3 sm:h-4 sm:w-4 mr-2' /> Tạm khóa
                                 </>
@@ -593,6 +610,7 @@ export default function UsersPage() {
                                 </>
                               )}
                             </DropdownMenuItem>
+
                             <DropdownMenuSeparator className='bg-gray-700' />
                             <DropdownMenuItem
                               className='text-red-500 hover:bg-gray-700 cursor-pointer text-xs sm:text-sm'
@@ -749,12 +767,7 @@ export default function UsersPage() {
                 >
                   Hủy
                 </Button>
-                <Button
-                  onClick={form.handleSubmit(handleUpdate)}
-                  className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto'
-                >
-                  Lưu thay đổi
-                </Button>
+                <Button className='bg-purple-600 hover:bg-purple-700 w-full sm:w-auto'>Lưu thay đổi</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
